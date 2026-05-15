@@ -1,0 +1,14 @@
+{
+  "_comment": "Add the block inside 'hooks.PostToolUse' in your project's .claude/settings.json (or ~/.claude/settings.json for global). Merge with any existing PostToolUse hooks — do not replace them.",
+  "PostToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "file=\"$CLAUDE_TOOL_RESULT_FILE_PATH\"; if [[ \"$file\" == */docs/plans/*.md || \"$file\" == */docs/architecture.md || \"$file\" == */docs/*.md ]]; then echo \"⚠  html-artifacts: source doc changed — run 'html-artifacts refresh' to update docs/html/\"; fi"
+        }
+      ]
+    }
+  ]
+}

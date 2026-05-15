@@ -1,0 +1,344 @@
+<!-- html-artifacts: product-brief example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-15T00:00:00Z | source: examples/product-brief.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acme Sync — Product Brief</title>
+  <style>
+    :root {
+      --bg:#FAF9F5; --fg:#141413; --accent:#D97757; --secondary:#E3DACC; --tertiary:#788C5D;
+      --g100:#F5F4F0; --g300:#D1CFC8; --g500:#8A887F; --g700:#3D3C38;
+      --font-serif:Georgia,'Times New Roman',serif;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      --font-mono:'SF Mono',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--g300);
+      padding: 0 32px; display: flex; align-items: center; gap: 32px; height: 48px;
+    }
+    .nav-brand { font-family: var(--font-serif); font-size: 16px; font-weight: normal; color: var(--fg); text-decoration: none; white-space: nowrap; }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a { color: var(--g500); text-decoration: none; font-size: 13px; letter-spacing: 0.02em; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); letter-spacing: 0.05em; }
+
+    /* Layout */
+    main { max-width: 860px; margin: 0 auto; padding: 48px 32px 96px; }
+    section { margin-bottom: 64px; }
+    h1 { font-family: var(--font-serif); font-size: 36px; font-weight: normal; line-height: 1.2; margin-bottom: 8px; }
+    h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g500); margin-bottom: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--g300); }
+    h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--fg); }
+    p { color: var(--g700); margin-bottom: 12px; }
+
+    /* Hero */
+    .hero { padding: 48px 0 32px; }
+    .tagline { font-family: var(--font-serif); font-size: 24px; font-weight: normal; color: var(--fg); margin-bottom: 16px; max-width: 560px; }
+    .value-prop { font-size: 15px; color: var(--g700); max-width: 560px; line-height: 1.7; }
+    .pill { display: inline-block; background: var(--g100); border: 1px solid var(--g300); border-radius: 100px; padding: 4px 12px; font-size: 12px; color: var(--g500); margin-top: 16px; margin-right: 8px; }
+    .pill-accent { background: #FDF0EB; border-color: #F3C4AE; color: var(--accent); }
+
+    /* Persona cards */
+    .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .persona-card {
+      background: var(--g100); border: 1px solid var(--g300); border-radius: var(--radius-lg);
+      padding: 24px; position: relative; overflow: hidden;
+    }
+    .persona-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent);
+    }
+    .persona-role { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g500); margin-bottom: 4px; }
+    .persona-name { font-size: 18px; font-family: var(--font-serif); margin-bottom: 12px; }
+    .persona-need { font-size: 13px; color: var(--g700); margin-bottom: 8px; }
+    .persona-pain { font-size: 12px; color: var(--accent); display: flex; align-items: flex-start; gap: 6px; }
+    .persona-pain::before { content: '!'; display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #FDF0EB; text-align: center; line-height: 16px; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* Architecture */
+    .arch-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin-bottom: 24px; }
+    .arch-node {
+      background: #fff; border: 1px solid var(--g300); border-radius: var(--radius-md);
+      padding: 12px 16px; text-align: center; min-width: 112px;
+    }
+    .arch-node-label { font-size: 12px; font-weight: 600; color: var(--fg); }
+    .arch-node-sub { font-size: 11px; color: var(--g500); margin-top: 2px; }
+    .arch-node.accent { background: #FDF0EB; border-color: #F3C4AE; }
+    .arch-arrow { color: var(--g300); font-size: 20px; padding: 0 4px; flex-shrink: 0; }
+    .arch-state { margin-top: 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--g500); }
+    .arch-state-box { background: var(--g100); border: 1px solid var(--g300); border-radius: var(--radius-sm); padding: 4px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--g700); }
+
+    /* Roadmap */
+    .timeline { position: relative; padding: 24px 0; }
+    .timeline-track { position: absolute; top: 40px; left: 0; right: 0; height: 2px; background: var(--g300); }
+    .timeline-phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; position: relative; }
+    .timeline-phase { padding-top: 48px; }
+    .timeline-dot {
+      position: absolute; top: 32px; width: 16px; height: 16px;
+      border-radius: 50%; border: 2px solid var(--g300); background: var(--bg);
+    }
+    .timeline-phase:nth-child(1) .timeline-dot { left: calc(16.66% - 8px); background: var(--accent); border-color: var(--accent); }
+    .timeline-phase:nth-child(2) .timeline-dot { left: calc(50% - 8px); border-color: var(--fg); }
+    .timeline-phase:nth-child(3) .timeline-dot { left: calc(83.33% - 8px); }
+    .timeline-phase-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--g500); margin-bottom: 8px; }
+    .timeline-phase-title { font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 8px; }
+    .timeline-items { list-style: none; font-size: 13px; color: var(--g700); }
+    .timeline-items li { padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+    .timeline-items li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--g300); flex-shrink: 0; }
+    .timeline-phase.shipped .timeline-items li::before { background: var(--tertiary); }
+
+    /* Risks table */
+    .risk-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .risk-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--g500); border-bottom: 1px solid var(--g300); }
+    .risk-table td { padding: 12px; border-bottom: 1px solid var(--g100); vertical-align: top; }
+    .risk-table tr:last-child td { border-bottom: none; }
+    .risk-table tr:hover td { background: var(--g100); }
+    .badge { display: inline-block; border-radius: var(--radius-sm); padding: 2px 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.03em; }
+    .badge-high { background: #FDECEA; color: #C0392B; }
+    .badge-med { background: #FEF3CD; color: #9A6700; }
+    .badge-low { background: #EAF4EC; color: #276738; }
+    .risk-name { font-weight: 500; color: var(--fg); }
+    .risk-mitigation { font-size: 12px; color: var(--g500); margin-top: 4px; }
+
+    /* Collapsible */
+    details { border: 1px solid var(--g300); border-radius: var(--radius-md); margin-bottom: 8px; overflow: hidden; }
+    details summary { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--fg); list-style: none; display: flex; justify-content: space-between; align-items: center; background: var(--g100); user-select: none; }
+    details summary::after { content: '+'; font-size: 18px; color: var(--g500); transition: transform 0.2s; }
+    details[open] summary::after { content: '−'; }
+    details > div { padding: 16px; font-size: 13px; color: var(--g700); line-height: 1.7; }
+
+    @media (max-width: 640px) {
+      .persona-grid { grid-template-columns: 1fr; }
+      .timeline-phases { grid-template-columns: 1fr; }
+      .timeline-track { display: none; }
+      .timeline-phase { padding-top: 8px; }
+      .timeline-dot { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#overview">Acme Sync</a>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#personas">Personas</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#risks">Risks</a></li>
+  </ul>
+  <span class="nav-badge">v1.0</span>
+</nav>
+
+<main>
+
+  <!-- Overview -->
+  <section id="overview" class="hero">
+    <h1>Acme Sync</h1>
+    <p class="tagline">Sync your project files across machines without thinking about it.</p>
+    <p class="value-prop">Zero-config, git-aware file sync. Works offline and reconciles automatically on reconnect. Drop it in any project directory and walk away — your files follow you.</p>
+    <div>
+      <span class="pill pill-accent">CLI-first</span>
+      <span class="pill">Git-aware</span>
+      <span class="pill">Offline-ready</span>
+      <span class="pill">S3-compatible</span>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <h2>Additional Context</h2>
+      <details>
+        <summary>What "git-aware" means in practice</summary>
+        <div>Acme Sync reads <code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">.gitignore</code> and respects it by default. Patterns in <code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">.syncignore</code> extend that. Binary files in <code>node_modules/</code>, <code>dist/</code>, and build artifacts are never synced unless explicitly opted in.</div>
+      </details>
+      <details>
+        <summary>Offline reconciliation approach</summary>
+        <div>Changes made while offline are recorded in the local SQLite conflict log with a vector clock timestamp. On reconnect, the Diff Engine replays them against the remote state. Three-way merge for text; last-write-wins for binary. Conflicts that cannot be auto-resolved surface as named conflict copies (<code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">file.conflict.local</code> / <code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">file.conflict.remote</code>).</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Personas -->
+  <section id="personas">
+    <h2>Personas</h2>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-role">Backend Engineer</div>
+        <div class="persona-name">Alex</div>
+        <p class="persona-need">Needs config files, <code style="font-family:var(--font-mono);font-size:12px;">.env</code> templates, and editor settings synced across two dev boxes — home and office.</p>
+        <div class="persona-pain">Constantly re-applying the same local changes after pulling on the wrong machine.</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-role">DevOps Engineer</div>
+        <div class="persona-name">Jordan</div>
+        <p class="persona-need">Needs dotfiles and shell configs consistent across a fleet of 40 short-lived VMs that spin up from a base image.</p>
+        <div class="persona-pain">Config drift between VMs causes impossible-to-reproduce environment bugs.</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-role">Freelancer</div>
+        <div class="persona-name">Sam</div>
+        <p class="persona-need">Moves between a personal laptop and client-provided machines daily. Can't install heavy clients on client hardware.</p>
+        <div class="persona-pain">Emailing files to themselves or using USB drives — breaks flow and risks data loss.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <div class="arch-flow">
+      <div class="arch-node accent">
+        <div class="arch-node-label">CLI</div>
+        <div class="arch-node-sub">acmesync init/push/pull</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="arch-node-label">Local Watcher</div>
+        <div class="arch-node-sub">fs events</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="arch-node-label">Diff Engine</div>
+        <div class="arch-node-sub">git-aware delta</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="arch-node-label">Sync Queue</div>
+        <div class="arch-node-sub">debounced, ordered</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="arch-node-label">Remote</div>
+        <div class="arch-node-sub">S3-compatible</div>
+      </div>
+    </div>
+    <div class="arch-state">
+      <span>State store:</span>
+      <span class="arch-state-box">SQLite — conflict log + vector clocks</span>
+      <span style="color:var(--g500); font-size:13px;">local only, never synced</span>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap">
+    <h2>Roadmap</h2>
+    <div class="timeline">
+      <div class="timeline-track"></div>
+      <div class="timeline-phases">
+        <div class="timeline-phase shipped">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase-label">Shipped · v1.0</div>
+          <div class="timeline-phase-title">Core Sync</div>
+          <ul class="timeline-items">
+            <li>Basic file sync</li>
+            <li>Conflict detection</li>
+            <li>Git-aware ignore rules</li>
+            <li>Offline queue + reconcile</li>
+            <li>S3-compatible backend</li>
+          </ul>
+        </div>
+        <div class="timeline-phase">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase-label">Next · v1.1</div>
+          <div class="timeline-phase-title">Team Namespaces</div>
+          <ul class="timeline-items">
+            <li>Shared namespace support</li>
+            <li>Per-user conflict isolation</li>
+            <li>Invite flow via CLI</li>
+            <li>Audit log</li>
+          </ul>
+        </div>
+        <div class="timeline-phase">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase-label">Post-launch</div>
+          <div class="timeline-phase-title">Surface Expansion</div>
+          <ul class="timeline-items">
+            <li>GUI tray app (macOS/Win)</li>
+            <li>Mobile read-only viewer</li>
+            <li>Conflict UI in tray</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Risks -->
+  <section id="risks">
+    <h2>Risks</h2>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Risk</th>
+          <th>Likelihood</th>
+          <th>Impact</th>
+          <th>Mitigation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="risk-name">Conflict resolution UX complexity</div>
+            <div class="risk-mitigation">Users may not understand conflict copies or dismiss them, leading to data loss perception.</div>
+          </td>
+          <td><span class="badge badge-high">High</span></td>
+          <td><span class="badge badge-high">High</span></td>
+          <td>Ship interactive <code style="font-family:var(--font-mono);font-size:12px;">acmesync resolve</code> wizard in v1.0; document with video walkthrough.</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="risk-name">S3 rate limits under heavy fleets</div>
+            <div class="risk-mitigation">Jordan's 40-VM use case could burst request rates during simultaneous VM starts.</div>
+          </td>
+          <td><span class="badge badge-low">Low</span></td>
+          <td><span class="badge badge-med">Medium</span></td>
+          <td>Exponential backoff + jitter in Sync Queue; configurable <code style="font-family:var(--font-mono);font-size:12px;">--max-concurrency</code> flag.</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="risk-name">SQLite corruption on hard shutdown</div>
+            <div class="risk-mitigation">Abrupt power loss mid-write could corrupt the local conflict log.</div>
+          </td>
+          <td><span class="badge badge-low">Low</span></td>
+          <td><span class="badge badge-high">High</span></td>
+          <td>Enable WAL mode + <code style="font-family:var(--font-mono);font-size:12px;">PRAGMA synchronous=NORMAL</code>; auto-repair on startup with <code>integrity_check</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<script>
+  // Highlight active nav link on scroll
+  (function () {
+    var sections = document.querySelectorAll('section[id]');
+    var links = document.querySelectorAll('.nav-links a');
+
+    function onScroll() {
+      var scrollY = window.scrollY + 80;
+      var current = '';
+      sections.forEach(function (sec) {
+        if (sec.offsetTop <= scrollY) {
+          current = sec.id;
+        }
+      });
+      links.forEach(function (a) {
+        if (a.getAttribute('href') === '#' + current) {
+          a.style.color = 'var(--accent)';
+        } else {
+          a.style.color = '';
+        }
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }());
+</script>
+
+</body>
+</html>

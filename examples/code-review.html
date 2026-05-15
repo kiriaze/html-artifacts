@@ -1,0 +1,593 @@
+<!-- html-artifacts: code-review example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-15T00:00:00Z | source: examples/code-review.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>feat: add three-way merge for text file conflicts — Acme Sync</title>
+  <style>
+    :root {
+      --bg: #FAF9F5;
+      --fg: #141413;
+      --accent: #D97757;
+      --secondary: #E3DACC;
+      --tertiary: #788C5D;
+      --g100: #F5F4F0;
+      --g300: #D1CFC8;
+      --g500: #8A887F;
+      --g700: #3D3C38;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--g300);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 48px;
+    }
+    .nav-brand {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--g700);
+      white-space: nowrap;
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+      overflow-x: auto;
+    }
+    .nav-links a {
+      display: block;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--g500);
+      font-size: 12px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover { background: var(--g100); color: var(--fg); }
+
+    /* ── Layout ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    /* ── PR Header ── */
+    .pr-header { margin-bottom: 32px; }
+    .pr-badge {
+      display: inline-block;
+      background: var(--tertiary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: normal;
+      color: var(--fg);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .pr-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--g500);
+    }
+    .pr-meta strong { color: var(--g700); }
+
+    /* ── Motivation ── */
+    .motivation {
+      background: var(--g100);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 12px 16px;
+      margin-bottom: 32px;
+      font-size: 13px;
+      color: var(--g700);
+    }
+    .motivation p + p { margin-top: 8px; }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 12px 16px;
+      background: var(--g100);
+      border-radius: var(--radius-md);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--g700);
+    }
+    .severity-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .sev-note   { background: #DBEAFE; color: #1E40AF; }
+    .sev-warn   { background: #FEF3C7; color: #92400E; }
+    .sev-crit   { background: #FEE2E2; color: #991B1B; }
+
+    /* ── Files changed list ── */
+    .files-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 32px;
+    }
+    .files-list li a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--g100);
+      transition: background 0.15s;
+    }
+    .files-list li a:hover { background: var(--secondary); }
+    .file-tag {
+      font-size: 10px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+    .tag-new  { background: #D1FAE5; color: #065F46; }
+    .tag-mod  { background: #FEF3C7; color: #92400E; }
+
+    /* ── File sections ── */
+    .file-section {
+      margin-bottom: 40px;
+      scroll-margin-top: 56px;
+    }
+    .file-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--g700);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      color: #fff;
+    }
+    .file-section-header .filename {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .file-section-header .file-status {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    /* ── Code blocks with annotations ── */
+    .code-wrapper {
+      position: relative;
+      overflow-x: auto;
+      background: #1E1E1E;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      border: 1px solid var(--g300);
+      border-top: none;
+    }
+    .code-block {
+      margin: 0;
+      padding: 16px 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: #D4D4D4;
+    }
+    .code-line {
+      display: flex;
+      position: relative;
+      padding: 0 16px;
+      min-width: 0;
+    }
+    .code-line:hover { background: rgba(255,255,255,0.04); }
+    .code-line.line-add { background: rgba(120, 140, 93, 0.15); }
+    .code-line.line-add::before { color: var(--tertiary); }
+    .code-line.line-del { background: rgba(217, 119, 87, 0.12); }
+    .code-line.line-del::before { color: var(--accent); }
+    .line-num {
+      min-width: 36px;
+      color: #555;
+      user-select: none;
+      font-size: 11px;
+      padding-right: 12px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .line-prefix {
+      min-width: 14px;
+      color: #888;
+      flex-shrink: 0;
+    }
+    .line-add .line-prefix { color: var(--tertiary); }
+    .line-del .line-prefix { color: var(--accent); }
+    .line-content { flex: 1; white-space: pre; }
+
+    /* annotation trigger */
+    .has-annotation { cursor: pointer; }
+    .has-annotation:hover { background: rgba(255,255,255,0.07); }
+    .annotation-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      font-family: var(--font-sans);
+      flex-shrink: 0;
+    }
+    .icon-note { background: #1E40AF; color: #fff; }
+    .icon-warn { background: #92400E; color: #fff; }
+    .icon-crit { background: #991B1B; color: #fff; }
+
+    .annotation-bubble {
+      display: none;
+      margin: 0 16px 4px 52px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--fg);
+    }
+    .annotation-bubble.visible { display: block; }
+    .bubble-note { background: #EFF6FF; border-left: 3px solid #3B82F6; }
+    .bubble-warn { background: #FFFBEB; border-left: 3px solid #F59E0B; }
+    .bubble-crit { background: #FEF2F2; border-left: 3px solid #EF4444; }
+
+    /* diff label */
+    .diff-label {
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--g500);
+      background: #282828;
+      border-bottom: 1px solid #333;
+    }
+
+    /* ── Review focus ── */
+    .review-focus {
+      margin-top: 32px;
+      padding: 16px;
+      border: 1px solid var(--secondary);
+      border-radius: var(--radius-lg);
+      background: var(--g100);
+    }
+    .review-focus h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--g700);
+      margin-bottom: 6px;
+    }
+    .review-focus p { font-size: 13px; color: var(--g500); }
+
+    /* keyword colors in code */
+    .kw  { color: #C586C0; }
+    .fn  { color: #DCDCAA; }
+    .str { color: #CE9178; }
+    .cm  { color: #6A9955; }
+    .tp  { color: #4EC9B0; }
+    .num { color: #B5CEA8; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Acme <span>Sync</span> · Code Review</div>
+  <ul class="nav-links" id="nav-links"></ul>
+</nav>
+
+<main>
+  <!-- PR Header -->
+  <header class="pr-header">
+    <div class="pr-badge">Pull Request</div>
+    <h1>feat: add three-way merge for text file conflicts</h1>
+    <div class="pr-meta">
+      <span><strong>Author:</strong> @alice</span>
+      <span><strong>Branch:</strong> feat/three-way-merge → main</span>
+      <span><strong>Files changed:</strong> 3</span>
+      <span><strong>Status:</strong> Open · Awaiting review</span>
+    </div>
+  </header>
+
+  <!-- Motivation -->
+  <div class="motivation">
+    <p><strong>Why:</strong> Previously, when two clients modified the same text file concurrently, Acme Sync resolved the conflict by keeping both copies as duplicates (e.g., <code>report.txt</code> and <code>report (conflict).txt</code>). This bloated synced directories and confused users.</p>
+    <p><strong>What:</strong> This PR introduces a three-way merge strategy using the common ancestor snapshot stored in the SQLite <code>snapshots</code> table. Text conflicts are merged in-memory; only genuinely unresolvable hunks are flagged and written to the conflict log.</p>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span style="font-size:12px;font-weight:600;color:var(--g700);margin-right:4px;">Annotations:</span>
+    <div class="legend-item"><span class="severity-pill sev-note">NOTE</span> informational, no action needed</div>
+    <div class="legend-item"><span class="severity-pill sev-warn">WARN</span> should address before merge</div>
+    <div class="legend-item"><span class="severity-pill sev-crit">CRITICAL</span> must fix before merge</div>
+  </div>
+
+  <!-- Files changed -->
+  <ul class="files-list" id="files-list"></ul>
+
+  <!-- src/conflict.ts (new) -->
+  <section class="file-section" id="file-conflict">
+    <div class="file-section-header">
+      <span class="filename">src/conflict.ts</span>
+      <span class="file-status">new file</span>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-block" id="code-conflict"></div>
+    </div>
+  </section>
+
+  <!-- src/watcher.ts (modified) -->
+  <section class="file-section" id="file-watcher">
+    <div class="file-section-header">
+      <span class="filename">src/watcher.ts</span>
+      <span class="file-status">modified</span>
+    </div>
+    <div class="code-wrapper">
+      <div class="diff-label">Before → After</div>
+      <div class="code-block" id="code-watcher"></div>
+    </div>
+  </section>
+
+  <!-- tests/conflict.test.ts (new) -->
+  <section class="file-section" id="file-test">
+    <div class="file-section-header">
+      <span class="filename">tests/conflict.test.ts</span>
+      <span class="file-status">new file</span>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-block" id="code-test"></div>
+    </div>
+  </section>
+
+  <!-- Review focus -->
+  <div class="review-focus">
+    <h3>Review Focus</h3>
+    <p>Pay attention to the ancestor lookup strategy and the binary file guard. The critical annotation on <code>flagUnresolved()</code> must be resolved before this merges — the conflict log write must happen before the function returns, not after.</p>
+  </div>
+</main>
+
+<script>
+  // ── Data ──────────────────────────────────────────────────────────────────
+
+  const FILES = [
+    { id: 'file-conflict', name: 'src/conflict.ts',         tag: 'new' },
+    { id: 'file-watcher',  name: 'src/watcher.ts',          tag: 'mod' },
+    { id: 'file-test',     name: 'tests/conflict.test.ts',  tag: 'new' },
+  ];
+
+  // Each line: { num, prefix, html, annotation? }
+  // annotation: { type: 'note'|'warn'|'crit', text }
+  const CONFLICT_LINES = [
+    { num:  1, prefix: ' ', html: '<span class="cm">// src/conflict.ts — three-way merge utilities</span>' },
+    { num:  2, prefix: ' ', html: '' },
+    { num:  3, prefix: ' ', html: '<span class="kw">import</span> { db } <span class="kw">from</span> <span class="str">\'./db\'</span>' },
+    { num:  4, prefix: ' ', html: '<span class="kw">import type</span> { Snapshot, ConflictRecord } <span class="kw">from</span> <span class="str">\'./types\'</span>' },
+    { num:  5, prefix: ' ', html: '' },
+    { num:  6, prefix: ' ', html: '<span class="cm">/** Return the nearest common ancestor snapshot for two revisions. */</span>' },
+    { num:  7, prefix: ' ', html: '<span class="kw">export async function</span> <span class="fn">findAncestor</span>(' },
+    { num:  8, prefix: ' ', html: '  revA: <span class="tp">string</span>, revB: <span class="tp">string</span>' },
+    { num:  9, prefix: ' ', html: '): <span class="tp">Promise</span>&lt;<span class="tp">Snapshot</span> | <span class="tp">null</span>&gt; {' },
+    { num: 10, prefix: ' ', html: '  <span class="kw">const</span> ancestorsA = <span class="kw">await</span> db.snapshots.where(<span class="str">\'revId\'</span>).equals(revA).toArray()' },
+    { num: 11, prefix: ' ', html: '  <span class="kw">const</span> ancestorsB = <span class="kw">await</span> db.snapshots.where(<span class="str">\'revId\'</span>).equals(revB).toArray()' },
+    { num: 12, prefix: ' ', html: '  <span class="kw">return</span> ancestorsA.find(s => ancestorsB.some(b => b.hash === s.hash)) ?? <span class="kw">null</span>',
+      annotation: { type: 'note', text: 'Ancestor lookup is O(n) on snapshot count — acceptable for now, but profile at scale. Consider a CTE or indexed ancestry table if snapshot history exceeds ~10k rows.' } },
+    { num: 13, prefix: ' ', html: '}' },
+    { num: 14, prefix: ' ', html: '' },
+    { num: 15, prefix: ' ', html: '<span class="cm">/** Perform a three-way merge and return merged text, or null on conflict. */</span>' },
+    { num: 16, prefix: ' ', html: '<span class="kw">export function</span> <span class="fn">threeWayMerge</span>(' },
+    { num: 17, prefix: ' ', html: '  base: <span class="tp">string</span>, ours: <span class="tp">string</span>, theirs: <span class="tp">string</span>' },
+    { num: 18, prefix: ' ', html: '): <span class="tp">string</span> | <span class="tp">null</span> {' },
+    { num: 19, prefix: ' ', html: '  <span class="kw">if</span> (ours === base) <span class="kw">return</span> theirs' },
+    { num: 20, prefix: ' ', html: '  <span class="kw">if</span> (theirs === base) <span class="kw">return</span> ours' },
+    { num: 21, prefix: ' ', html: '  <span class="kw">if</span> (ours === theirs) <span class="kw">return</span> ours' },
+    { num: 22, prefix: ' ', html: '  <span class="kw">const</span> merged = <span class="fn">applyDiff</span>(base, ours, theirs)' },
+    { num: 23, prefix: ' ', html: '  <span class="kw">return</span> merged.hasConflicts ? <span class="kw">null</span> : merged.text' },
+    { num: 24, prefix: ' ', html: '}' },
+    { num: 25, prefix: ' ', html: '' },
+    { num: 26, prefix: ' ', html: '<span class="cm">/** Persist an unresolvable conflict to the conflict log. */</span>' },
+    { num: 27, prefix: ' ', html: '<span class="kw">export async function</span> <span class="fn">flagUnresolved</span>(record: <span class="tp">ConflictRecord</span>): <span class="tp">Promise</span>&lt;<span class="tp">void</span>&gt; {',
+      annotation: { type: 'crit', text: 'Must write to the conflict log BEFORE returning, not after any async side-effect. The caller relies on the record existing immediately to surface it in the CLI. If the write is deferred or batched, the next "acmesync status" call will miss active conflicts.' } },
+    { num: 28, prefix: ' ', html: '  <span class="kw">await</span> db.conflicts.add({ ...record, flaggedAt: Date.now() })' },
+    { num: 29, prefix: ' ', html: '  <span class="kw">await</span> <span class="fn">notifyWatcher</span>(record.path)' },
+    { num: 30, prefix: ' ', html: '}' },
+  ];
+
+  const WATCHER_LINES = [
+    { num:  8, prefix: '-', html: '<span class="cm">  // Overwrite remote with local — last write wins</span>' },
+    { num:  9, prefix: '-', html: '  <span class="kw">await</span> remote.<span class="fn">put</span>(event.path, localContent)' },
+    { num:  8, prefix: '+', html: '  <span class="kw">if</span> (isBinary(event.path)) {',
+      annotation: { type: 'warn', text: 'This path skips binary files entirely. Add an explicit guard or a user-visible warning — a silently skipped .docx could be mistaken for a sync failure. At minimum, log at debug level.' } },
+    { num:  9, prefix: '+', html: '    <span class="kw">await</span> remote.<span class="fn">put</span>(event.path, localContent) <span class="cm">// binary: skip merge</span>' },
+    { num: 10, prefix: '+', html: '    <span class="kw">return</span>' },
+    { num: 11, prefix: '+', html: '  }' },
+    { num: 12, prefix: '+', html: '  <span class="kw">const</span> ancestor = <span class="kw">await</span> <span class="fn">findAncestor</span>(event.revA, event.revB)' },
+    { num: 13, prefix: '+', html: '  <span class="kw">const</span> merged = ancestor' },
+    { num: 14, prefix: '+', html: '    ? <span class="fn">threeWayMerge</span>(ancestor.content, localContent, remoteContent)' },
+    { num: 15, prefix: '+', html: '    : <span class="kw">null</span>' },
+    { num: 16, prefix: '+', html: '  <span class="kw">if</span> (merged !== <span class="kw">null</span>) {' },
+    { num: 17, prefix: '+', html: '    <span class="kw">await</span> remote.<span class="fn">put</span>(event.path, merged)' },
+    { num: 18, prefix: '+', html: '  } <span class="kw">else</span> {' },
+    { num: 19, prefix: '+', html: '    <span class="kw">await</span> <span class="fn">flagUnresolved</span>({ path: event.path, revA: event.revA, revB: event.revB })' },
+    { num: 20, prefix: '+', html: '  }' },
+  ];
+
+  const TEST_LINES = [
+    { num:  1, prefix: ' ', html: '<span class="kw">import</span> { describe, it, expect } <span class="kw">from</span> <span class="str">\'vitest\'</span>' },
+    { num:  2, prefix: ' ', html: '<span class="kw">import</span> { threeWayMerge, findAncestor } <span class="kw">from</span> <span class="str">\'../src/conflict\'</span>' },
+    { num:  3, prefix: ' ', html: '' },
+    { num:  4, prefix: ' ', html: '<span class="fn">describe</span>(<span class="str">\'threeWayMerge\'</span>, () => {' },
+    { num:  5, prefix: ' ', html: '  <span class="fn">it</span>(<span class="str">\'returns theirs when base === ours\'</span>, () => {' },
+    { num:  6, prefix: ' ', html: '    <span class="fn">expect</span>(<span class="fn">threeWayMerge</span>(<span class="str">\'a\'</span>, <span class="str">\'a\'</span>, <span class="str">\'b\'</span>)).toBe(<span class="str">\'b\'</span>)' },
+    { num:  7, prefix: ' ', html: '  })' },
+    { num:  8, prefix: ' ', html: '  <span class="fn">it</span>(<span class="str">\'returns ours when base === theirs\'</span>, () => {' },
+    { num:  9, prefix: ' ', html: '    <span class="fn">expect</span>(<span class="fn">threeWayMerge</span>(<span class="str">\'a\'</span>, <span class="str">\'b\'</span>, <span class="str">\'a\'</span>)).toBe(<span class="str">\'b\'</span>)' },
+    { num: 10, prefix: ' ', html: '  })' },
+    { num: 11, prefix: ' ', html: '  <span class="fn">it</span>(<span class="str">\'returns null on genuine conflict\'</span>, () => {' },
+    { num: 12, prefix: ' ', html: '    <span class="fn">expect</span>(<span class="fn">threeWayMerge</span>(<span class="str">\'base\'</span>, <span class="str">\'ours\'</span>, <span class="str">\'theirs\'</span>)).toBeNull()' },
+    { num: 13, prefix: ' ', html: '  })' },
+    { num: 14, prefix: ' ', html: '})' },
+  ];
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  function renderLines(containerId, lines) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    lines.forEach((line, idx) => {
+      const row = document.createElement('div');
+      row.className = 'code-line';
+      if (line.prefix === '+') row.classList.add('line-add');
+      if (line.prefix === '-') row.classList.add('line-del');
+      if (line.annotation) row.classList.add('has-annotation');
+
+      const numEl = document.createElement('span');
+      numEl.className = 'line-num';
+      numEl.textContent = String(line.num);
+
+      const prefixEl = document.createElement('span');
+      prefixEl.className = 'line-prefix';
+      prefixEl.textContent = line.prefix === ' ' ? '' : line.prefix;
+
+      const contentEl = document.createElement('span');
+      contentEl.className = 'line-content';
+      // Safe: content is authored inline in this file, not from external input
+      contentEl.innerHTML = line.html;
+
+      row.appendChild(numEl);
+      row.appendChild(prefixEl);
+      row.appendChild(contentEl);
+
+      if (line.annotation) {
+        const ann = line.annotation;
+        const icon = document.createElement('span');
+        icon.className = 'annotation-icon icon-' + ann.type;
+        icon.textContent = ann.type === 'note' ? 'N' : ann.type === 'warn' ? 'W' : '!';
+        icon.title = 'Click to expand annotation';
+        row.appendChild(icon);
+
+        container.appendChild(row);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'annotation-bubble bubble-' + ann.type;
+        const pill = document.createElement('span');
+        pill.className = 'severity-pill sev-' + ann.type;
+        pill.textContent = ann.type.toUpperCase();
+        const txt = document.createTextNode(' ' + ann.text);
+        bubble.appendChild(pill);
+        bubble.appendChild(txt);
+        container.appendChild(bubble);
+
+        row.addEventListener('click', function() {
+          bubble.classList.toggle('visible');
+        });
+      } else {
+        container.appendChild(row);
+      }
+    });
+  }
+
+  function buildNav() {
+    const list = document.getElementById('nav-links');
+    FILES.forEach(function(f) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#' + f.id;
+      a.textContent = f.name;
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  }
+
+  function buildFilesList() {
+    const list = document.getElementById('files-list');
+    FILES.forEach(function(f) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#' + f.id;
+      const tag = document.createElement('span');
+      tag.className = 'file-tag tag-' + f.tag;
+      tag.textContent = f.tag === 'new' ? 'new' : 'modified';
+      const name = document.createTextNode(f.name);
+      a.appendChild(tag);
+      a.appendChild(name);
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  }
+
+  buildNav();
+  buildFilesList();
+  renderLines('code-conflict', CONFLICT_LINES);
+  renderLines('code-watcher',  WATCHER_LINES);
+  renderLines('code-test',     TEST_LINES);
+</script>
+</body>
+</html>

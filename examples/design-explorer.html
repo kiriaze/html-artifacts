@@ -1,0 +1,588 @@
+<!-- html-artifacts: design-explorer example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-16T00:00:00Z | source: examples/design-explorer.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Explorer — Acme Sync</title>
+  <style>
+    :root {
+      --bg: #FAF9F5;
+      --fg: #141413;
+      --accent: #D97757;
+      --secondary: #E3DACC;
+      --tertiary: #788C5D;
+      --g100: #F5F4F0;
+      --g300: #D1CFC8;
+      --g500: #8A887F;
+      --g700: #3D3C38;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--g300);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 48px;
+      z-index: 10;
+    }
+
+    nav .brand {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: normal;
+      color: var(--g700);
+      margin-right: auto;
+    }
+
+    nav a {
+      color: var(--g500);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    nav a:hover { color: var(--fg); }
+
+    /* ── Page shell ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+
+    /* ── Page title ── */
+    .page-title {
+      margin-bottom: 64px;
+    }
+
+    .page-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--g500);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: normal;
+    }
+
+    /* ── Section ── */
+    section { margin-bottom: 64px; }
+
+    h2 {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--g500);
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--g300);
+    }
+
+    /* ── Color swatches ── */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .swatch-card {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--g300);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      user-select: none;
+    }
+
+    .swatch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .swatch-color {
+      height: 72px;
+      position: relative;
+    }
+
+    .swatch-copied {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.15s;
+      border-radius: 0;
+    }
+
+    .swatch-card.flash .swatch-copied { opacity: 1; }
+
+    .swatch-info {
+      padding: 10px 12px;
+      background: var(--g100);
+    }
+
+    .swatch-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+      display: block;
+    }
+
+    .swatch-hex {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--g500);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .swatch-var {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--g500);
+      display: block;
+    }
+
+    /* ── Typography specimens ── */
+    .type-scale {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      transition: background 0.1s;
+    }
+
+    .type-row:hover { background: var(--g100); }
+
+    .type-meta {
+      width: 120px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .type-size-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--accent);
+    }
+
+    .type-role {
+      font-size: 11px;
+      color: var(--g500);
+    }
+
+    .type-specimen { flex: 1; }
+
+    .type-specimen.mono {
+      font-family: var(--font-mono);
+      background: var(--g100);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--g700);
+    }
+
+    /* ── CLI states ── */
+    .cli-states {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cli-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--g700);
+      color: #E8E6E0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+    }
+
+    .cli-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .cli-dot.idle    { background: var(--g500); }
+    .cli-dot.syncing { background: #D4A017; }
+    .cli-dot.done    { background: var(--tertiary); }
+    .cli-dot.conflict { background: #C0392B; }
+
+    .cli-text { flex: 1; }
+
+    .cli-state-label {
+      font-size: 11px;
+      color: var(--g500);
+      margin-left: 4px;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--g500);
+      color: var(--g500);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.1s, color 0.1s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      border-color: #E8E6E0;
+      color: #E8E6E0;
+    }
+
+    .copy-btn.copied {
+      border-color: var(--tertiary);
+      color: var(--tertiary);
+    }
+
+    /* ── Spacing scale ── */
+    .spacing-scale {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .space-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .space-label {
+      width: 96px;
+      flex-shrink: 0;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--g500);
+      text-align: right;
+    }
+
+    .space-bar-wrap {
+      flex: 1;
+      background: var(--g100);
+      border-radius: var(--radius-sm);
+      height: 24px;
+      overflow: hidden;
+    }
+
+    .space-bar {
+      height: 100%;
+      background: var(--accent);
+      opacity: 0.7;
+      border-radius: var(--radius-sm);
+    }
+
+    .space-var {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--g500);
+      width: 88px;
+      flex-shrink: 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px;
+      border-top: 1px solid var(--g300);
+      font-size: 12px;
+      color: var(--g500);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">Acme Sync</span>
+  <a href="#colors">Colors</a>
+  <a href="#type">Typography</a>
+  <a href="#cli-states">CLI States</a>
+  <a href="#spacing">Spacing</a>
+</nav>
+
+<main>
+
+  <div class="page-title">
+    <p class="page-label">Design System</p>
+    <h1>Design Explorer</h1>
+  </div>
+
+  <!-- Color swatches -->
+  <section id="colors">
+    <h2>Color Palette — click to copy hex</h2>
+    <div class="swatch-grid" id="swatchGrid"></div>
+  </section>
+
+  <!-- Typography -->
+  <section id="type">
+    <h2>Typography Scale</h2>
+    <div class="type-scale">
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="type-size-label">28px</span>
+          <span class="type-role">heading</span>
+        </div>
+        <span class="type-specimen" style="font-family:var(--font-serif);font-size:28px;font-weight:normal;">Sync everything, everywhere</span>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="type-size-label">20px</span>
+          <span class="type-role">heading-sm</span>
+        </div>
+        <span class="type-specimen" style="font-family:var(--font-sans);font-size:20px;font-weight:600;">Conflict resolution</span>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="type-size-label">16px</span>
+          <span class="type-role">body</span>
+        </div>
+        <span class="type-specimen" style="font-size:16px;">Three-way merge detects changes from both local and remote before writing.</span>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="type-size-label">14px</span>
+          <span class="type-role">body-sm</span>
+        </div>
+        <span class="type-specimen" style="font-size:14px;color:var(--g700);">Last synced 2 minutes ago · 4 files watched</span>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="type-size-label">12px</span>
+          <span class="type-role">caption</span>
+        </div>
+        <span class="type-specimen" style="font-size:12px;color:var(--g500);">SHA-256 checksum verified</span>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="type-size-label">14px mono</span>
+          <span class="type-role">code</span>
+        </div>
+        <span class="type-specimen mono">$ acmesync push --dry-run</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLI states -->
+  <section id="cli-states">
+    <h2>CLI Status Component — 4 States</h2>
+    <div class="cli-states" id="cliStates"></div>
+  </section>
+
+  <!-- Spacing scale -->
+  <section id="spacing">
+    <h2>Spacing Scale — 4pt base</h2>
+    <div class="spacing-scale" id="spacingScale"></div>
+  </section>
+
+</main>
+
+<footer>generated 2026-05-16 · Acme Sync · Design Explorer</footer>
+
+<script>
+  /* ── Color swatches ── */
+  (function () {
+    var swatches = [
+      { name: 'Background', hex: '#FAF9F5', varName: '--bg' },
+      { name: 'Foreground', hex: '#141413', varName: '--fg' },
+      { name: 'Accent',     hex: '#D97757', varName: '--accent' },
+      { name: 'Secondary',  hex: '#E3DACC', varName: '--secondary' },
+      { name: 'Tertiary',   hex: '#788C5D', varName: '--tertiary' },
+      { name: 'G300',       hex: '#D1CFC8', varName: '--g300' },
+      { name: 'G500',       hex: '#8A887F', varName: '--g500' },
+      { name: 'G700',       hex: '#3D3C38', varName: '--g700' },
+    ];
+
+    var grid = document.getElementById('swatchGrid');
+
+    swatches.forEach(function (s) {
+      var card = document.createElement('div');
+      card.className = 'swatch-card';
+
+      var colorDiv = document.createElement('div');
+      colorDiv.className = 'swatch-color';
+      colorDiv.style.background = s.hex;
+
+      var copiedDiv = document.createElement('div');
+      copiedDiv.className = 'swatch-copied';
+      copiedDiv.textContent = 'Copied!';
+      colorDiv.appendChild(copiedDiv);
+
+      var info = document.createElement('div');
+      info.className = 'swatch-info';
+
+      var nameEl = document.createElement('span');
+      nameEl.className = 'swatch-name';
+      nameEl.textContent = s.name;
+
+      var hexEl = document.createElement('span');
+      hexEl.className = 'swatch-hex';
+      hexEl.textContent = s.hex;
+
+      var varEl = document.createElement('span');
+      varEl.className = 'swatch-var';
+      varEl.textContent = s.varName;
+
+      info.appendChild(nameEl);
+      info.appendChild(hexEl);
+      info.appendChild(varEl);
+      card.appendChild(colorDiv);
+      card.appendChild(info);
+      grid.appendChild(card);
+
+      card.addEventListener('click', function () {
+        navigator.clipboard.writeText(s.hex).then(function () {
+          card.classList.add('flash');
+          setTimeout(function () { card.classList.remove('flash'); }, 900);
+        });
+      });
+    });
+  }());
+
+  /* ── CLI states ── */
+  (function () {
+    var states = [
+      { dotClass: 'idle',     label: 'Idle',     text: 'Watching...',              stateText: 'IDLE' },
+      { dotClass: 'syncing',  label: 'Syncing',  text: 'Syncing 3 files...',       stateText: 'SYNC' },
+      { dotClass: 'done',     label: 'Complete', text: 'All files synced',         stateText: 'OK' },
+      { dotClass: 'conflict', label: 'Conflict', text: '1 conflict needs resolution', stateText: 'ERR' },
+    ];
+
+    var container = document.getElementById('cliStates');
+
+    states.forEach(function (s) {
+      var row = document.createElement('div');
+      row.className = 'cli-row';
+
+      var dot = document.createElement('span');
+      dot.className = 'cli-dot ' + s.dotClass;
+
+      var textEl = document.createElement('span');
+      textEl.className = 'cli-text';
+      textEl.textContent = s.text;
+
+      var stateLabel = document.createElement('span');
+      stateLabel.className = 'cli-state-label';
+      stateLabel.textContent = '[' + s.stateText + ']';
+
+      var btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.type = 'button';
+
+      btn.addEventListener('click', function () {
+        navigator.clipboard.writeText(s.text).then(function () {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(function () {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 1200);
+        });
+      });
+
+      row.appendChild(dot);
+      row.appendChild(textEl);
+      row.appendChild(stateLabel);
+      row.appendChild(btn);
+      container.appendChild(row);
+    });
+  }());
+
+  /* ── Spacing scale ── */
+  (function () {
+    var steps = [
+      { px: 4,  varName: '--space-1' },
+      { px: 8,  varName: '--space-2' },
+      { px: 12, varName: '--space-3' },
+      { px: 16, varName: '--space-4' },
+      { px: 24, varName: '--space-6' },
+      { px: 32, varName: '--space-8' },
+      { px: 48, varName: '--space-12' },
+      { px: 64, varName: '--space-16' },
+    ];
+
+    var maxPx = 64;
+    var container = document.getElementById('spacingScale');
+
+    steps.forEach(function (s) {
+      var row = document.createElement('div');
+      row.className = 'space-row';
+
+      var label = document.createElement('span');
+      label.className = 'space-label';
+      label.textContent = s.px + 'px';
+
+      var wrap = document.createElement('div');
+      wrap.className = 'space-bar-wrap';
+
+      var bar = document.createElement('div');
+      bar.className = 'space-bar';
+      bar.style.width = Math.round((s.px / maxPx) * 100) + '%';
+
+      wrap.appendChild(bar);
+
+      var varLabel = document.createElement('span');
+      varLabel.className = 'space-var';
+      varLabel.textContent = s.varName;
+
+      row.appendChild(label);
+      row.appendChild(wrap);
+      row.appendChild(varLabel);
+      container.appendChild(row);
+    });
+  }());
+</script>
+
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!-- html-artifacts: research-explainer example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-15T00:00:00Z | source: examples/research-explainer.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three-Way Merge — Acme Sync Docs</title>
+  <style>
+    :root {
+      --bg: #FAF9F5;
+      --fg: #141413;
+      --accent: #D97757;
+      --secondary: #E3DACC;
+      --tertiary: #788C5D;
+      --g100: #F5F4F0;
+      --g300: #D1CFC8;
+      --g500: #8A887F;
+      --g700: #3D3C38;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      border-bottom: 1px solid var(--g300);
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 0 32px;
+      height: 48px;
+    }
+    nav .brand {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--fg);
+      text-decoration: none;
+    }
+    nav a {
+      font-size: 13px;
+      color: var(--g500);
+      text-decoration: none;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── Layout ── */
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: normal;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: var(--g500);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* ── TL;DR chip ── */
+    .tldr {
+      background: var(--g100);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 40px;
+    }
+    .tldr-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .tldr p {
+      font-size: 14px;
+      color: var(--g700);
+      line-height: 1.55;
+    }
+
+    /* ── Section headings ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--g500);
+      margin-bottom: 16px;
+    }
+
+    section { margin-bottom: 48px; }
+
+    /* ── Collapsible steps ── */
+    .steps { display: flex; flex-direction: column; gap: 8px; }
+
+    details {
+      background: var(--g100);
+      border: 1px solid var(--g300);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    details[open] { border-color: var(--accent); }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--secondary);
+      color: var(--g700);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    details[open] .step-num {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .chevron {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--g500);
+      transition: transform .15s;
+    }
+    details[open] .chevron { transform: rotate(180deg); }
+
+    .step-body {
+      padding: 0 16px 16px 52px;
+      font-size: 14px;
+      color: var(--g700);
+      line-height: 1.6;
+    }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+      border-bottom: 1px solid var(--g300);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--g500);
+      padding: 8px 16px;
+      margin-bottom: -1px;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      transition: color .1s;
+    }
+    .tab-btn:hover { color: var(--fg); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-panels { position: relative; }
+
+    .tab-panel {
+      display: none;
+      background: var(--g700);
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+      padding: 20px;
+      overflow-x: auto;
+    }
+    .tab-panel[aria-hidden="false"] { display: block; }
+
+    pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      color: #E3DACC;
+      white-space: pre;
+    }
+
+    .comment { color: var(--g500); }
+    .key { color: #9ECBFF; }
+    .val { color: #9FD9A3; }
+    .str { color: #FFCA80; }
+
+    /* ── Glossary ── */
+    .glossary { display: flex; flex-direction: column; gap: 4px; }
+
+    .term-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      cursor: default;
+    }
+    .term-row:hover { background: var(--g100); }
+
+    .term {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      color: var(--fg);
+      border-bottom: 1px dashed var(--g300);
+      position: relative;
+    }
+    .term-row:hover .term { border-bottom-color: var(--accent); color: var(--accent); }
+
+    .term-def {
+      font-size: 13px;
+      color: var(--g500);
+      line-height: 1.5;
+    }
+
+    /* ── FAQ ── */
+    .faq { display: flex; flex-direction: column; gap: 8px; }
+
+    .faq details {
+      background: none;
+      border: 1px solid var(--g300);
+    }
+    .faq details[open] { border-color: var(--g300); background: var(--g100); }
+
+    .faq summary {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg);
+      gap: 8px;
+    }
+    .faq summary::before {
+      content: 'Q';
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-sm);
+      background: var(--secondary);
+      color: var(--g700);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .faq-answer {
+      padding: 0 16px 14px 44px;
+      font-size: 14px;
+      color: var(--g700);
+      line-height: 1.6;
+    }
+    .faq-answer::before {
+      content: 'A: ';
+      font-weight: 600;
+      color: var(--tertiary);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="#">Acme Sync</a>
+  <a href="#how-it-works">How it works</a>
+  <a href="#config">Config</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<main>
+  <h1>Three-Way Merge Conflict Resolution</h1>
+  <p class="subtitle">Last updated 2026-05-15 · Acme Sync v1.2</p>
+
+  <!-- TL;DR -->
+  <div class="tldr">
+    <div class="tldr-label">TL;DR</div>
+    <p>Acme Sync uses the common ancestor snapshot to merge divergent file versions. Most conflicts resolve automatically. The rest surface in the CLI.</p>
+  </div>
+
+  <!-- How it works -->
+  <section id="how-it-works">
+    <div class="section-label">How it works</div>
+    <div class="steps">
+
+      <details open>
+        <summary>
+          <span class="step-num">1</span>
+          Snapshot the ancestor on every sync
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="step-body">
+          On every successful sync, Acme Sync records the SHA-256 hash of each file into
+          the local conflict store. This hash becomes the <em>ancestor snapshot</em> — the
+          agreed-upon baseline for both machines.
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="step-num">2</span>
+          Detect divergence on reconnect
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="step-body">
+          When a file changes on two machines while offline, both versions are compared
+          against the ancestor snapshot. If neither hash matches the ancestor, the file is
+          flagged as <em>diverged</em>.
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="step-num">3</span>
+          Auto-resolve single-side changes
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="step-body">
+          If only one machine changed the file (one hash matches the ancestor, the other
+          doesn't), the changed version wins automatically. No user action required.
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="step-num">4</span>
+          Auto-merge non-overlapping edits
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="step-body">
+          If both machines changed the file but on different lines, Acme Sync applies a
+          standard diff3 merge. The result is committed and the ancestor snapshot is updated.
+          Binary files skip this step entirely — they're copied whole.
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span class="step-num">5</span>
+          Flag true conflicts for manual resolution
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="step-body">
+          When both machines edited the same line differently, Acme Sync writes a conflict
+          record to the conflict store and surfaces it in the CLI with
+          <code>acmesync conflicts list</code>. The file is quarantined until resolved.
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- Config tabs -->
+  <section id="config">
+    <div class="section-label">Config snippets</div>
+
+    <div class="tab-bar" role="tablist" aria-label="Environment configs">
+      <button class="tab-btn" role="tab" aria-selected="true" data-target="tab-local">Local Dev</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-ci">CI</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-prod">Production</button>
+    </div>
+
+    <div class="tab-panels">
+      <div class="tab-panel" id="tab-local" role="tabpanel" aria-hidden="false">
+        <pre><span class="comment"># ~/.acmesync/config.toml — Local Dev</span>
+
+<span class="key">[sync]</span>
+<span class="key">debounce_ms</span>     = <span class="val">150</span>
+<span class="key">auto_merge</span>      = <span class="val">true</span>
+<span class="key">conflict_notify</span> = <span class="str">"desktop"</span>
+<span class="key">ancestor_ttl_days</span> = <span class="val">30</span>
+
+<span class="key">[storage]</span>
+<span class="key">endpoint</span> = <span class="str">"https://dev-bucket.acmesync.test"</span>
+<span class="key">region</span>   = <span class="str">"us-east-1"</span>
+
+<span class="key">[logging]</span>
+<span class="key">level</span> = <span class="str">"debug"</span></pre>
+      </div>
+
+      <div class="tab-panel" id="tab-ci" role="tabpanel" aria-hidden="true">
+        <pre><span class="comment"># ~/.acmesync/config.toml — CI</span>
+
+<span class="key">[sync]</span>
+<span class="key">debounce_ms</span>     = <span class="val">0</span>
+<span class="key">auto_merge</span>      = <span class="val">true</span>
+<span class="key">conflict_notify</span> = <span class="str">"stderr"</span>
+<span class="key">ancestor_ttl_days</span> = <span class="val">7</span>
+
+<span class="key">[storage]</span>
+<span class="key">endpoint</span> = <span class="str">"https://ci-bucket.acmesync.internal"</span>
+<span class="key">region</span>   = <span class="str">"us-east-1"</span>
+
+<span class="key">[logging]</span>
+<span class="key">level</span> = <span class="str">"warn"</span>
+<span class="key">format</span> = <span class="str">"json"</span></pre>
+      </div>
+
+      <div class="tab-panel" id="tab-prod" role="tabpanel" aria-hidden="true">
+        <pre><span class="comment"># ~/.acmesync/config.toml — Production</span>
+
+<span class="key">[sync]</span>
+<span class="key">debounce_ms</span>     = <span class="val">500</span>
+<span class="key">auto_merge</span>      = <span class="val">true</span>
+<span class="key">conflict_notify</span> = <span class="str">"webhook"</span>
+<span class="key">conflict_webhook_url</span> = <span class="str">"https://hooks.example.com/acmesync"</span>
+<span class="key">ancestor_ttl_days</span> = <span class="val">90</span>
+
+<span class="key">[storage]</span>
+<span class="key">endpoint</span> = <span class="str">"https://prod-bucket.acmesync.io"</span>
+<span class="key">region</span>   = <span class="str">"us-west-2"</span>
+<span class="key">presign_ttl_s</span> = <span class="val">900</span>
+
+<span class="key">[logging]</span>
+<span class="key">level</span>  = <span class="str">"error"</span>
+<span class="key">format</span> = <span class="str">"json"</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Glossary -->
+  <section id="glossary">
+    <div class="section-label">Glossary</div>
+    <div class="glossary">
+      <div class="term-row">
+        <span class="term">ancestor snapshot</span>
+        <span class="term-def">The file state (SHA-256 hash) recorded at the last successful sync. Used as the common base when comparing diverged versions.</span>
+      </div>
+      <div class="term-row">
+        <span class="term">three-way merge</span>
+        <span class="term-def">A merge strategy that compares both changed versions against a common base, enabling auto-resolution of non-overlapping edits.</span>
+      </div>
+      <div class="term-row">
+        <span class="term">conflict store</span>
+        <span class="term-def">An SQLite table on each device that records unresolved conflicts, including both versions and the ancestor hash.</span>
+      </div>
+      <div class="term-row">
+        <span class="term">debounce window</span>
+        <span class="term-def">The delay (default 150 ms) between a file-change event and the sync trigger. Prevents excessive syncs during rapid edits.</span>
+      </div>
+      <div class="term-row">
+        <span class="term">presigned URL</span>
+        <span class="term-def">A temporary S3 access URL generated per transfer. Valid for 15 minutes by default (configurable via <code>presign_ttl_s</code>).</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="section-label">FAQ</div>
+    <div class="faq">
+
+      <details>
+        <summary>Does Acme Sync handle binary files?<span class="chevron">▼</span></summary>
+        <div class="faq-answer">Binary files are copied whole — no line-level merge is attempted. The most recently modified version wins. A warning is logged if both sides changed.</div>
+      </details>
+
+      <details>
+        <summary>What happens if I'm offline?<span class="chevron">▼</span></summary>
+        <div class="faq-answer">Changes queue locally in the conflict store and are synced automatically on reconnect. No data is lost during offline periods.</div>
+      </details>
+
+      <details>
+        <summary>How long are ancestor snapshots kept?<span class="chevron">▼</span></summary>
+        <div class="faq-answer">30 days by default. Set <code>ancestor_ttl_days</code> in your config to override. Expired ancestors cause the next sync to treat the file as new.</div>
+      </details>
+
+    </div>
+  </section>
+</main>
+
+<script>
+  // Tab switching
+  const tabBar = document.querySelector('.tab-bar');
+  const tabBtns = tabBar.querySelectorAll('.tab-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+
+  tabBar.addEventListener('click', function(e) {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+
+    tabBtns.forEach(function(b) { b.setAttribute('aria-selected', 'false'); });
+    tabPanels.forEach(function(p) { p.setAttribute('aria-hidden', 'true'); });
+
+    btn.setAttribute('aria-selected', 'true');
+    const target = document.getElementById(btn.getAttribute('data-target'));
+    if (target) target.setAttribute('aria-hidden', 'false');
+  });
+</script>
+</body>
+</html>
