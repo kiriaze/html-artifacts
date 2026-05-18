@@ -6,7 +6,7 @@
       "hooks": [
         {
           "type": "command",
-          "command": "file=\"$CLAUDE_TOOL_RESULT_FILE_PATH\"; if [[ \"$file\" == */docs/plans/*.md || \"$file\" == */docs/architecture.md || \"$file\" == */docs/*.md ]]; then echo \"⚠  html-artifacts: source doc changed — run 'html-artifacts refresh' to update docs/html/\"; fi"
+          "command": "file=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))\" 2>/dev/null); if [[ \"$file\" == */docs/plans/*.md || \"$file\" == */docs/architecture.md ]]; then echo \"\\u26a0  html-artifacts: $file changed — run 'html-artifacts refresh' to update docs/html/\"; fi"
         }
       ]
     }

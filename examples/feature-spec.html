@@ -1,0 +1,437 @@
+<!-- html-artifacts: feature-spec example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-15T00:00:00Z | source: examples/feature-spec.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Folder Invitations — Feature Spec · Acme Sync</title>
+  <style>
+    :root {
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
+    }
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 48px;
+    }
+    .back { font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0; }
+    .back:hover { color: var(--fg); }
+    .nav-brand { font-size: 14px; font-weight: 600; color: var(--fg); white-space: nowrap; }
+    .nav-brand span { color: var(--accent); }
+    .dm-toggle {
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 4px 8px;
+      font-size: 13px; cursor: pointer; color: var(--fg-muted); line-height: 1; flex-shrink: 0;
+    }
+    .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
+
+    /* Layout */
+    main { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* Section titles */
+    .section-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--fg-faint); margin-bottom: 12px; margin-top: 40px;
+    }
+
+    /* Header block */
+    .feature-header { margin-bottom: 8px; }
+    .feature-header h1 { font-size: 24px; font-weight: 800; line-height: 1.25; margin-bottom: 14px; }
+    .meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+
+    /* Chips */
+    .chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 500;
+      border: 1px solid var(--border); background: var(--bg-subtle); color: var(--fg-muted);
+    }
+    .chip-accent  { background: var(--accent-bg);  color: var(--accent);  border-color: var(--accent-border); }
+    .chip-success { background: var(--success-bg); color: var(--success); border-color: color-mix(in srgb, var(--success) 30%, transparent); }
+    .chip-warning { background: var(--warning-bg); color: var(--warning); border-color: color-mix(in srgb, var(--warning) 30%, transparent); }
+    .chip-mono { font-family: var(--font-mono); font-size: 11px; }
+
+    /* TL;DR */
+    .tldr {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-bg);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 14px 20px; margin: 24px 0;
+    }
+    .tldr .tldr-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--accent); margin-bottom: 4px;
+    }
+    .tldr p { font-size: 14px; color: var(--fg); line-height: 1.65; }
+
+    /* User stories */
+    .stories { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+    details.story {
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--bg); overflow: hidden;
+    }
+    details.story summary {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; cursor: pointer; font-size: 14px; font-weight: 600;
+      list-style: none; user-select: none;
+      background: var(--bg-subtle);
+    }
+    details.story summary::-webkit-details-marker { display: none; }
+    details.story summary::after {
+      content: '›'; font-size: 18px; color: var(--fg-faint);
+      transform: rotate(90deg); transition: transform 0.15s; flex-shrink: 0;
+    }
+    details.story[open] summary::after { transform: rotate(270deg); }
+    .story-body { padding: 16px 18px 18px; }
+    .story-body label {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--fg-muted); padding: 6px 0;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .story-body label:last-child { border-bottom: none; }
+    .story-body input[type="checkbox"] {
+      margin-top: 3px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer;
+    }
+    .story-body label:has(input:checked) { color: var(--fg-faint); text-decoration: line-through; }
+
+    /* Edge cases table */
+    .edge-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .edge-table th {
+      background: var(--bg-subtle); font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-faint);
+      padding: 10px 14px; text-align: left; border: 1px solid var(--border);
+    }
+    .edge-table td {
+      padding: 12px 14px; border: 1px solid var(--border);
+      vertical-align: top; color: var(--fg-muted); line-height: 1.5;
+    }
+    .edge-table td:first-child { font-weight: 500; color: var(--fg); }
+    .edge-table tr:nth-child(even) td { background: var(--bg-subtle); }
+
+    /* Open questions */
+    .questions { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .question-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px; border: 1px solid var(--border);
+      border-radius: var(--radius-md); background: var(--bg); font-size: 14px;
+    }
+    .question-item.resolved { color: var(--fg-faint); }
+    .question-item.resolved .q-text { text-decoration: line-through; }
+    .q-num {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      color: var(--fg-faint); flex-shrink: 0; padding-top: 2px;
+    }
+    .q-content { flex: 1; }
+    .q-text { line-height: 1.55; }
+    .q-note { font-size: 12px; color: var(--fg-faint); margin-top: 4px; }
+    .q-badge {
+      flex-shrink: 0; display: inline-flex; align-items: center;
+      border-radius: var(--radius-sm); padding: 2px 8px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .q-badge.open     { background: var(--warning-bg); color: var(--warning); }
+    .q-badge.resolved { background: var(--success-bg); color: var(--success); }
+
+    /* Out of scope */
+    .oos-card {
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 16px 20px;
+    }
+    .oos-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+    .oos-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--fg-muted); padding: 7px 0;
+      border-bottom: 1px solid var(--border); line-height: 1.5;
+    }
+    .oos-list li:last-child { border-bottom: none; }
+    .oos-list li::before {
+      content: '—'; color: var(--fg-faint); flex-shrink: 0; padding-top: 1px;
+    }
+    .oos-ticket {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--accent); margin-left: 4px;
+    }
+
+    /* Progress summary */
+    .progress-row {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; color: var(--fg-muted); margin-top: 6px;
+    }
+    .progress-bar-wrap {
+      flex: 1; height: 6px; background: var(--bg-subtle-2);
+      border-radius: 99px; overflow: hidden; max-width: 200px;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--accent); border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="back">← Acme Sync</a>
+    <div class="nav-brand">Acme <span>Sync</span> · Feature Spec</div>
+    <div style="flex:1"></div>
+    <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
+  </nav>
+
+  <main>
+    <!-- Header -->
+    <div class="feature-header">
+      <h1>Shared Folder Invitations</h1>
+      <div class="meta-row">
+        <span class="chip">👤 @priya</span>
+        <span class="chip chip-success">Ready</span>
+        <span class="chip chip-mono chip-accent">SYNC-204</span>
+        <span class="chip">Target: v2.3.0</span>
+      </div>
+    </div>
+
+    <!-- TL;DR -->
+    <div class="tldr">
+      <div class="tldr-label">TL;DR</div>
+      <p>Allow workspace owners to invite others to shared folders via email. Invitees receive a link; accepting adds the folder to their Acme Sync. Free tier limited to 3 collaborators; Pro unlimited.</p>
+    </div>
+
+    <!-- User Stories -->
+    <div class="section-title">User Stories</div>
+    <div class="stories" id="stories-container"></div>
+    <div class="progress-row" id="progress-row">
+      <span id="progress-label">0 of 0 criteria checked</span>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Edge Cases -->
+    <div class="section-title">Edge Cases</div>
+    <table class="edge-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Expected Behavior</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="edge-tbody"></tbody>
+    </table>
+
+    <!-- Open Questions -->
+    <div class="section-title">Open Questions</div>
+    <ol class="questions" id="questions-list"></ol>
+
+    <!-- Out of Scope -->
+    <div class="section-title">Out of Scope</div>
+    <div class="oos-card">
+      <ul class="oos-list" id="oos-list"></ul>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+      if(t==='dark')document.documentElement.classList.add('dark');
+      document.getElementById('dm-toggle').addEventListener('click',function(){
+        var d=document.documentElement.classList.toggle('dark');
+        localStorage.setItem('ha-theme',d?'dark':'light');
+      });
+    })();
+
+    /* ── Data ── */
+    var STORIES = [
+      {
+        persona: 'As a workspace owner',
+        openByDefault: true,
+        criteria: [
+          'I can enter one or more email addresses in an invite dialog',
+          'I can set permission level per invitee: View Only or Edit',
+          'I can see a list of pending invitations with their status',
+          'I can revoke a pending invitation before it is accepted',
+          'I receive an in-app notification when an invitee accepts'
+        ]
+      },
+      {
+        persona: 'As a collaborator (invitee)',
+        openByDefault: false,
+        criteria: [
+          'I receive an email with a clearly labeled accept button',
+          'Clicking the link opens Acme Sync (or prompts install) and adds the shared folder',
+          'I can see the folder owner\'s name and the permission level granted',
+          'I can decline the invitation from the email without creating an account'
+        ]
+      },
+      {
+        persona: 'As a guest (no existing account)',
+        openByDefault: false,
+        criteria: [
+          'I can accept an invitation and create an account in the same flow',
+          'After account creation, the shared folder is immediately available',
+          'I am prompted to install the desktop client; web fallback is available'
+        ]
+      }
+    ];
+
+    var EDGE_CASES = [
+      { scenario: 'Inviting an existing member',       behavior: 'Show error: "Already a collaborator"',      notes: 'Do not send email; show inline message' },
+      { scenario: 'Invalid email format',              behavior: 'Prevent submission',                        notes: 'Client-side validation; highlight bad address in red' },
+      { scenario: 'Invitation expires (7 days)',       behavior: 'Link shows "Invitation expired" page',      notes: 'Offer owner a "Resend" action' },
+      { scenario: 'Free tier limit reached (3 collaborators)', behavior: 'Block invite dialog',              notes: 'Show upgrade prompt with Pro comparison' },
+      { scenario: 'Invitee already has folder at same path', behavior: 'Rename incoming folder with (2) suffix', notes: 'Notify invitee of rename in accept confirmation' }
+    ];
+
+    var QUESTIONS = [
+      { id: 1, resolved: true,  text: 'Should we support bulk CSV upload of invitees?', note: 'No — defer to v2.4. Too much UX complexity for v2.3 timeline.' },
+      { id: 2, resolved: false, text: 'Do invitations survive if the owner\'s account is downgraded from Pro to Free? (affects existing collaborators over the limit)', note: null },
+      { id: 3, resolved: true,  text: 'Permission levels: View Only / Edit / Admin?', note: 'Two levels only (View Only / Edit). Admin = owner only; avoids permission escalation complexity.' },
+      { id: 4, resolved: false, text: 'Localization: should invite emails be sent in the invitee\'s browser locale or the owner\'s? Waiting on product decision.', note: null },
+      { id: 5, resolved: false, text: 'Analytics: which events to track? At minimum: invite_sent, invite_accepted, invite_revoked, invite_expired. Confirm with data team.', note: null }
+    ];
+
+    var OOS = [
+      { text: 'Folder sharing via public link (no auth required)', ticket: 'SYNC-210' },
+      { text: 'Permission inheritance for sub-folders', ref: 'v2.4' },
+      { text: 'Slack / Teams integration for invite notifications', ref: 'post-launch' },
+      { text: 'Invitation templates / custom messages', ref: 'post-launch' }
+    ];
+
+    /* ── Render User Stories ── */
+    var container = document.getElementById('stories-container');
+    var allCheckboxes = [];
+
+    STORIES.forEach(function(story) {
+      var det = document.createElement('details');
+      det.className = 'story';
+      if (story.openByDefault) det.open = true;
+
+      var sum = document.createElement('summary');
+      sum.textContent = story.persona;
+      det.appendChild(sum);
+
+      var body = document.createElement('div');
+      body.className = 'story-body';
+
+      story.criteria.forEach(function(criterion) {
+        var lbl = document.createElement('label');
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        allCheckboxes.push(cb);
+        cb.addEventListener('change', updateProgress);
+        var txt = document.createTextNode(criterion);
+        lbl.appendChild(cb);
+        lbl.appendChild(txt);
+        body.appendChild(lbl);
+      });
+
+      det.appendChild(body);
+      container.appendChild(det);
+    });
+
+    function updateProgress() {
+      var total = allCheckboxes.length;
+      var checked = allCheckboxes.filter(function(c){ return c.checked; }).length;
+      var pct = total > 0 ? Math.round(checked / total * 100) : 0;
+      document.getElementById('progress-label').textContent = checked + ' of ' + total + ' criteria checked';
+      document.getElementById('progress-fill').style.width = pct + '%';
+    }
+    updateProgress();
+
+    /* ── Render Edge Cases ── */
+    var etbody = document.getElementById('edge-tbody');
+    EDGE_CASES.forEach(function(row) {
+      var tr = document.createElement('tr');
+      ['scenario','behavior','notes'].forEach(function(key) {
+        var td = document.createElement('td');
+        td.textContent = row[key];
+        tr.appendChild(td);
+      });
+      etbody.appendChild(tr);
+    });
+
+    /* ── Render Open Questions ── */
+    var qlist = document.getElementById('questions-list');
+    QUESTIONS.forEach(function(q) {
+      var li = document.createElement('li');
+      li.className = 'question-item' + (q.resolved ? ' resolved' : '');
+
+      var num = document.createElement('span');
+      num.className = 'q-num';
+      num.textContent = q.id + '.';
+
+      var content = document.createElement('div');
+      content.className = 'q-content';
+
+      var txt = document.createElement('div');
+      txt.className = 'q-text';
+      txt.textContent = q.text;
+      content.appendChild(txt);
+
+      if (q.note) {
+        var note = document.createElement('div');
+        note.className = 'q-note';
+        note.textContent = q.note;
+        content.appendChild(note);
+      }
+
+      var badge = document.createElement('span');
+      badge.className = 'q-badge ' + (q.resolved ? 'resolved' : 'open');
+      badge.textContent = q.resolved ? 'Resolved' : 'Open';
+
+      li.appendChild(num);
+      li.appendChild(content);
+      li.appendChild(badge);
+      qlist.appendChild(li);
+    });
+
+    /* ── Render Out of Scope ── */
+    var olist = document.getElementById('oos-list');
+    OOS.forEach(function(item) {
+      var li = document.createElement('li');
+      var txt = document.createTextNode(item.text);
+      li.appendChild(txt);
+      if (item.ticket || item.ref) {
+        var tag = document.createElement('span');
+        tag.className = 'oos-ticket';
+        tag.textContent = '— ' + (item.ticket || item.ref);
+        li.appendChild(tag);
+      }
+      olist.appendChild(li);
+    });
+  </script>
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Feature Spec · May 2026
+</footer>
+</body>
+</html>

@@ -8,123 +8,190 @@
   <title>Acme Sync — Product Brief</title>
   <style>
     :root {
-      --bg:#FAF9F5; --fg:#141413; --accent:#D97757; --secondary:#E3DACC; --tertiary:#788C5D;
-      --g100:#F5F4F0; --g300:#D1CFC8; --g500:#8A887F; --g700:#3D3C38;
-      --font-serif:Georgia,'Times New Roman',serif;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      --font-mono:'SF Mono',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; }
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
     /* Nav */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: var(--bg); border-bottom: 1px solid var(--g300);
+      background: var(--bg); border-bottom: 1px solid var(--border);
       padding: 0 32px; display: flex; align-items: center; gap: 32px; height: 48px;
     }
-    .nav-brand { font-family: var(--font-serif); font-size: 16px; font-weight: normal; color: var(--fg); text-decoration: none; white-space: nowrap; }
+    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; margin-right: auto; }
+    .back-link:hover { color: var(--fg); }
+    .nav-brand { font-size: 15px; font-weight: 600; color: var(--fg); text-decoration: none; white-space: nowrap; }
     .nav-links { display: flex; gap: 24px; list-style: none; }
-    .nav-links a { color: var(--g500); text-decoration: none; font-size: 13px; letter-spacing: 0.02em; transition: color 0.15s; }
+    .nav-links a { color: var(--fg-muted); text-decoration: none; font-size: 13px; letter-spacing: 0.02em; transition: color 0.15s; }
     .nav-links a:hover { color: var(--accent); }
-    .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); letter-spacing: 0.05em; }
+    .nav-badge { background: var(--accent); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); letter-spacing: 0.05em; }
 
     /* Layout */
     main { max-width: 860px; margin: 0 auto; padding: 48px 32px 96px; }
     section { margin-bottom: 64px; }
-    h1 { font-family: var(--font-serif); font-size: 36px; font-weight: normal; line-height: 1.2; margin-bottom: 8px; }
-    h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g500); margin-bottom: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--g300); }
+    h1 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
     h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--fg); }
-    p { color: var(--g700); margin-bottom: 12px; }
+    p { color: var(--fg-muted); margin-bottom: 12px; }
 
     /* Hero */
     .hero { padding: 48px 0 32px; }
-    .tagline { font-family: var(--font-serif); font-size: 24px; font-weight: normal; color: var(--fg); margin-bottom: 16px; max-width: 560px; }
-    .value-prop { font-size: 15px; color: var(--g700); max-width: 560px; line-height: 1.7; }
-    .pill { display: inline-block; background: var(--g100); border: 1px solid var(--g300); border-radius: 100px; padding: 4px 12px; font-size: 12px; color: var(--g500); margin-top: 16px; margin-right: 8px; }
-    .pill-accent { background: #FDF0EB; border-color: #F3C4AE; color: var(--accent); }
+    .tagline { font-size: 24px; font-weight: 400; color: var(--fg); margin-bottom: 16px; max-width: 560px; }
+    .value-prop { font-size: 15px; color: var(--fg-muted); max-width: 560px; line-height: 1.7; }
+    .pill { display: inline-block; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 100px; padding: 4px 12px; font-size: 12px; color: var(--fg-muted); margin-top: 16px; margin-right: 8px; }
+    .pill-accent { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
 
     /* Persona cards */
     .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .persona-card {
-      background: var(--g100); border: 1px solid var(--g300); border-radius: var(--radius-lg);
+      background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-lg);
       padding: 24px; position: relative; overflow: hidden;
     }
     .persona-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent);
     }
-    .persona-role { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g500); margin-bottom: 4px; }
-    .persona-name { font-size: 18px; font-family: var(--font-serif); margin-bottom: 12px; }
-    .persona-need { font-size: 13px; color: var(--g700); margin-bottom: 8px; }
-    .persona-pain { font-size: 12px; color: var(--accent); display: flex; align-items: flex-start; gap: 6px; }
-    .persona-pain::before { content: '!'; display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #FDF0EB; text-align: center; line-height: 16px; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .persona-role { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 4px; }
+    .persona-name { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+    .persona-need { font-size: 13px; color: var(--fg-muted); margin-bottom: 8px; }
+    .persona-pain { font-size: 12px; color: var(--danger); display: flex; align-items: flex-start; gap: 6px; }
+    .persona-pain::before { content: '!'; display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: var(--danger-bg); text-align: center; line-height: 16px; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
 
     /* Architecture */
     .arch-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin-bottom: 24px; }
     .arch-node {
-      background: #fff; border: 1px solid var(--g300); border-radius: var(--radius-md);
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md);
       padding: 12px 16px; text-align: center; min-width: 112px;
+      box-shadow: var(--shadow-sm);
     }
     .arch-node-label { font-size: 12px; font-weight: 600; color: var(--fg); }
-    .arch-node-sub { font-size: 11px; color: var(--g500); margin-top: 2px; }
-    .arch-node.accent { background: #FDF0EB; border-color: #F3C4AE; }
-    .arch-arrow { color: var(--g300); font-size: 20px; padding: 0 4px; flex-shrink: 0; }
-    .arch-state { margin-top: 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--g500); }
-    .arch-state-box { background: var(--g100); border: 1px solid var(--g300); border-radius: var(--radius-sm); padding: 4px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--g700); }
+    .arch-node-sub { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
+    .arch-node.accent { background: var(--accent-bg); border-color: var(--accent-border); }
+    .arch-arrow { color: var(--border-strong); font-size: 20px; padding: 0 4px; flex-shrink: 0; }
+    .arch-state { margin-top: 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--fg-muted); }
+    .arch-state-box { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--fg); }
 
-    /* Roadmap */
-    .timeline { position: relative; padding: 24px 0; }
-    .timeline-track { position: absolute; top: 40px; left: 0; right: 0; height: 2px; background: var(--g300); }
-    .timeline-phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; position: relative; }
-    .timeline-phase { padding-top: 48px; }
-    .timeline-dot {
-      position: absolute; top: 32px; width: 16px; height: 16px;
-      border-radius: 50%; border: 2px solid var(--g300); background: var(--bg);
+    /* Roadmap — horizontal timeline */
+    .timeline { padding: 24px 0 8px; }
+    .timeline-container {
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+      position: relative;
     }
-    .timeline-phase:nth-child(1) .timeline-dot { left: calc(16.66% - 8px); background: var(--accent); border-color: var(--accent); }
-    .timeline-phase:nth-child(2) .timeline-dot { left: calc(50% - 8px); border-color: var(--fg); }
-    .timeline-phase:nth-child(3) .timeline-dot { left: calc(83.33% - 8px); }
-    .timeline-phase-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--g500); margin-bottom: 8px; }
-    .timeline-phase-title { font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 8px; }
-    .timeline-items { list-style: none; font-size: 13px; color: var(--g700); }
-    .timeline-items li { padding: 2px 0; display: flex; align-items: center; gap: 6px; }
-    .timeline-items li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--g300); flex-shrink: 0; }
-    .timeline-phase.shipped .timeline-items li::before { background: var(--tertiary); }
+    /* Horizontal connector line drawn behind dots */
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 8px; /* center of dot (16px / 2) */
+      left: calc(16.66% - 0px);
+      right: calc(16.66% - 0px);
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .milestone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+    .milestone-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--border-strong);
+      background: var(--bg);
+      flex-shrink: 0;
+      margin-bottom: 16px;
+    }
+    .milestone.shipped .milestone-dot {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .milestone.next .milestone-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .milestone.future .milestone-dot {
+      background: var(--bg);
+      border-color: var(--fg-faint);
+    }
+    .milestone-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 8px; text-align: center;
+    }
+    .milestone.shipped .milestone-label { color: var(--success); }
+    .milestone.next .milestone-label { color: var(--accent); }
+    .milestone.future .milestone-label { color: var(--fg-muted); }
+    .milestone-title { font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 8px; text-align: center; }
+    .milestone-items { list-style: none; font-size: 13px; color: var(--fg-muted); width: 100%; padding: 0 8px; }
+    .milestone-items li { padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+    .milestone-items li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--border-strong); flex-shrink: 0; }
+    .milestone.shipped .milestone-items li::before { background: var(--success); }
+    .milestone.next .milestone-items li::before { background: var(--accent); }
 
     /* Risks table */
     .risk-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .risk-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--g500); border-bottom: 1px solid var(--g300); }
-    .risk-table td { padding: 12px; border-bottom: 1px solid var(--g100); vertical-align: top; }
+    .risk-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+    .risk-table td { padding: 12px; border-bottom: 1px solid var(--bg-subtle); vertical-align: top; }
     .risk-table tr:last-child td { border-bottom: none; }
-    .risk-table tr:hover td { background: var(--g100); }
+    .risk-table tr:hover td { background: var(--bg-subtle); }
     .badge { display: inline-block; border-radius: var(--radius-sm); padding: 2px 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.03em; }
-    .badge-high { background: #FDECEA; color: #C0392B; }
-    .badge-med { background: #FEF3CD; color: #9A6700; }
-    .badge-low { background: #EAF4EC; color: #276738; }
+    .badge-high { background: var(--danger-bg); color: var(--danger); }
+    .badge-med { background: var(--warning-bg); color: var(--warning); }
+    .badge-low { background: var(--success-bg); color: var(--success); }
     .risk-name { font-weight: 500; color: var(--fg); }
-    .risk-mitigation { font-size: 12px; color: var(--g500); margin-top: 4px; }
+    .risk-mitigation { font-size: 12px; color: var(--fg-muted); margin-top: 4px; }
 
     /* Collapsible */
-    details { border: 1px solid var(--g300); border-radius: var(--radius-md); margin-bottom: 8px; overflow: hidden; }
-    details summary { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--fg); list-style: none; display: flex; justify-content: space-between; align-items: center; background: var(--g100); user-select: none; }
-    details summary::after { content: '+'; font-size: 18px; color: var(--g500); transition: transform 0.2s; }
+    details { border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 8px; overflow: hidden; }
+    details summary { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--fg); list-style: none; display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle); user-select: none; }
+    details summary::after { content: '+'; font-size: 18px; color: var(--fg-muted); transition: transform 0.2s; }
     details[open] summary::after { content: '−'; }
-    details > div { padding: 16px; font-size: 13px; color: var(--g700); line-height: 1.7; }
+    details > div { padding: 16px; font-size: 13px; color: var(--fg-muted); line-height: 1.7; }
+
+    code { font-family: var(--font-mono); background: var(--bg-subtle-2); padding: 2px 4px; border-radius: var(--radius-sm); font-size: 0.9em; }
+
+    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
+    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
 
     @media (max-width: 640px) {
       .persona-grid { grid-template-columns: 1fr; }
-      .timeline-phases { grid-template-columns: 1fr; }
-      .timeline-track { display: none; }
-      .timeline-phase { padding-top: 8px; }
-      .timeline-dot { display: none; }
+      .timeline-container { flex-direction: column; gap: 24px; }
+      .timeline-container::before { display: none; }
+      .milestone { align-items: flex-start; }
+      .milestone-dot { margin-bottom: 8px; }
+      .milestone-label, .milestone-title { text-align: left; }
     }
   </style>
 </head>
 <body>
 
 <nav>
-  <a class="nav-brand" href="#overview">Acme Sync</a>
+  <a href="index.html" class="back-link">← Acme Sync</a>
   <ul class="nav-links">
     <li><a href="#overview">Overview</a></li>
     <li><a href="#personas">Personas</a></li>
@@ -133,6 +200,7 @@
     <li><a href="#risks">Risks</a></li>
   </ul>
   <span class="nav-badge">v1.0</span>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>
 
 <main>
@@ -153,11 +221,11 @@
       <h2>Additional Context</h2>
       <details>
         <summary>What "git-aware" means in practice</summary>
-        <div>Acme Sync reads <code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">.gitignore</code> and respects it by default. Patterns in <code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">.syncignore</code> extend that. Binary files in <code>node_modules/</code>, <code>dist/</code>, and build artifacts are never synced unless explicitly opted in.</div>
+        <div>Acme Sync reads <code>.gitignore</code> and respects it by default. Patterns in <code>.syncignore</code> extend that. Binary files in <code>node_modules/</code>, <code>dist/</code>, and build artifacts are never synced unless explicitly opted in.</div>
       </details>
       <details>
         <summary>Offline reconciliation approach</summary>
-        <div>Changes made while offline are recorded in the local SQLite conflict log with a vector clock timestamp. On reconnect, the Diff Engine replays them against the remote state. Three-way merge for text; last-write-wins for binary. Conflicts that cannot be auto-resolved surface as named conflict copies (<code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">file.conflict.local</code> / <code style="font-family:var(--font-mono);background:var(--g100);padding:2px 4px;border-radius:var(--radius-sm);">file.conflict.remote</code>).</div>
+        <div>Changes made while offline are recorded in the local SQLite conflict log with a vector clock timestamp. On reconnect, the Diff Engine replays them against the remote state. Three-way merge for text; last-write-wins for binary. Conflicts that cannot be auto-resolved surface as named conflict copies (<code>file.conflict.local</code> / <code>file.conflict.remote</code>).</div>
       </details>
     </div>
   </section>
@@ -169,7 +237,7 @@
       <div class="persona-card">
         <div class="persona-role">Backend Engineer</div>
         <div class="persona-name">Alex</div>
-        <p class="persona-need">Needs config files, <code style="font-family:var(--font-mono);font-size:12px;">.env</code> templates, and editor settings synced across two dev boxes — home and office.</p>
+        <p class="persona-need">Needs config files, <code>.env</code> templates, and editor settings synced across two dev boxes — home and office.</p>
         <div class="persona-pain">Constantly re-applying the same local changes after pulling on the wrong machine.</div>
       </div>
       <div class="persona-card">
@@ -219,7 +287,7 @@
     <div class="arch-state">
       <span>State store:</span>
       <span class="arch-state-box">SQLite — conflict log + vector clocks</span>
-      <span style="color:var(--g500); font-size:13px;">local only, never synced</span>
+      <span style="color:var(--fg-muted); font-size:13px;">local only, never synced</span>
     </div>
   </section>
 
@@ -227,13 +295,12 @@
   <section id="roadmap">
     <h2>Roadmap</h2>
     <div class="timeline">
-      <div class="timeline-track"></div>
-      <div class="timeline-phases">
-        <div class="timeline-phase shipped">
-          <div class="timeline-dot"></div>
-          <div class="timeline-phase-label">Shipped · v1.0</div>
-          <div class="timeline-phase-title">Core Sync</div>
-          <ul class="timeline-items">
+      <div class="timeline-container">
+        <div class="milestone shipped">
+          <div class="milestone-dot"></div>
+          <div class="milestone-label">v1.0 Shipped ✓</div>
+          <div class="milestone-title">Core Sync</div>
+          <ul class="milestone-items">
             <li>Basic file sync</li>
             <li>Conflict detection</li>
             <li>Git-aware ignore rules</li>
@@ -241,22 +308,22 @@
             <li>S3-compatible backend</li>
           </ul>
         </div>
-        <div class="timeline-phase">
-          <div class="timeline-dot"></div>
-          <div class="timeline-phase-label">Next · v1.1</div>
-          <div class="timeline-phase-title">Team Namespaces</div>
-          <ul class="timeline-items">
+        <div class="milestone next">
+          <div class="milestone-dot"></div>
+          <div class="milestone-label">v1.1 Next</div>
+          <div class="milestone-title">Team Namespaces</div>
+          <ul class="milestone-items">
             <li>Shared namespace support</li>
             <li>Per-user conflict isolation</li>
             <li>Invite flow via CLI</li>
             <li>Audit log</li>
           </ul>
         </div>
-        <div class="timeline-phase">
-          <div class="timeline-dot"></div>
-          <div class="timeline-phase-label">Post-launch</div>
-          <div class="timeline-phase-title">Surface Expansion</div>
-          <ul class="timeline-items">
+        <div class="milestone future">
+          <div class="milestone-dot"></div>
+          <div class="milestone-label">Post-launch</div>
+          <div class="milestone-title">Surface Expansion</div>
+          <ul class="milestone-items">
             <li>GUI tray app (macOS/Win)</li>
             <li>Mobile read-only viewer</li>
             <li>Conflict UI in tray</li>
@@ -286,7 +353,7 @@
           </td>
           <td><span class="badge badge-high">High</span></td>
           <td><span class="badge badge-high">High</span></td>
-          <td>Ship interactive <code style="font-family:var(--font-mono);font-size:12px;">acmesync resolve</code> wizard in v1.0; document with video walkthrough.</td>
+          <td>Ship interactive <code>acmesync resolve</code> wizard in v1.0; document with video walkthrough.</td>
         </tr>
         <tr>
           <td>
@@ -295,7 +362,7 @@
           </td>
           <td><span class="badge badge-low">Low</span></td>
           <td><span class="badge badge-med">Medium</span></td>
-          <td>Exponential backoff + jitter in Sync Queue; configurable <code style="font-family:var(--font-mono);font-size:12px;">--max-concurrency</code> flag.</td>
+          <td>Exponential backoff + jitter in Sync Queue; configurable <code>--max-concurrency</code> flag.</td>
         </tr>
         <tr>
           <td>
@@ -304,7 +371,7 @@
           </td>
           <td><span class="badge badge-low">Low</span></td>
           <td><span class="badge badge-high">High</span></td>
-          <td>Enable WAL mode + <code style="font-family:var(--font-mono);font-size:12px;">PRAGMA synchronous=NORMAL</code>; auto-repair on startup with <code>integrity_check</code>.</td>
+          <td>Enable WAL mode + <code>PRAGMA synchronous=NORMAL</code>; auto-repair on startup with <code>integrity_check</code>.</td>
         </tr>
       </tbody>
     </table>
@@ -313,6 +380,14 @@
 </main>
 
 <script>
+  (function(){
+    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+    if(t==='dark')document.documentElement.classList.add('dark');
+    document.getElementById('dm-toggle').addEventListener('click',function(){
+      var d=document.documentElement.classList.toggle('dark');
+      localStorage.setItem('ha-theme',d?'dark':'light');
+    });
+  })();
   // Highlight active nav link on scroll
   (function () {
     var sections = document.querySelectorAll('section[id]');
@@ -340,5 +415,9 @@
   }());
 </script>
 
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Product Brief · May 2026
+</footer>
 </body>
 </html>

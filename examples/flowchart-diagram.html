@@ -1,0 +1,769 @@
+<!-- html-artifacts: flowchart-diagram example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-15T00:00:00Z | source: examples/flowchart-diagram.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Change Processing Flow — Acme Sync</title>
+  <style>
+    :root {
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
+    }
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      height: 48px; display: flex; align-items: center; gap: 16px;
+      padding: 0 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    nav a.back {
+      color: var(--fg-muted); text-decoration: none; font-size: 13px;
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    nav a.back:hover { color: var(--fg); }
+    nav .brand {
+      font-size: 14px; font-weight: 600; color: var(--fg);
+    }
+    nav .spacer { flex: 1; }
+    nav .dm-toggle {
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 4px 8px;
+      font-size: 13px; cursor: pointer; color: var(--fg-muted);
+      line-height: 1; flex-shrink: 0;
+    }
+    nav .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
+
+    /* Page layout */
+    main {
+      max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px;
+    }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .page-header p { color: var(--fg-muted); font-size: 14px; max-width: 620px; }
+
+    /* Diagram container */
+    .diagram-wrapper {
+      position: relative;
+      width: 100%;
+      height: 1120px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-subtle);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .diagram-wrapper svg.arrows {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    /* Nodes */
+    .node {
+      position: absolute;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      font-size: 11.5px; font-weight: 500; line-height: 1.35;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.1s;
+      user-select: none;
+      padding: 6px 8px;
+    }
+    .node:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .node.active { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+
+    /* Terminal (pill) */
+    .node-terminal {
+      border-radius: 999px;
+      border: 2px solid;
+      font-weight: 600; font-size: 11px; letter-spacing: 0.02em;
+    }
+    .node-terminal.success-node {
+      background: var(--success-bg); border-color: var(--success); color: var(--success);
+    }
+    .node-terminal.danger-node {
+      background: var(--danger-bg); border-color: var(--danger); color: var(--danger);
+    }
+    .node-terminal.muted-node {
+      background: var(--bg-subtle-2); border-color: var(--border-strong); color: var(--fg-muted);
+    }
+
+    /* Process (rectangle) */
+    .node-process {
+      background: var(--bg);
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      color: var(--fg);
+    }
+    .node-process.accent-node {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+    .node-process.warning-node {
+      background: var(--warning-bg);
+      border-color: #fcd34d;
+      color: var(--warning);
+    }
+    .node-process.danger-node {
+      background: var(--danger-bg);
+      border-color: #fca5a5;
+      color: var(--danger);
+    }
+
+    /* Decision (diamond) */
+    .node-decision-wrap {
+      position: absolute;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .node-decision {
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      font-size: 10.5px; font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .node-decision:hover { transform: translateY(-1px); filter: brightness(0.95); }
+    .node-decision.active { outline: 2.5px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
+    .diamond-outer {
+      width: 100%; height: 100%;
+      transform: rotate(45deg);
+      background: var(--bg);
+      border: 2px solid var(--border-strong);
+      border-radius: 4px;
+      position: absolute; top: 0; left: 0;
+    }
+    .diamond-inner {
+      position: relative; z-index: 1;
+      transform: rotate(0deg);
+      line-height: 1.3;
+      padding: 4px;
+      color: var(--fg);
+    }
+
+    /* Note node */
+    .node-note {
+      background: var(--bg-subtle);
+      border: 1.5px dashed var(--border-strong);
+      border-radius: var(--radius-md);
+      color: var(--fg-faint);
+      font-size: 10.5px;
+      font-style: italic;
+    }
+
+    /* Arrow labels */
+    .arrow-label {
+      position: absolute;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .arrow-label.yes { background: var(--success-bg); color: var(--success); }
+    .arrow-label.no  { background: var(--danger-bg);  color: var(--danger);  }
+
+    /* Detail panel */
+    .detail-panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      box-shadow: var(--shadow-md);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      min-height: 90px;
+      transition: opacity 0.15s;
+    }
+    .detail-panel .detail-type {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .detail-panel .detail-name {
+      font-size: 16px; font-weight: 700; margin-bottom: 6px;
+    }
+    .detail-panel .detail-desc {
+      font-size: 14px; color: var(--fg-muted); max-width: 680px;
+    }
+    .detail-panel .detail-hint {
+      margin-top: 10px; font-size: 13px; color: var(--fg-faint);
+    }
+    .detail-panel.empty { display: flex; align-items: center; }
+    .detail-panel.empty .prompt {
+      color: var(--fg-faint); font-size: 14px;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+    }
+    .legend-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--fg-faint);
+      margin-right: 4px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--fg-muted);
+    }
+    .legend-shape {
+      flex-shrink: 0;
+    }
+    .ls-terminal {
+      width: 48px; height: 18px;
+      border-radius: 999px;
+      border: 2px solid var(--success); background: var(--success-bg);
+    }
+    .ls-process {
+      width: 36px; height: 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-strong); background: var(--bg);
+      box-shadow: var(--shadow-sm);
+    }
+    .ls-decision-wrap {
+      width: 20px; height: 20px;
+      position: relative; flex-shrink: 0;
+    }
+    .ls-decision {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border-strong);
+      border-radius: 2px;
+      transform: rotate(45deg);
+      position: absolute; top: 3px; left: 3px;
+      background: var(--bg);
+    }
+    .ls-note {
+      width: 40px; height: 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px dashed var(--border-strong); background: var(--bg-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="back">← Acme Sync</a>
+  <span class="brand">File Change Processing Flow</span>
+  <span class="spacer"></span>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Acme Sync — File Change Processing Flow</h1>
+    <p>Decision flow the background sync worker follows when a file change event arrives. Click any node to see details.</p>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span class="legend-title">Legend</span>
+    <div class="legend-item">
+      <span class="legend-shape ls-terminal"></span>
+      Terminal (start / end)
+    </div>
+    <div class="legend-item">
+      <span class="legend-shape ls-process"></span>
+      Process step
+    </div>
+    <div class="legend-item">
+      <div class="legend-shape ls-decision-wrap"><div class="ls-decision"></div></div>
+      Decision (yes / no)
+    </div>
+    <div class="legend-item">
+      <span class="legend-shape ls-note"></span>
+      Note / callout
+    </div>
+  </div>
+
+  <!-- Diagram -->
+  <div class="diagram-wrapper" id="diagram">
+
+    <!-- SVG arrows layer -->
+    <svg class="arrows" id="arrows-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="var(--fg-muted)"/>
+        </marker>
+        <marker id="arrow-danger" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="var(--danger)"/>
+        </marker>
+        <marker id="arrow-warning" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="var(--warning)"/>
+        </marker>
+      </defs>
+      <!-- Lines drawn by JS after layout -->
+    </svg>
+
+    <!-- COLUMN 1: Entry -->
+    <!-- N1: START -->
+    <div class="node node-terminal success-node" id="n1"
+         style="width:130px;height:38px;left:3%;top:36px;"
+         data-node="n1">File change<br>event received</div>
+
+    <!-- N2: Ignored? -->
+    <div class="node-decision-wrap node-decision" id="n2"
+         style="width:104px;height:104px;left:3%;top:130px;"
+         data-node="n2">
+      <div class="diamond-outer"></div>
+      <div class="diamond-inner">In ignored<br>list?</div>
+    </div>
+
+    <!-- N3: Discard -->
+    <div class="node node-terminal muted-node" id="n3"
+         style="width:108px;height:32px;left:17%;top:166px;"
+         data-node="n3">Discard<br>event</div>
+
+    <!-- N4: Accessible? -->
+    <div class="node-decision-wrap node-decision" id="n4"
+         style="width:104px;height:104px;left:3%;top:390px;"
+         data-node="n4">
+      <div class="diamond-outer"></div>
+      <div class="diamond-inner">File<br>accessible?</div>
+    </div>
+
+    <!-- N5: Log inaccessible -->
+    <div class="node node-process warning-node" id="n5"
+         style="width:115px;height:40px;left:18%;top:422px;"
+         data-node="n5">Log<br>inaccessible</div>
+
+    <!-- N6: Retry after 2s -->
+    <div class="node node-process" id="n6"
+         style="width:115px;height:40px;left:18%;top:520px;"
+         data-node="n6">Retry after 2s<br><span style="font-size:10px;opacity:0.7">(max 3×)</span></div>
+
+    <!-- N7: Emit sync_error -->
+    <div class="node node-terminal danger-node" id="n7"
+         style="width:115px;height:32px;left:18%;top:618px;"
+         data-node="n7">Emit<br>sync_error</div>
+
+    <!-- COLUMN 2: Binary check -->
+    <!-- N8: Binary file? -->
+    <div class="node-decision-wrap node-decision" id="n8"
+         style="width:104px;height:104px;left:35%;top:390px;"
+         data-node="n8">
+      <div class="diamond-outer"></div>
+      <div class="diamond-inner">Binary<br>file?</div>
+    </div>
+
+    <!-- N9: Note — last-write-wins -->
+    <div class="node node-note" id="n9"
+         style="width:124px;height:44px;left:49%;top:420px;"
+         data-node="n9">Skip merge;<br>last-write-wins</div>
+
+    <!-- COLUMN 3: DB + merge -->
+    <!-- N10: Fetch ancestor -->
+    <div class="node node-process" id="n10"
+         style="width:132px;height:40px;left:35%;top:630px;"
+         data-node="n10">Fetch ancestor<br>snapshot from DB</div>
+
+    <!-- N11: Ancestor found? -->
+    <div class="node-decision-wrap node-decision" id="n11"
+         style="width:104px;height:104px;left:35%;top:726px;"
+         data-node="n11">
+      <div class="diamond-outer"></div>
+      <div class="diamond-inner">Ancestor<br>found?</div>
+    </div>
+
+    <!-- N13: Three-way merge -->
+    <div class="node node-process accent-node" id="n13"
+         style="width:122px;height:40px;left:51%;top:756px;"
+         data-node="n13">Run three-way<br>merge</div>
+
+    <!-- N12: Two-way merge -->
+    <div class="node node-process warning-node" id="n12"
+         style="width:122px;height:40px;left:51%;top:856px;"
+         data-node="n12">Two-way merge<br>(no base)</div>
+
+    <!-- N14: Merge successful? -->
+    <div class="node-decision-wrap node-decision" id="n14"
+         style="width:108px;height:108px;left:68%;top:726px;"
+         data-node="n14">
+      <div class="diamond-outer"></div>
+      <div class="diamond-inner">Merge<br>successful?</div>
+    </div>
+
+    <!-- N15: Flag conflict -->
+    <div class="node node-process danger-node" id="n15"
+         style="width:122px;height:40px;left:82%;top:640px;"
+         data-node="n15">Flag conflict +<br>notify user</div>
+
+    <!-- N16: Conflict logged END -->
+    <div class="node node-terminal danger-node" id="n16"
+         style="width:122px;height:32px;left:82%;top:740px;"
+         data-node="n16">Conflict logged</div>
+
+    <!-- COLUMN 4: Write + queue -->
+    <!-- N17: Write to disk -->
+    <div class="node node-process" id="n17"
+         style="width:132px;height:40px;left:68%;top:940px;"
+         data-node="n17">Write merged<br>content to disk</div>
+
+    <!-- N18: Queue upload -->
+    <div class="node node-process accent-node" id="n18"
+         style="width:132px;height:40px;left:68%;top:1038px;"
+         data-node="n18">Queue upload<br>to cloud</div>
+
+    <!-- N19: Update DB snapshot -->
+    <div class="node node-process" id="n19"
+         style="width:134px;height:40px;left:82%;top:950px;"
+         data-node="n19">Update local<br>DB snapshot</div>
+
+    <!-- N20: END success -->
+    <div class="node node-terminal success-node" id="n20"
+         style="width:114px;height:36px;left:82%;top:1044px;"
+         data-node="n20">Sync complete</div>
+
+    <!-- Arrow labels (positioned by JS) -->
+  </div><!-- /diagram-wrapper -->
+
+  <!-- Detail panel -->
+  <div class="detail-panel empty" id="detail-panel">
+    <span class="prompt">Click any node to see its description and branch conditions.</span>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  if(t==='dark')document.documentElement.classList.add('dark');
+  document.getElementById('dm-toggle').addEventListener('click',function(){
+    var d=document.documentElement.classList.toggle('dark');
+    localStorage.setItem('ha-theme',d?'dark':'light');
+    drawArrows();
+  });
+})();
+
+/* Node metadata */
+var nodeData = {
+  n1:  { name:'File change event received', type:'terminal', typeLabel:'Start', color:'success',
+         desc:'The sync worker receives a filesystem change event (inotify / FSEvents / ReadDirectoryChangesW). The event carries the absolute path and change type (create, modify, delete, rename).',
+         branch: null },
+  n2:  { name:'In ignored list?', type:'decision', typeLabel:'Decision', color:'neutral',
+         desc:'Checks whether the changed path matches any ignored pattern: .git/, node_modules/, OS temp files (*.tmp, .DS_Store), and patterns listed in .syncignore.',
+         branch:'YES → discard event immediately. NO → proceed to accessibility check.' },
+  n3:  { name:'Discard event', type:'terminal', typeLabel:'End', color:'muted',
+         desc:'The event is silently dropped. No log entry is written unless debug verbosity is enabled. This path is extremely fast — designed to handle editor autosave storms.',
+         branch: null },
+  n4:  { name:'File accessible?', type:'decision', typeLabel:'Decision', color:'neutral',
+         desc:'Checks that the file exists at the reported path and that the worker process has read permission. A file may disappear between the event and this check (rename race).',
+         branch:'YES → proceed to binary detection. NO → log the inaccessible event and schedule a retry.' },
+  n5:  { name:'Log inaccessible event', type:'process', typeLabel:'Process', color:'warning',
+         desc:'Records a warning-level entry in the sync log: path, timestamp, attempt count. The log entry persists across retries so the user can see the failure history.',
+         branch: null },
+  n6:  { name:'Retry after 2s (max 3×)', type:'process', typeLabel:'Process', color:'neutral',
+         desc:'Schedules a re-check of file accessibility after a 2-second delay. The worker keeps an in-memory counter per path. After 3 failed attempts, the retry loop exits and the error is escalated.',
+         branch: null },
+  n7:  { name:'Emit sync_error', type:'terminal', typeLabel:'End', color:'danger',
+         desc:'Dispatches a sync_error event to all registered listeners (UI, notification system). The error payload includes path, attempt count, and last-seen error code. Processing halts for this change event.',
+         branch: null },
+  n8:  { name:'Binary file?', type:'decision', typeLabel:'Decision', color:'neutral',
+         desc:'Detects binary files using two signals: (1) extension allowlist (.png, .jpg, .sqlite, .zip, etc.) and (2) magic-byte inspection of the first 512 bytes — if the null-byte ratio exceeds 30%, the file is treated as binary.',
+         branch:'YES → skip three-way merge; use last-write-wins. NO → proceed to ancestor fetch.' },
+  n9:  { name:'Skip merge; last-write-wins', type:'note', typeLabel:'Note', color:'faint',
+         desc:'Binary files cannot be meaningfully merged at the byte level. The worker accepts the incoming version unconditionally and overwrites any cloud copy. The previous version is kept as a single backup snapshot.',
+         branch: null },
+  n10: { name:'Fetch ancestor snapshot from DB', type:'process', typeLabel:'Process', color:'neutral',
+         desc:'Queries the local SQLite (or IndexedDB) store for the last-known-good snapshot of this file: its content hash, size, and the timestamp when it was last synced. This becomes the merge base.',
+         branch: null },
+  n11: { name:'Ancestor found?', type:'decision', typeLabel:'Decision', color:'neutral',
+         desc:'The DB lookup may return nothing for files that have never been synced (new file) or whose history was pruned. An empty result is not an error — it simply selects a different merge strategy.',
+         branch:'YES → run standard three-way merge using the ancestor as base. NO → fall back to two-way merge (no shared base).' },
+  n12: { name:'Two-way merge (no base)', type:'process', typeLabel:'Process', color:'warning',
+         desc:'When no ancestor is available, the worker computes a diff between the local file and the cloud copy using a line-level diff algorithm. Overlapping edits are flagged as conflicts; non-overlapping regions are auto-merged. Produces a higher conflict rate than three-way merge.',
+         branch: null },
+  n13: { name:'Run three-way merge', type:'process', typeLabel:'Process', color:'accent',
+         desc:'Applies a standard three-way merge: ancestor as base, local file as "ours", cloud copy as "theirs". Uses a character-level diff for small files (<64 KB) and a line-level diff for larger files. Produces conflict markers for unresolvable regions.',
+         branch: null },
+  n14: { name:'Merge successful?', type:'decision', typeLabel:'Decision', color:'neutral',
+         desc:'A merge is successful when the algorithm produces an output with zero conflict markers. Partial merges (some regions merged, some conflicted) count as unsuccessful.',
+         branch:'YES → write merged content to disk. NO → flag the conflict and notify the user.' },
+  n15: { name:'Flag conflict + notify user', type:'process', typeLabel:'Process', color:'danger',
+         desc:'Writes the conflict-marked output to a sidecar file (filename.conflict.TIMESTAMP) and records the conflict in the DB. Triggers an OS notification with a "Resolve" action button that opens the file in the configured diff tool.',
+         branch: null },
+  n16: { name:'Conflict logged', type:'terminal', typeLabel:'End', color:'danger',
+         desc:'Processing ends for this event. The conflict remains open until the user manually resolves it and triggers a fresh sync cycle. The original local and cloud copies are both preserved unchanged.',
+         branch: null },
+  n17: { name:'Write merged content to disk', type:'process', typeLabel:'Process', color:'neutral',
+         desc:'Atomically writes the merged output to the original path using a write-then-rename pattern (temp file → fsync → rename). This prevents partial writes from leaving a corrupted file if the process is interrupted.',
+         branch: null },
+  n18: { name:'Queue upload to cloud', type:'process', typeLabel:'Process', color:'accent',
+         desc:'Adds an upload task to the outbound queue with a 5-second debounce window. Multiple rapid changes to the same file collapse into a single upload. The queue is persisted to DB so uploads survive a worker restart.',
+         branch: null },
+  n19: { name:'Update local DB snapshot', type:'process', typeLabel:'Process', color:'neutral',
+         desc:'Writes the new content hash, file size, and current timestamp to the local DB. This snapshot becomes the ancestor for the next merge cycle. Also clears any open retry counters for this path.',
+         branch: null },
+  n20: { name:'Sync complete', type:'terminal', typeLabel:'End', color:'success',
+         desc:'The change event has been fully processed: merged, written to disk, queued for upload, and recorded in the DB. The sync worker signals completion and returns to listening for new events.',
+         branch: null }
+};
+
+/* Type label color mapping */
+var typeColors = {
+  terminal: 'var(--fg-muted)', decision: 'var(--accent)',
+  process: 'var(--fg-muted)', note: 'var(--fg-faint)'
+};
+var typeBg = {
+  terminal: 'var(--bg-subtle-2)', decision: 'var(--accent-bg)',
+  process: 'var(--bg-subtle-2)', note: 'var(--bg-subtle)'
+};
+
+/* Click handler */
+var activeNode = null;
+function activateNode(id) {
+  if (activeNode) {
+    var prev = document.getElementById(activeNode);
+    if (prev) prev.classList.remove('active');
+  }
+  activeNode = id;
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+
+  var d = nodeData[id];
+  var panel = document.getElementById('detail-panel');
+  panel.classList.remove('empty');
+  panel.innerHTML = '';
+
+  var badge = document.createElement('div');
+  badge.className = 'detail-type';
+  badge.textContent = d.typeLabel;
+  badge.style.background = typeBg[d.type];
+  badge.style.color = typeColors[d.type];
+  panel.appendChild(badge);
+
+  var name = document.createElement('div');
+  name.className = 'detail-name';
+  name.textContent = d.name;
+  panel.appendChild(name);
+
+  var desc = document.createElement('div');
+  desc.className = 'detail-desc';
+  desc.textContent = d.desc;
+  panel.appendChild(desc);
+
+  if (d.branch) {
+    var hint = document.createElement('div');
+    hint.className = 'detail-hint';
+    hint.textContent = 'Branch: ' + d.branch;
+    panel.appendChild(hint);
+  }
+}
+
+/* Bind click to all nodes */
+document.querySelectorAll('[data-node]').forEach(function(el) {
+  el.addEventListener('click', function() {
+    activateNode(el.getAttribute('data-node'));
+  });
+});
+
+/* Arrow drawing */
+function cx(el) {
+  var r = el.getBoundingClientRect();
+  var wrap = document.getElementById('diagram').getBoundingClientRect();
+  return r.left - wrap.left + r.width / 2;
+}
+function cy(el) {
+  var r = el.getBoundingClientRect();
+  var wrap = document.getElementById('diagram').getBoundingClientRect();
+  return r.top - wrap.top + r.height / 2;
+}
+function getTop(el) {
+  var r = el.getBoundingClientRect();
+  var wrap = document.getElementById('diagram').getBoundingClientRect();
+  return r.top - wrap.top;
+}
+function getBot(el) {
+  var r = el.getBoundingClientRect();
+  var wrap = document.getElementById('diagram').getBoundingClientRect();
+  return r.top - wrap.top + r.height;
+}
+function getLeft(el) {
+  var r = el.getBoundingClientRect();
+  var wrap = document.getElementById('diagram').getBoundingClientRect();
+  return r.left - wrap.left;
+}
+function getRight(el) {
+  var r = el.getBoundingClientRect();
+  var wrap = document.getElementById('diagram').getBoundingClientRect();
+  return r.left - wrap.left + r.width;
+}
+
+function line(svg, x1, y1, x2, y2, marker) {
+  var l = document.createElementNS('http://www.w3.org/2000/svg','line');
+  l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+  l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+  l.setAttribute('stroke', 'var(--fg-faint)');
+  l.setAttribute('stroke-width', '1.5');
+  l.setAttribute('marker-end', 'url(#' + (marker||'arrow') + ')');
+  svg.appendChild(l);
+}
+function path(svg, d, marker) {
+  var p = document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d', d);
+  p.setAttribute('fill','none');
+  p.setAttribute('stroke','var(--fg-faint)');
+  p.setAttribute('stroke-width','1.5');
+  p.setAttribute('marker-end','url(#'+(marker||'arrow')+')');
+  svg.appendChild(p);
+}
+
+function drawArrows() {
+  var svg = document.getElementById('arrows-svg');
+  /* Remove existing lines/paths but keep defs */
+  Array.from(svg.querySelectorAll('line,path')).forEach(function(e){ e.remove(); });
+  /* Remove old labels */
+  document.querySelectorAll('.arrow-label').forEach(function(e){ e.remove(); });
+
+  var g = function(id){ return document.getElementById(id); };
+
+  /* n1 → n2 (START down to ignored?) */
+  line(svg, cx(g('n1')), getBot(g('n1')), cx(g('n2')), getTop(g('n2')));
+
+  /* n2 → n3 (YES right: ignored) */
+  line(svg, getRight(g('n2')), cy(g('n2')), getLeft(g('n3')), cy(g('n3')));
+  label('YES', (getRight(g('n2'))+getLeft(g('n3')))/2-10, cy(g('n2'))-14, 'yes');
+
+  /* n2 → n4 (NO down: not ignored) */
+  line(svg, cx(g('n2')), getBot(g('n2')), cx(g('n4')), getTop(g('n4')));
+  label('NO', cx(g('n2'))+4, (getBot(g('n2'))+getTop(g('n4')))/2-7, 'no');
+
+  /* n4 → n5 (NO right: not accessible) */
+  line(svg, getRight(g('n4')), cy(g('n4')), getLeft(g('n5')), cy(g('n5')));
+  label('NO', (getRight(g('n4'))+getLeft(g('n5')))/2-8, cy(g('n4'))-14, 'no');
+
+  /* n5 → n6 */
+  line(svg, cx(g('n5')), getBot(g('n5')), cx(g('n6')), getTop(g('n6')));
+
+  /* n6 retry loop back to n4: path left then up */
+  var lx = getLeft(g('n4')) - 18;
+  var y6 = cy(g('n6'));
+  var y4 = cy(g('n4'));
+  path(svg, 'M'+cx(g('n6'))+' '+y6+' L'+lx+' '+y6+' L'+lx+' '+y4+' L'+(getLeft(g('n4')))+' '+y4);
+
+  /* n6 → n7 (after 3 retries: down) */
+  line(svg, cx(g('n6')), getBot(g('n6')), cx(g('n7')), getTop(g('n7')));
+
+  /* n4 → n8 (YES right then right: accessible) */
+  /* Go from right of n4 to left of n8 via mid-point */
+  var midY_4_8 = cy(g('n4'));
+  line(svg, getRight(g('n4')), midY_4_8, getLeft(g('n8')), cy(g('n8')));
+  label('YES', (getRight(g('n4'))+getLeft(g('n8')))/2-10, midY_4_8-14, 'yes');
+
+  /* n8 → n9 (YES right: binary) */
+  line(svg, getRight(g('n8')), cy(g('n8')), getLeft(g('n9')), cy(g('n9')));
+  label('YES', (getRight(g('n8'))+getLeft(g('n9')))/2-10, cy(g('n8'))-14, 'yes');
+
+  /* n8 → n10 (NO down: not binary) */
+  line(svg, cx(g('n8')), getBot(g('n8')), cx(g('n10')), getTop(g('n10')));
+  label('NO', cx(g('n8'))+4, (getBot(g('n8'))+getTop(g('n10')))/2-7, 'no');
+
+  /* n10 → n11 */
+  line(svg, cx(g('n10')), getBot(g('n10')), cx(g('n11')), getTop(g('n11')));
+
+  /* n11 → n13 (YES right: ancestor found) */
+  line(svg, getRight(g('n11')), cy(g('n11')), getLeft(g('n13')), cy(g('n13')));
+  label('YES', (getRight(g('n11'))+getLeft(g('n13')))/2-10, cy(g('n11'))-14, 'yes');
+
+  /* n11 → n12 (NO: further right) */
+  /* n12 is below n13 */
+  line(svg, getRight(g('n11')), cy(g('n11'))+20, getLeft(g('n12')), cy(g('n12')));
+  label('NO', (getRight(g('n11'))+getLeft(g('n12')))/2-8, cy(g('n11'))+24, 'no');
+
+  /* n13 → n14 */
+  line(svg, getRight(g('n13')), cy(g('n13')), getLeft(g('n14')), cy(g('n14'))-10);
+
+  /* n14 → n15 (NO right: conflict) */
+  line(svg, getRight(g('n14')), cy(g('n14'))-10, getLeft(g('n15')), cy(g('n15')));
+  label('NO', (getRight(g('n14'))+getLeft(g('n15')))/2-8, cy(g('n14'))-24, 'no');
+
+  /* n15 → n16 */
+  line(svg, cx(g('n15')), getBot(g('n15')), cx(g('n16')), getTop(g('n16')));
+
+  /* n14 → n17 (YES down: merge ok) */
+  line(svg, cx(g('n14')), getBot(g('n14')), cx(g('n17')), getTop(g('n17')));
+  label('YES', cx(g('n14'))+4, (getBot(g('n14'))+getTop(g('n17')))/2-7, 'yes');
+
+  /* n12 → n17 (down-right arc) */
+  var x12 = cx(g('n12')); var b12 = getBot(g('n12'));
+  var x17 = cx(g('n17')); var t17 = getTop(g('n17'));
+  path(svg, 'M'+x12+' '+b12+' L'+x12+' '+(b12+16)+' L'+x17+' '+(b12+16)+' L'+x17+' '+t17);
+
+  /* n9 → n17 (note feeds into write — right-angle path) */
+  var r9 = getRight(g('n9')); var cy9 = cy(g('n9'));
+  var t17b = getTop(g('n17')); var cx17 = cx(g('n17'));
+  path(svg, 'M'+r9+' '+cy9+' L'+(cx17+30)+' '+cy9+' L'+(cx17+30)+' '+t17b+' L'+(cx17+1)+' '+t17b, 'arrow');
+
+  /* n17 → n18 */
+  line(svg, cx(g('n17')), getBot(g('n17')), cx(g('n18')), getTop(g('n18')));
+
+  /* n18 → n19 */
+  line(svg, getRight(g('n18')), cy(g('n18')), getLeft(g('n19')), cy(g('n19')));
+
+  /* n19 → n20 */
+  line(svg, cx(g('n19')), getBot(g('n19')), cx(g('n20')), getTop(g('n20')));
+}
+
+function label(text, x, y, cls) {
+  var wrap = document.getElementById('diagram');
+  var el = document.createElement('div');
+  el.className = 'arrow-label ' + cls;
+  el.textContent = text;
+  el.style.left = Math.round(x) + 'px';
+  el.style.top = Math.round(y) + 'px';
+  wrap.appendChild(el);
+}
+
+/* Draw after layout */
+window.addEventListener('load', function() { drawArrows(); });
+window.addEventListener('resize', function() { drawArrows(); });
+</script>
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Flowchart Diagram · May 2026
+</footer>
+</body>
+</html>

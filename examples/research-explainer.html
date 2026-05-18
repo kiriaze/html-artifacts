@@ -8,32 +8,31 @@
   <title>Three-Way Merge — Acme Sync Docs</title>
   <style>
     :root {
-      --bg: #FAF9F5;
-      --fg: #141413;
-      --accent: #D97757;
-      --secondary: #E3DACC;
-      --tertiary: #788C5D;
-      --g100: #F5F4F0;
-      --g300: #D1CFC8;
-      --g500: #8A887F;
-      --g700: #3D3C38;
-      --font-serif: Georgia, 'Times New Roman', serif;
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.6;
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
     /* ── Nav ── */
     nav {
@@ -41,25 +40,26 @@
       top: 0;
       z-index: 10;
       background: var(--bg);
-      border-bottom: 1px solid var(--g300);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 24px;
       padding: 0 32px;
       height: 48px;
     }
-    nav .brand {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--fg);
-      text-decoration: none;
-    }
-    nav a {
+    nav .back-link {
       font-size: 13px;
-      color: var(--g500);
+      color: var(--fg-muted);
+      text-decoration: none;
+      margin-right: auto;
+    }
+    nav .back-link:hover { color: var(--fg); }
+    nav a.nav-link {
+      font-size: 13px;
+      color: var(--fg-muted);
       text-decoration: none;
     }
-    nav a:hover { color: var(--accent); }
+    nav a.nav-link:hover { color: var(--fg); }
 
     /* ── Layout ── */
     main {
@@ -69,21 +69,20 @@
     }
 
     h1 {
-      font-family: var(--font-serif);
       font-size: 28px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 1.3;
       margin-bottom: 8px;
     }
     .subtitle {
-      color: var(--g500);
+      color: var(--fg-muted);
       font-size: 14px;
       margin-bottom: 32px;
     }
 
     /* ── TL;DR chip ── */
     .tldr {
-      background: var(--g100);
+      background: var(--bg-subtle);
       border-left: 3px solid var(--accent);
       border-radius: var(--radius-md);
       padding: 16px 20px;
@@ -99,7 +98,7 @@
     }
     .tldr p {
       font-size: 14px;
-      color: var(--g700);
+      color: var(--fg-muted);
       line-height: 1.55;
     }
 
@@ -109,7 +108,7 @@
       font-weight: 700;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: var(--g500);
+      color: var(--fg-muted);
       margin-bottom: 16px;
     }
 
@@ -119,12 +118,12 @@
     .steps { display: flex; flex-direction: column; gap: 8px; }
 
     details {
-      background: var(--g100);
-      border: 1px solid var(--g300);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
       overflow: hidden;
     }
-    details[open] { border-color: var(--accent); }
+    details[open] { border-color: var(--accent-border); }
 
     summary {
       list-style: none;
@@ -143,8 +142,8 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: var(--secondary);
-      color: var(--g700);
+      background: var(--bg-subtle-2);
+      color: var(--fg-muted);
       font-size: 12px;
       font-weight: 700;
       display: flex;
@@ -160,7 +159,7 @@
     .chevron {
       margin-left: auto;
       font-size: 11px;
-      color: var(--g500);
+      color: var(--fg-faint);
       transition: transform .15s;
     }
     details[open] .chevron { transform: rotate(180deg); }
@@ -168,7 +167,7 @@
     .step-body {
       padding: 0 16px 16px 52px;
       font-size: 14px;
-      color: var(--g700);
+      color: var(--fg-muted);
       line-height: 1.6;
     }
 
@@ -177,7 +176,7 @@
       display: flex;
       gap: 4px;
       margin-bottom: 0;
-      border-bottom: 1px solid var(--g300);
+      border-bottom: 1px solid var(--border);
     }
     .tab-btn {
       background: none;
@@ -187,15 +186,16 @@
       font-family: var(--font-sans);
       font-size: 13px;
       font-weight: 500;
-      color: var(--g500);
+      color: var(--fg-muted);
       padding: 8px 16px;
       margin-bottom: -1px;
       border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-      transition: color .1s;
+      transition: color .1s, background .1s;
     }
     .tab-btn:hover { color: var(--fg); }
     .tab-btn[aria-selected="true"] {
-      color: var(--accent);
+      background: var(--accent);
+      color: #fff;
       border-bottom-color: var(--accent);
     }
 
@@ -203,7 +203,7 @@
 
     .tab-panel {
       display: none;
-      background: var(--g700);
+      background: #1e293b;
       border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
       padding: 20px;
       overflow-x: auto;
@@ -214,11 +214,11 @@
       font-family: var(--font-mono);
       font-size: 13px;
       line-height: 1.7;
-      color: #E3DACC;
+      color: #e2e8f0;
       white-space: pre;
     }
 
-    .comment { color: var(--g500); }
+    .comment { color: #64748b; }
     .key { color: #9ECBFF; }
     .val { color: #9FD9A3; }
     .str { color: #FFCA80; }
@@ -234,21 +234,21 @@
       border-radius: var(--radius-md);
       cursor: default;
     }
-    .term-row:hover { background: var(--g100); }
+    .term-row:hover { background: var(--bg-subtle); }
 
     .term {
       font-weight: 600;
       font-size: 14px;
       white-space: nowrap;
       color: var(--fg);
-      border-bottom: 1px dashed var(--g300);
+      border-bottom: 1px dashed var(--border);
       position: relative;
     }
     .term-row:hover .term { border-bottom-color: var(--accent); color: var(--accent); }
 
     .term-def {
       font-size: 13px;
-      color: var(--g500);
+      color: var(--fg-muted);
       line-height: 1.5;
     }
 
@@ -257,9 +257,9 @@
 
     .faq details {
       background: none;
-      border: 1px solid var(--g300);
+      border: 1px solid var(--border);
     }
-    .faq details[open] { border-color: var(--g300); background: var(--g100); }
+    .faq details[open] { border-color: var(--border); background: var(--bg-subtle); }
 
     .faq summary {
       font-size: 14px;
@@ -272,8 +272,8 @@
       width: 20px;
       height: 20px;
       border-radius: var(--radius-sm);
-      background: var(--secondary);
-      color: var(--g700);
+      background: var(--bg-subtle-2);
+      color: var(--fg-muted);
       font-size: 11px;
       font-weight: 700;
       display: flex;
@@ -285,24 +285,27 @@
     .faq-answer {
       padding: 0 16px 14px 44px;
       font-size: 14px;
-      color: var(--g700);
+      color: var(--fg-muted);
       line-height: 1.6;
     }
     .faq-answer::before {
       content: 'A: ';
       font-weight: 600;
-      color: var(--tertiary);
+      color: var(--success);
     }
+    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
+    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
   </style>
 </head>
 <body>
 
 <nav>
-  <a class="brand" href="#">Acme Sync</a>
-  <a href="#how-it-works">How it works</a>
-  <a href="#config">Config</a>
-  <a href="#glossary">Glossary</a>
-  <a href="#faq">FAQ</a>
+  <a class="back-link" href="index.html">← Acme Sync</a>
+  <a class="nav-link" href="#how-it-works">How it works</a>
+  <a class="nav-link" href="#config">Config</a>
+  <a class="nav-link" href="#glossary">Glossary</a>
+  <a class="nav-link" href="#faq">FAQ</a>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>
 
 <main>
@@ -507,6 +510,15 @@
 </main>
 
 <script>
+(function(){
+  var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  if(t==='dark')document.documentElement.classList.add('dark');
+  document.getElementById('dm-toggle').addEventListener('click',function(){
+    var d=document.documentElement.classList.toggle('dark');
+    localStorage.setItem('ha-theme',d?'dark':'light');
+  });
+})();
+
   // Tab switching
   const tabBar = document.querySelector('.tab-bar');
   const tabBtns = tabBar.querySelectorAll('.tab-btn');
@@ -524,5 +536,9 @@
     if (target) target.setAttribute('aria-hidden', 'false');
   });
 </script>
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Research Explainer · May 2026
+</footer>
 </body>
 </html>

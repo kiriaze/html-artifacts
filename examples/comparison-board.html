@@ -8,42 +8,57 @@
   <title>File Sync Tools — Comparison Board</title>
   <style>
     :root {
-      --bg:#FAF9F5; --fg:#141413; --accent:#D97757; --secondary:#E3DACC; --tertiary:#788C5D;
-      --g100:#F5F4F0; --g300:#D1CFC8; --g500:#8A887F; --g700:#3D3C38;
-      --font-serif:Georgia,'Times New Roman',serif;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      --font-mono:'SF Mono',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
-      --green:#EAF4EC; --green-fg:#276738;
-      --amber:#FEF3CD; --amber-fg:#9A6700;
-      --red:#FDECEA; --red-fg:#C0392B;
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; }
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
     /* Nav */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: var(--bg); border-bottom: 1px solid var(--g300);
+      background: var(--bg); border-bottom: 1px solid var(--border);
       padding: 0 32px; display: flex; align-items: center; gap: 24px; height: 48px;
     }
-    .nav-brand { font-family: var(--font-serif); font-size: 16px; font-weight: normal; color: var(--fg); }
+    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; margin-right: auto; }
+    .back-link:hover { color: var(--fg); }
+    .nav-brand { font-size: 15px; font-weight: 600; color: var(--fg); }
     .nav-links { display: flex; gap: 20px; list-style: none; }
-    .nav-links a { color: var(--g500); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+    .nav-links a { color: var(--fg-muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
     .nav-links a:hover { color: var(--accent); }
 
     /* Layout */
     main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 96px; }
     section { margin-bottom: 56px; }
-    h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g500); margin-bottom: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--g300); }
+    h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 
     /* Header */
     .page-header { margin-bottom: 40px; }
-    .page-title { font-family: var(--font-serif); font-size: 30px; font-weight: normal; margin-bottom: 8px; }
-    .page-sub { font-size: 14px; color: var(--g500); margin-bottom: 16px; }
+    .page-title { font-size: 30px; font-weight: 700; margin-bottom: 8px; }
+    .page-sub { font-size: 14px; color: var(--fg-muted); margin-bottom: 16px; }
     .positioning-callout {
-      background: #FDF0EB; border: 1px solid #F3C4AE; border-radius: var(--radius-md);
-      padding: 16px 20px; font-size: 14px; color: var(--g700); line-height: 1.6;
+      background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: var(--radius-md);
+      padding: 16px 20px; font-size: 14px; color: var(--fg-muted); line-height: 1.6;
       border-left: 4px solid var(--accent);
     }
     .positioning-callout strong { color: var(--fg); }
@@ -56,48 +71,63 @@
     }
     .matrix th {
       padding: 10px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; text-align: center; border-bottom: 2px solid var(--g300);
+      text-transform: uppercase; text-align: center; border-bottom: 2px solid var(--border);
       background: var(--bg); cursor: pointer; user-select: none; white-space: nowrap;
     }
     .matrix th:first-child { text-align: left; cursor: default; }
-    .matrix th.our-col { background: #FDF0EB; color: var(--accent); }
-    .matrix th .sort-arrow { font-size: 10px; color: var(--g300); margin-left: 4px; }
+    .matrix th.our-col { background: var(--accent-bg); color: var(--accent); }
+    .matrix th .sort-arrow { font-size: 10px; color: var(--fg-faint); margin-left: 4px; }
     .matrix th.sorted-asc .sort-arrow::after { content: '▲'; color: var(--accent); }
     .matrix th.sorted-desc .sort-arrow::after { content: '▼'; color: var(--accent); }
     .matrix th:not(.sorted-asc):not(.sorted-desc) .sort-arrow::after { content: '⇅'; }
     .matrix td {
-      padding: 10px 12px; border-bottom: 1px solid var(--g100);
+      padding: 10px 12px; border-bottom: 1px solid var(--bg-subtle);
       text-align: center; vertical-align: middle;
     }
     .matrix td:first-child { text-align: left; font-size: 13px; font-weight: 500; color: var(--fg); }
-    .matrix td.our-col { background: #FFFAF7; }
-    .matrix tr:hover td { background: var(--g100); }
-    .matrix tr:hover td.our-col { background: #FDF0EB; }
-    .cell-yes { color: var(--green-fg); background: var(--green); display: inline-block; width: 24px; height: 24px; border-radius: 50%; line-height: 24px; font-size: 13px; font-weight: 700; }
-    .cell-partial { color: var(--amber-fg); background: var(--amber); display: inline-block; width: 24px; height: 24px; border-radius: 50%; line-height: 24px; font-size: 13px; font-weight: 700; }
-    .cell-no { color: var(--red-fg); background: var(--red); display: inline-block; width: 24px; height: 24px; border-radius: 50%; line-height: 24px; font-size: 13px; font-weight: 700; }
-    .legend { display: flex; gap: 16px; font-size: 12px; color: var(--g500); margin-top: 12px; }
+    .matrix td.our-col { background: var(--bg-subtle); }
+    .matrix tr:hover td { background: var(--bg-subtle); }
+    .matrix tr:hover td.our-col { background: var(--accent-bg); }
+
+    /* Feature matrix icon cells — centered */
+    .matrix td { text-align: center; vertical-align: middle; }
+    .cell-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .cell-yes  { background: var(--success-bg); color: var(--success); }
+    .cell-partial { background: var(--warning-bg); color: var(--warning); }
+    .cell-no   { background: var(--danger-bg);   color: var(--danger);  }
+
+    .legend { display: flex; gap: 16px; font-size: 12px; color: var(--fg-muted); margin-top: 12px; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
 
     /* Positioning map */
     .map-container { position: relative; }
     .map-canvas {
       width: 100%; aspect-ratio: 16/9; max-height: 380px;
-      background: var(--g100); border: 1px solid var(--g300); border-radius: var(--radius-lg);
+      background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-lg);
       position: relative; overflow: hidden;
     }
     /* Axes */
     .map-axis-x {
       position: absolute; left: 0; right: 0; top: 50%; height: 1px;
-      background: var(--g300);
+      background: var(--border);
     }
     .map-axis-y {
       position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
-      background: var(--g300);
+      background: var(--border);
     }
     .map-label {
       position: absolute; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--g500);
+      text-transform: uppercase; color: var(--fg-muted);
     }
     .map-label.left   { left: 12px; top: 50%; transform: translateY(-50%); }
     .map-label.right  { right: 12px; top: 50%; transform: translateY(-50%); }
@@ -110,19 +140,22 @@
     }
     .map-chip.ours {
       background: var(--accent); color: #fff; border-color: var(--accent);
-      box-shadow: 0 2px 8px rgba(217,119,87,0.35);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.30);
     }
     .map-chip.other {
-      background: #fff; color: var(--g700); border-color: var(--g300);
+      background: #fff; color: var(--fg-muted); border-color: var(--border);
     }
-    .map-chip:hover { z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .map-chip:hover { z-index: 10; box-shadow: var(--shadow-md); }
+
+    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
+    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
 
     /* Tooltip on hover for chips */
     .map-chip[data-tip] { position: absolute; }
     .map-chip[data-tip]:hover::after {
       content: attr(data-tip);
       position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
-      background: var(--g700); color: #fff; font-size: 11px; font-weight: normal;
+      background: var(--fg); color: #fff; font-size: 11px; font-weight: normal;
       padding: 4px 8px; border-radius: var(--radius-sm); white-space: nowrap; pointer-events: none;
     }
   </style>
@@ -130,11 +163,13 @@
 <body>
 
 <nav>
-  <span class="nav-brand">Acme Sync</span>
+  <a href="index.html" class="back-link">← Acme Sync</a>
+  <span class="nav-brand">Comparison Board</span>
   <ul class="nav-links">
     <li><a href="#matrix">Feature Matrix</a></li>
     <li><a href="#map">Positioning Map</a></li>
   </ul>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>
 
 <main>
@@ -168,10 +203,10 @@
       </table>
     </div>
     <div class="legend">
-      <div class="legend-item"><span class="cell-yes">✓</span> Has it</div>
-      <div class="legend-item"><span class="cell-partial">~</span> Partial</div>
-      <div class="legend-item"><span class="cell-no">✗</span> Missing</div>
-      <div style="margin-left:auto;color:var(--g500);font-size:11px;">Click a column header to sort</div>
+      <div class="legend-item"><span class="cell-icon cell-yes">✓</span> Has it</div>
+      <div class="legend-item"><span class="cell-icon cell-partial">~</span> Partial</div>
+      <div class="legend-item"><span class="cell-icon cell-no">✗</span> Missing</div>
+      <div style="margin-left:auto;color:var(--fg-faint);font-size:11px;">Click a column header to sort</div>
     </div>
   </section>
 
@@ -207,6 +242,14 @@
 </main>
 
 <script>
+  (function(){
+    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+    if(t==='dark')document.documentElement.classList.add('dark');
+    document.getElementById('dm-toggle').addEventListener('click',function(){
+      var d=document.documentElement.classList.toggle('dark');
+      localStorage.setItem('ha-theme',d?'dark':'light');
+    });
+  })();
   (function () {
     // Feature data — values: 'yes' | 'partial' | 'no'
     var features = [
@@ -224,9 +267,9 @@
     var sortState = { col: null, dir: 1 }; // dir: 1=asc, -1=desc
 
     function cellHTML(val) {
-      if (val === 'yes')     return '<span class="cell-yes">✓</span>';
-      if (val === 'partial') return '<span class="cell-partial">~</span>';
-      return '<span class="cell-no">✗</span>';
+      if (val === 'yes')     return '<span class="cell-icon cell-yes">✓</span>';
+      if (val === 'partial') return '<span class="cell-icon cell-partial">~</span>';
+      return '<span class="cell-icon cell-no">✗</span>';
     }
 
     function scoreVal(val) {
@@ -297,5 +340,9 @@
   }());
 </script>
 
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Comparison Board · May 2026
+</footer>
 </body>
 </html>

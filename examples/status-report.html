@@ -5,494 +5,497 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprint 14 Wrap-up — Acme Sync</title>
+  <title>Sprint 14 Status — Acme Sync</title>
   <style>
     :root {
-      --bg: #FAF9F5;
-      --fg: #141413;
-      --accent: #D97757;
-      --secondary: #E3DACC;
-      --tertiary: #788C5D;
-      --g100: #F5F4F0;
-      --g300: #D1CFC8;
-      --g500: #8A887F;
-      --g700: #3D3C38;
-      --font-serif: Georgia, 'Times New Roman', serif;
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.6;
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
     /* ── Nav ── */
-    nav {
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--g300);
-      padding: 0 32px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      height: 48px;
-      z-index: 10;
+    nav{
+      display:flex;align-items:center;gap:16px;
+      padding:0 24px;height:48px;
+      border-bottom:1px solid var(--border);
+      background:var(--bg);
+      position:sticky;top:0;z-index:100;
+    }
+    nav a{color:var(--fg-muted);text-decoration:none;font-size:13px}
+    nav a:hover{color:var(--fg)}
+    nav .spacer{flex:1}
+    nav .dm-toggle{
+      background:none;border:1px solid var(--border);border-radius:var(--radius-sm);
+      padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;
+    }
+    nav .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
+
+    /* ── Page ── */
+    .page{max-width:860px;margin:0 auto;padding:0 24px 80px}
+
+    /* ── Hero header ── */
+    .hero{
+      padding:40px 0 32px;
+      border-bottom:1px solid var(--border);
+      margin-bottom:36px;
+    }
+    .hero-eyebrow{
+      font-size:11px;font-weight:700;
+      letter-spacing:0.1em;text-transform:uppercase;
+      color:var(--accent);margin-bottom:10px;
+    }
+    .hero-title{
+      font-size:26px;font-weight:700;line-height:1.2;color:var(--fg);
+      margin-bottom:10px;
+    }
+    .hero-meta{
+      display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+      font-size:13px;color:var(--fg-muted);
+    }
+    .hero-meta .sep{color:var(--border-strong)}
+
+    /* ── Stat cards ── */
+    .stat-row{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+      margin-bottom:40px;
+    }
+    .stat-card{
+      background:var(--bg-subtle);border:1px solid var(--border);
+      border-radius:var(--radius-lg);padding:16px;
+      text-align:center;
+    }
+    .stat-num{
+      font-size:32px;font-weight:700;letter-spacing:-0.02em;
+      line-height:1;color:var(--fg);margin-bottom:6px;
+    }
+    .stat-num.good{color:var(--success)}
+    .stat-label{font-size:11px;color:var(--fg-muted);font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
+    .stat-delta{font-size:12px;color:var(--fg-faint);margin-top:4px}
+    .stat-delta.up{color:var(--success)}
+
+    /* ── Sections ── */
+    .section{margin-bottom:40px}
+    .section-header{
+      font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+      color:var(--fg-faint);
+      margin-bottom:16px;padding-bottom:8px;
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .section-header-count{
+      font-weight:500;text-transform:none;letter-spacing:0;color:var(--fg-faint);
     }
 
-    nav .brand {
-      font-family: var(--font-serif);
-      font-size: 15px;
-      font-weight: normal;
-      color: var(--g700);
-      margin-right: auto;
+    /* ── Highlights ── */
+    .highlights-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .highlights-list li{
+      display:flex;align-items:flex-start;gap:10px;
+      font-size:15px;line-height:1.6;color:var(--fg);
+    }
+    .hl-dot{
+      width:6px;height:6px;border-radius:50%;background:var(--accent);
+      flex-shrink:0;margin-top:9px;
     }
 
-    nav a {
-      color: var(--g500);
-      text-decoration: none;
-      font-size: 13px;
+    /* ── Shipped table ── */
+    .shipped-table{width:100%;border-collapse:collapse}
+    .shipped-table thead th{
+      padding:8px 12px;text-align:left;
+      font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+      color:var(--fg-faint);border-bottom:1px solid var(--border);
+    }
+    .shipped-table thead th:last-child{text-align:center}
+    .shipped-table tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s}
+    .shipped-table tbody tr:last-child{border-bottom:none}
+    .shipped-table tbody tr:hover{background:var(--bg-subtle)}
+    .shipped-table td{padding:10px 12px;font-size:14px;vertical-align:middle}
+    .td-pr{font-family:var(--font-mono);font-size:12px;color:var(--fg-faint);white-space:nowrap}
+    .td-title{color:var(--fg);font-weight:500;line-height:1.4}
+    .td-cat{
+      display:inline-block;padding:2px 7px;border-radius:var(--radius-sm);
+      font-size:11px;font-weight:600;letter-spacing:0.03em;
+      background:var(--bg-subtle-2);color:var(--fg-muted);white-space:nowrap;
+    }
+    .td-author{font-size:13px;color:var(--fg-muted);white-space:nowrap}
+    .td-risk{text-align:center}
+    .risk-cell{display:flex;align-items:center;justify-content:center;gap:5px}
+    .risk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .risk-low{background:var(--success)}
+    .risk-med{background:var(--warning)}
+    .risk-high{background:var(--danger)}
+    .risk-label{font-size:11px;color:var(--fg-muted);white-space:nowrap}
+
+    /* ── Velocity chart ── */
+    .chart-wrap{
+      background:var(--bg-subtle);border:1px solid var(--border);
+      border-radius:var(--radius-lg);padding:24px 24px 20px;
+    }
+    .chart-title-row{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:28px;
+    }
+    .chart-title{font-size:13px;font-weight:600;color:var(--fg)}
+    .chart-avg{font-size:12px;color:var(--fg-muted)}
+    .chart-bars{
+      display:flex;align-items:flex-end;gap:6px;height:160px;
+    }
+    .bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+    .bar-value{
+      font-size:11px;font-weight:600;color:var(--fg-muted);
+      height:20px;line-height:20px;text-align:center;flex-shrink:0;
+    }
+    .bar-fill{
+      border-radius:3px 3px 0 0;width:100%;min-height:3px;
+      background:var(--accent);opacity:0.6;
+      transition:opacity 0.15s;flex-shrink:0;
+    }
+    .bar-col:hover .bar-fill{opacity:1}
+    .bar-fill.peak{opacity:1}
+    .bar-day{font-size:10px;color:var(--fg-faint);margin-top:6px;text-align:center;white-space:nowrap;flex-shrink:0}
+    .chart-axis{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-top:14px;padding-top:10px;border-top:1px solid var(--border);
+      font-size:11px;color:var(--fg-faint);
     }
 
-    nav a:hover { color: var(--fg); }
-
-    /* ── Page shell ── */
-    main {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 48px 24px 96px;
+    /* ── Key metric callout ── */
+    .metric-callout{
+      background:var(--accent-bg);border:1px solid var(--accent-border);
+      border-radius:var(--radius-lg);padding:24px 28px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:20px;
     }
+    .metric-kicker{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+    .metric-desc{font-size:14px;color:var(--fg-muted)}
+    .metric-badge{margin-top:8px;font-size:13px;font-weight:600;color:var(--success)}
+    .metric-numbers{display:flex;align-items:center;gap:14px}
+    .metric-before{font-size:36px;font-weight:700;letter-spacing:-0.02em;color:var(--fg-muted);line-height:1}
+    .metric-arrow{font-size:18px;color:var(--fg-faint)}
+    .metric-after{font-size:36px;font-weight:700;letter-spacing:-0.02em;color:var(--success);line-height:1}
 
-    /* ── Header ── */
-    .report-header {
-      border-bottom: 2px solid var(--fg);
-      padding-bottom: 24px;
-      margin-bottom: 48px;
+    /* ── Slipped ── */
+    .slipped-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .slipped-item{display:flex;align-items:flex-start;gap:10px}
+    .slip-tag{
+      padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;
+      white-space:nowrap;flex-shrink:0;margin-top:2px;
     }
+    .slip-next{background:var(--warning-bg);color:var(--warning)}
+    .slip-deferred{background:var(--bg-subtle-2);color:var(--fg-muted)}
+    .slipped-reason{font-size:14px;color:var(--fg-muted);line-height:1.5}
 
-    .report-label {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--g500);
-      margin-bottom: 8px;
+    /* ── Next steps ── */
+    .checklist{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .checklist li{display:flex;align-items:flex-start;gap:10px}
+    .checklist input[type="checkbox"]{
+      width:16px;height:16px;margin-top:2px;
+      accent-color:var(--accent);flex-shrink:0;cursor:pointer;
     }
-
-    h1 {
-      font-family: var(--font-serif);
-      font-size: 28px;
-      font-weight: normal;
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-
-    .report-meta {
-      display: flex;
-      gap: 24px;
-      font-size: 13px;
-      color: var(--g500);
-    }
-
-    .report-meta span { display: flex; align-items: center; gap: 6px; }
-
-    /* ── Metric callout ── */
-    .metric-callout {
-      background: var(--g100);
-      border-left: 3px solid var(--tertiary);
-      border-radius: 0 var(--radius-md) var(--radius-md) 0;
-      padding: 16px 24px;
-      margin-bottom: 48px;
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-    }
-
-    .metric-callout .metric-value {
-      font-family: var(--font-mono);
-      font-size: 28px;
-      color: var(--tertiary);
-    }
-
-    .metric-callout .metric-label {
-      font-size: 13px;
-      color: var(--g700);
-    }
-
-    .metric-callout .metric-delta {
-      font-size: 12px;
-      color: var(--g500);
-      margin-left: auto;
-    }
-
-    /* ── Section ── */
-    section { margin-bottom: 48px; }
-
-    h2 {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--g500);
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--g300);
-    }
-
-    /* ── Shipped list ── */
-    .shipped-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .shipped-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--g100);
-      border-radius: var(--radius-md);
-      font-size: 14px;
-    }
-
-    .shipped-list li::before {
-      content: '';
-      display: block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--tertiary);
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-
-    .item-desc { flex: 1; }
-    .item-tag {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      background: var(--secondary);
-      color: var(--g700);
-      padding: 2px 8px;
-      border-radius: var(--radius-sm);
-      white-space: nowrap;
-      align-self: center;
-    }
-
-    /* ── Slipped list ── */
-    .slipped-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .slipped-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--g100);
-      border-radius: var(--radius-md);
-      font-size: 14px;
-    }
-
-    .slipped-list li::before {
-      content: '';
-      display: block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--g300);
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-
-    .slip-reason {
-      display: block;
-      font-size: 12px;
-      color: var(--g500);
-      margin-top: 2px;
-    }
-
-    /* ── Bar chart (pure CSS) ── */
-    .chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      height: 120px;
-      padding: 0 0 32px;
-      position: relative;
-    }
-
-    .chart::after {
-      content: '';
-      position: absolute;
-      bottom: 32px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--g300);
-    }
-
-    .bar-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-    }
-
-    .bar {
-      width: 100%;
-      background: var(--accent);
-      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-      opacity: 0.85;
-      transition: opacity 0.15s;
-    }
-
-    .bar:hover { opacity: 1; }
-
-    /* Values: 1 2 3 1 4 2 3 2 1 2 — max 4, chart height 88px (120-32) */
-    .bar[data-v="1"] { height: 22px; }
-    .bar[data-v="2"] { height: 44px; }
-    .bar[data-v="3"] { height: 66px; }
-    .bar[data-v="4"] { height: 88px; }
-
-    .bar-label {
-      font-size: 11px;
-      color: var(--g500);
-      font-family: var(--font-mono);
-    }
-
-    .bar-val {
-      font-size: 10px;
-      color: var(--g700);
-      font-family: var(--font-mono);
-    }
-
-    .chart-title {
-      font-size: 12px;
-      color: var(--g500);
-      margin-bottom: 12px;
-    }
-
-    /* ── Checklist ── */
-    .checklist {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .checklist li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      transition: background 0.1s;
-    }
-
-    .checklist li:hover { background: var(--g100); }
-
-    .checklist input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--accent);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .checklist label { cursor: pointer; }
+    .checklist label{cursor:pointer;font-size:14px;color:var(--fg);line-height:1.5}
 
     /* ── Footer ── */
-    footer {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 24px;
-      border-top: 1px solid var(--g300);
-      font-size: 12px;
-      color: var(--g500);
-      font-family: var(--font-mono);
+    .site-footer{
+      margin-top:60px;padding-top:20px;border-top:1px solid var(--border);
+      text-align:center;font-size:12px;color:var(--fg-faint);
+    }
+    .dm-toggle{
+      background:none;border:1px solid var(--border);border-radius:var(--radius-sm);
+      padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0;
     }
   </style>
 </head>
 <body>
 
 <nav>
-  <span class="brand">Acme Sync</span>
-  <a href="#shipped">Shipped</a>
-  <a href="#slipped">Slipped</a>
-  <a href="#velocity">Velocity</a>
-  <a href="#next">Next Steps</a>
+  <a href="index.html">← Acme Sync</a>
+  <span class="spacer"></span>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>
 
-<main>
+<div class="page">
 
-  <div class="report-header">
-    <p class="report-label">Sprint Report</p>
-    <h1>Sprint 14 Wrap-up</h1>
-    <div class="report-meta">
+  <!-- Hero header -->
+  <header class="hero">
+    <div class="hero-eyebrow">Sprint 14 · Engineering Status</div>
+    <h1 class="hero-title">Three-Way Merge Ships</h1>
+    <div class="hero-meta">
       <span>May 5 – 16, 2026</span>
-      <span>6 shipped · 2 slipped</span>
-      <span>Coverage 71% → 83%</span>
+      <span class="sep">·</span>
+      <span>2-week sprint</span>
+      <span class="sep">·</span>
+      <span>Acme Sync</span>
+    </div>
+  </header>
+
+  <!-- Stat cards -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-num">14</div>
+      <div class="stat-label">PRs Merged</div>
+      <div class="stat-delta">+2 vs sprint 13</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num good">6</div>
+      <div class="stat-label">Deploys</div>
+      <div class="stat-delta up">0 rollbacks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num good">0</div>
+      <div class="stat-label">Incidents</div>
+      <div class="stat-delta up">Clean sprint</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num good">83%</div>
+      <div class="stat-label">Coverage</div>
+      <div class="stat-delta up">↑ 12 pts (71%→83%)</div>
     </div>
   </div>
 
-  <div class="metric-callout">
-    <span class="metric-value">340ms</span>
-    <span class="metric-label">Sync latency p95</span>
-    <span class="metric-delta">↓ from 890ms in Sprint 13</span>
-  </div>
-
-  <!-- Shipped -->
-  <section id="shipped">
-    <h2>Shipped — 6 items</h2>
-    <ul class="shipped-list">
+  <!-- Highlights -->
+  <section class="section">
+    <div class="section-header">Highlights</div>
+    <ul class="highlights-list">
       <li>
-        <span class="item-desc">Three-way merge conflict resolution</span>
-        <span class="item-tag">core</span>
+        <span class="hl-dot"></span>
+        <span>Three-way merge conflict resolver shipped — the highest-complexity piece of the sync engine. Non-overlapping edits now resolve automatically without user input.</span>
       </li>
       <li>
-        <span class="item-desc">Conflict store SQLite schema</span>
-        <span class="item-tag">db</span>
+        <span class="hl-dot"></span>
+        <span>Coverage jumped 12 points after 47 new unit tests landed alongside the merge feature — all conflict resolution paths are now covered.</span>
       </li>
       <li>
-        <span class="item-desc">CLI <code>acmesync conflicts list</code> command</span>
-        <span class="item-tag">cli</span>
-      </li>
-      <li>
-        <span class="item-desc">S3 multipart upload for files &gt;100 MB</span>
-        <span class="item-tag">storage</span>
-      </li>
-      <li>
-        <span class="item-desc">Retry backoff with jitter</span>
-        <span class="item-tag">reliability</span>
-      </li>
-      <li>
-        <span class="item-desc">47 new unit tests — coverage 71% → 83%</span>
-        <span class="item-tag">tests</span>
+        <span class="hl-dot"></span>
+        <span>p95 sync latency dropped from 890 ms to 340 ms after switching to delta uploads and multipart chunking on files over 100 MB.</span>
       </li>
     </ul>
+  </section>
+
+  <!-- Shipped -->
+  <section class="section">
+    <div class="section-header">
+      Shipped
+      <span class="section-header-count">6 items</span>
+    </div>
+    <table class="shipped-table">
+      <thead>
+        <tr>
+          <th>PR</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Author</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-pr">#23</td>
+          <td class="td-title">Three-way merge conflict resolution</td>
+          <td><span class="td-cat">Sync</span></td>
+          <td class="td-author">@kj</td>
+          <td class="td-risk"><span class="risk-cell"><span class="risk-dot risk-med"></span><span class="risk-label">Med</span></span></td>
+        </tr>
+        <tr>
+          <td class="td-pr">#24</td>
+          <td class="td-title">Conflict store SQLite schema</td>
+          <td><span class="td-cat">Storage</span></td>
+          <td class="td-author">@mg</td>
+          <td class="td-risk"><span class="risk-cell"><span class="risk-dot risk-low"></span><span class="risk-label">Low</span></span></td>
+        </tr>
+        <tr>
+          <td class="td-pr">#25</td>
+          <td class="td-title"><code style="font-family:var(--font-mono);font-size:12px">acmesync conflicts list</code> CLI command</td>
+          <td><span class="td-cat">CLI</span></td>
+          <td class="td-author">@kj</td>
+          <td class="td-risk"><span class="risk-cell"><span class="risk-dot risk-low"></span><span class="risk-label">Low</span></span></td>
+        </tr>
+        <tr>
+          <td class="td-pr">#26</td>
+          <td class="td-title">S3 multipart upload for files &gt;100 MB</td>
+          <td><span class="td-cat">Storage</span></td>
+          <td class="td-author">@ar</td>
+          <td class="td-risk"><span class="risk-cell"><span class="risk-dot risk-med"></span><span class="risk-label">Med</span></span></td>
+        </tr>
+        <tr>
+          <td class="td-pr">#27</td>
+          <td class="td-title">Retry backoff with ±20% jitter</td>
+          <td><span class="td-cat">Reliability</span></td>
+          <td class="td-author">@mg</td>
+          <td class="td-risk"><span class="risk-cell"><span class="risk-dot risk-low"></span><span class="risk-label">Low</span></span></td>
+        </tr>
+        <tr>
+          <td class="td-pr">#28</td>
+          <td class="td-title">47 new unit tests — conflict resolution paths</td>
+          <td><span class="td-cat">Tests</span></td>
+          <td class="td-author">@all</td>
+          <td class="td-risk"><span class="risk-cell"><span class="risk-dot risk-low"></span><span class="risk-label">Low</span></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Velocity -->
+  <section class="section">
+    <div class="section-header">Velocity</div>
+    <div class="chart-wrap">
+      <div class="chart-title-row">
+        <span class="chart-title">PRs merged per day · Sprint 14</span>
+        <span class="chart-avg">Avg 1.4 / day</span>
+      </div>
+      <!-- chart-bars height:160px — tallest bar 120px + value label 20px = 140px, leaving 20px top room -->
+      <div class="chart-bars">
+        <div class="bar-col">
+          <div class="bar-value">1</div>
+          <div class="bar-fill" style="height:30px"></div>
+          <div class="bar-day">Mon<br>May 5</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">2</div>
+          <div class="bar-fill" style="height:60px"></div>
+          <div class="bar-day">Tue<br>May 6</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">3</div>
+          <div class="bar-fill" style="height:90px"></div>
+          <div class="bar-day">Wed<br>May 7</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">0</div>
+          <div class="bar-fill" style="height:3px;opacity:0.15"></div>
+          <div class="bar-day">Thu<br>May 8</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">4</div>
+          <div class="bar-fill peak" style="height:120px"></div>
+          <div class="bar-day">Fri<br>May 9</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">–</div>
+          <div class="bar-fill" style="height:3px;opacity:0.08"></div>
+          <div class="bar-day">Weekend</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">2</div>
+          <div class="bar-fill" style="height:60px"></div>
+          <div class="bar-day">Mon<br>May 12</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">1</div>
+          <div class="bar-fill" style="height:30px"></div>
+          <div class="bar-day">Tue<br>May 13</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">2</div>
+          <div class="bar-fill" style="height:60px"></div>
+          <div class="bar-day">Wed<br>May 14</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-value">1</div>
+          <div class="bar-fill" style="height:30px"></div>
+          <div class="bar-day">Thu<br>May 15</div>
+        </div>
+      </div>
+      <div class="chart-axis">
+        <span>Sprint start · May 5</span>
+        <span>14 total PRs</span>
+        <span>Sprint end · May 16</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key metric -->
+  <section class="section">
+    <div class="section-header">Key metric</div>
+    <div class="metric-callout">
+      <div>
+        <div class="metric-kicker">p95 Sync latency</div>
+        <div class="metric-desc">After delta upload + multipart chunking</div>
+        <div class="metric-badge">↓ 62% improvement</div>
+      </div>
+      <div class="metric-numbers">
+        <span class="metric-before">890ms</span>
+        <span class="metric-arrow">→</span>
+        <span class="metric-after">340ms</span>
+      </div>
+    </div>
   </section>
 
   <!-- Slipped -->
-  <section id="slipped">
-    <h2>Slipped — 2 items</h2>
+  <section class="section">
+    <div class="section-header">Slipped</div>
     <ul class="slipped-list">
-      <li>
-        <div>
-          Team namespaces UI
-          <span class="slip-reason">Moved to Sprint 15 — waiting on auth design review</span>
-        </div>
+      <li class="slipped-item">
+        <span class="slip-tag slip-next">→ Sprint 15</span>
+        <span class="slipped-reason">Team namespaces UI — waiting on auth design sign-off</span>
       </li>
-      <li>
-        <div>
-          Binary file diffing
-          <span class="slip-reason">Deprioritized — affects &lt;2% of files; revisit in Sprint 16</span>
-        </div>
+      <li class="slipped-item">
+        <span class="slip-tag slip-deferred">Deprioritized</span>
+        <span class="slipped-reason">Binary file diffing — affects &lt;2% of files, deferred indefinitely</span>
       </li>
     </ul>
-  </section>
-
-  <!-- Velocity chart -->
-  <section id="velocity">
-    <h2>Velocity</h2>
-    <p class="chart-title">PRs merged per day — Sprint 14 (Day 1–10)</p>
-    <div class="chart" role="img" aria-label="Bar chart: PRs merged per day. Day 1: 1, Day 2: 2, Day 3: 3, Day 4: 1, Day 5: 4, Day 6: 2, Day 7: 3, Day 8: 2, Day 9: 1, Day 10: 2">
-      <div class="bar-group">
-        <span class="bar-val">1</span>
-        <div class="bar" data-v="1"></div>
-        <span class="bar-label">D1</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">2</span>
-        <div class="bar" data-v="2"></div>
-        <span class="bar-label">D2</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">3</span>
-        <div class="bar" data-v="3"></div>
-        <span class="bar-label">D3</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">1</span>
-        <div class="bar" data-v="1"></div>
-        <span class="bar-label">D4</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">4</span>
-        <div class="bar" data-v="4"></div>
-        <span class="bar-label">D5</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">2</span>
-        <div class="bar" data-v="2"></div>
-        <span class="bar-label">D6</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">3</span>
-        <div class="bar" data-v="3"></div>
-        <span class="bar-label">D7</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">2</span>
-        <div class="bar" data-v="2"></div>
-        <span class="bar-label">D8</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">1</span>
-        <div class="bar" data-v="1"></div>
-        <span class="bar-label">D9</span>
-      </div>
-      <div class="bar-group">
-        <span class="bar-val">2</span>
-        <div class="bar" data-v="2"></div>
-        <span class="bar-label">D10</span>
-      </div>
-    </div>
   </section>
 
   <!-- Next steps -->
-  <section id="next">
-    <h2>Next Steps</h2>
+  <section class="section">
+    <div class="section-header">Next steps</div>
     <ul class="checklist">
       <li>
-        <input type="checkbox" id="t1">
-        <label for="t1">Write Sprint 15 spec for team namespaces</label>
+        <input type="checkbox" id="ns1">
+        <label for="ns1">Ship team namespaces UI after auth design sign-off</label>
       </li>
       <li>
-        <input type="checkbox" id="t2">
-        <label for="t2">Schedule auth design review</label>
+        <input type="checkbox" id="ns2">
+        <label for="ns2">Add conflict resolution UI in the web client</label>
       </li>
       <li>
-        <input type="checkbox" id="t3">
-        <label for="t3">Bump coverage target to 90%</label>
+        <input type="checkbox" id="ns3">
+        <label for="ns3">Load-test multipart upload at 1 GB file size</label>
       </li>
       <li>
-        <input type="checkbox" id="t4">
-        <label for="t4">Update CHANGELOG.md</label>
+        <input type="checkbox" id="ns4">
+        <label for="ns4">Integrate jitter retry into the mobile SDK</label>
       </li>
       <li>
-        <input type="checkbox" id="t5">
-        <label for="t5">Tag v1.1.0-rc1</label>
+        <input type="checkbox" id="ns5">
+        <label for="ns5">Push coverage target to 90% — focus on storage layer</label>
       </li>
     </ul>
   </section>
 
-</main>
+  <footer class="site-footer">
+    Generated by html-artifacts · Sprint 14 · May 2026
+  </footer>
 
-<footer>generated 2026-05-16 · Acme Sync · Sprint 14</footer>
-
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  if(t==='dark')document.documentElement.classList.add('dark');
+  document.getElementById('dm-toggle').addEventListener('click',function(){
+    var d=document.documentElement.classList.toggle('dark');
+    localStorage.setItem('ha-theme',d?'dark':'light');
+  });
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,716 @@
+<!-- html-artifacts: milestone-plan example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- generated: 2026-05-15T00:00:00Z | source: examples/milestone-plan.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Roadmap — Acme Sync</title>
+  <style>
+    :root {
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
+    }
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 48px;
+    }
+    .back { color: var(--fg-muted); text-decoration: none; font-size: 13px; flex-shrink: 0; }
+    .back:hover { color: var(--fg); }
+    .nav-brand { font-size: 14px; font-weight: 600; color: var(--fg); }
+    .nav-brand span { color: var(--accent); }
+    .dm-toggle {
+      background: none; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 4px 8px; font-size: 13px; cursor: pointer; color: var(--fg-muted);
+      line-height: 1; flex-shrink: 0;
+    }
+    .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
+
+    /* Layout */
+    .page-header {
+      padding: 32px 24px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .page-header p { color: var(--fg-muted); font-size: 14px; }
+
+    /* Filter bar */
+    .filter-bar {
+      height: 48px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      background: var(--bg);
+      position: sticky; top: 48px; z-index: 90;
+    }
+    .filter-label { font-size: 12px; color: var(--fg-muted); font-weight: 500; margin-right: 4px; }
+    .filter-btn {
+      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border); background: var(--bg);
+      color: var(--fg-muted); transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--border-strong); color: var(--fg); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* Timeline scroll container */
+    .timeline-outer {
+      overflow-x: auto;
+      padding: 0 24px 48px;
+    }
+    .timeline-scroll {
+      min-width: 1100px;
+      position: relative;
+    }
+
+    /* Phase color palette — distinct from status colors */
+    :root {
+      --ph1:#4f46e5; --ph1-bg:#eef2ff;   /* indigo */
+      --ph2:#0891b2; --ph2-bg:#ecfeff;   /* cyan */
+      --ph3:#7c3aed; --ph3-bg:#f5f3ff;   /* violet */
+      --ph4:#be185d; --ph4-bg:#fdf2f8;   /* pink */
+    }
+    html.dark {
+      --ph1:#818cf8; --ph1-bg:#1e1b4b;
+      --ph2:#22d3ee; --ph2-bg:#083344;
+      --ph3:#a78bfa; --ph3-bg:#2e1065;
+      --ph4:#f472b6; --ph4-bg:#500724;
+    }
+
+    /* Phase bands */
+    .phase-bands {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      pointer-events: none;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .phase-band {
+      border-right: 1px solid var(--border);
+    }
+    .phase-band:last-child { border-right: none; }
+
+    /* Sticky phase column headers — live OUTSIDE the scroll container */
+    .phase-headers-bar {
+      position: sticky; top: 96px; z-index: 80;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .phase-headers {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 0 24px;
+    }
+    .phase-header {
+      padding: 14px 16px 12px;
+      border-top: 4px solid transparent;
+      border-right: 1px solid var(--border);
+    }
+    .phase-header:last-child { border-right: none; }
+    .phase-header.ph1 { border-top-color: var(--ph1); background: var(--ph1-bg); }
+    .phase-header.ph2 { border-top-color: var(--ph2); background: var(--ph2-bg); }
+    .phase-header.ph3 { border-top-color: var(--ph3); background: var(--ph3-bg); }
+    .phase-header.ph4 { border-top-color: var(--ph4); background: var(--ph4-bg); }
+    .phase-num {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 3px;
+    }
+    .phase-header.ph1 .phase-num { color: var(--ph1); }
+    .phase-header.ph2 .phase-num { color: var(--ph2); }
+    .phase-header.ph3 .phase-num { color: var(--ph3); }
+    .phase-header.ph4 .phase-num { color: var(--ph4); }
+    .phase-name {
+      font-size: 15px; font-weight: 700; color: var(--fg); line-height: 1.2;
+    }
+    .phase-dates {
+      font-size: 11px; color: var(--fg-muted); margin-top: 2px;
+    }
+
+    /* Milestone grid */
+    .milestones-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 8px 12px 20px;
+      position: relative;
+    }
+
+    /* Milestone card */
+    .milestone-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .milestone-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+    }
+    .milestone-card.status-shipped { border-left: 3px solid var(--success); }
+    .milestone-card.status-in-progress { border-left: 3px solid var(--accent); }
+    .milestone-card.status-planned { border-left: 3px solid var(--border-strong); }
+    .milestone-card.status-deferred { border-left: 3px solid var(--fg-faint); opacity: 0.7; }
+    .milestone-card.hidden { display: none; }
+
+    .card-top {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .card-info { flex: 1; min-width: 0; }
+    .card-title {
+      font-size: 13px; font-weight: 600; line-height: 1.3;
+      color: var(--fg);
+    }
+    .status-deferred .card-title { color: var(--fg-faint); }
+    .card-date {
+      font-size: 11px; color: var(--fg-muted); margin-top: 2px;
+      font-family: var(--font-mono);
+    }
+
+    /* Status chip */
+    .status-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 600;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .chip-shipped { background: var(--success-bg); color: var(--success); }
+    .chip-in-progress { background: var(--accent-bg); color: var(--accent); }
+    .chip-planned { background: var(--bg-subtle-2); color: var(--fg-muted); }
+    .chip-deferred { background: var(--bg-subtle); color: var(--fg-faint); }
+
+    /* Completion ring */
+    .ring-wrap {
+      flex-shrink: 0; position: relative; width: 40px; height: 40px;
+    }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+    .ring-fill { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray 0.4s; }
+    .ring-fill.shipped { stroke: var(--success); }
+    .ring-fill.in-progress { stroke: var(--accent); }
+    .ring-fill.planned { stroke: var(--border-strong); }
+    .ring-fill.deferred { stroke: var(--fg-faint); }
+    .ring-pct {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: var(--fg-muted);
+    }
+    .status-shipped .ring-pct { color: var(--success); }
+
+    /* Checkmark for shipped */
+    .shipped-check {
+      position: absolute; top: 6px; right: 6px;
+      width: 14px; height: 14px; background: var(--success);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 9px; line-height: 1;
+    }
+
+    /* Detail drawer */
+    .card-detail {
+      display: none;
+      margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--fg-muted);
+      line-height: 1.5;
+    }
+    .milestone-card.expanded .card-detail { display: block; }
+
+    /* Dependency connector SVG overlay */
+    .dep-svg {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .dep-line {
+      stroke: var(--fg-faint); stroke-width: 1.5;
+      stroke-dasharray: 4 3; fill: none;
+    }
+    .dep-arrow {
+      fill: var(--fg-faint);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 24px 20px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--fg-muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .ld-shipped { background: var(--success); }
+    .ld-progress { background: var(--accent); }
+    .ld-planned { background: var(--border-strong); }
+    .ld-deferred { background: var(--fg-faint); }
+
+    /* Dep info section */
+    .dep-section {
+      padding: 0 24px 32px;
+    }
+    .dep-section h3 {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--fg-muted); margin-bottom: 12px;
+    }
+    .dep-list { display: flex; flex-direction: column; gap: 8px; }
+    .dep-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px;
+    }
+    .dep-arrow-icon { color: var(--fg-faint); font-size: 16px; }
+    .dep-note { font-size: 12px; color: var(--fg-muted); margin-left: 4px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="back">← Acme Sync</a>
+  <div class="nav-brand">Acme <span>Sync</span> · Milestone Plan</div>
+  <div style="flex:1"></div>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
+</nav>
+
+<div class="page-header">
+  <h1>Product Roadmap — Acme Sync</h1>
+  <p>Jan 2026 – Dec 2026 · 12 milestones across 4 phases</p>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" type="button" data-filter="all">All</button>
+  <button class="filter-btn" type="button" data-filter="shipped">Shipped</button>
+  <button class="filter-btn" type="button" data-filter="in-progress">In Progress</button>
+  <button class="filter-btn" type="button" data-filter="planned">Planned</button>
+  <button class="filter-btn" type="button" data-filter="deferred">Deferred</button>
+</div>
+
+<!-- Sticky phase column headers — outside the scroll container so they're always visible -->
+<div class="phase-headers-bar">
+  <div class="phase-headers">
+    <div class="phase-header ph1">
+      <div class="phase-num">Phase 1</div>
+      <div class="phase-name">Core</div>
+      <div class="phase-dates">Jan – Mar 2026</div>
+    </div>
+    <div class="phase-header ph2">
+      <div class="phase-num">Phase 2</div>
+      <div class="phase-name">Teams</div>
+      <div class="phase-dates">Apr – Jun 2026</div>
+    </div>
+    <div class="phase-header ph3">
+      <div class="phase-num">Phase 3</div>
+      <div class="phase-name">Enterprise</div>
+      <div class="phase-dates">Jul – Sep 2026</div>
+    </div>
+    <div class="phase-header ph4">
+      <div class="phase-num">Phase 4</div>
+      <div class="phase-name">Mobile</div>
+      <div class="phase-dates">Oct – Dec 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="timeline-outer">
+  <div class="timeline-scroll" id="timeline-scroll">
+
+    <!-- Phase bands background -->
+    <div class="phase-bands">
+      <div class="phase-band" style="background:var(--ph1-bg);"></div>
+      <div class="phase-band" style="background:var(--ph2-bg);"></div>
+      <div class="phase-band" style="background:var(--ph3-bg);"></div>
+      <div class="phase-band" style="background:var(--ph4-bg);"></div>
+    </div>
+
+    <!-- Milestones grid with dep SVG overlay -->
+    <div style="position:relative;">
+      <div class="milestones-grid" id="milestones-grid">
+
+        <!-- Phase 1 -->
+        <div class="milestone-card status-shipped" id="m-v10" data-status="shipped">
+          <div class="shipped-check">✓</div>
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill shipped" cx="20" cy="20" r="16" stroke-dasharray="100.53 100.53"/>
+              </svg>
+              <div class="ring-pct">100%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v1.0 — Initial Release</div>
+              <div class="card-date">Jan 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-shipped">✓ Shipped</span>
+          <div class="card-detail">File sync across 2 devices. SQLite local store. Basic conflict detection (last-write-wins). macOS + Windows desktop app.</div>
+        </div>
+
+        <div class="milestone-card status-shipped" id="m-v11" data-status="shipped">
+          <div class="shipped-check">✓</div>
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill shipped" cx="20" cy="20" r="16" stroke-dasharray="100.53 100.53"/>
+              </svg>
+              <div class="ring-pct">100%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v1.1 — Conflict Alerts</div>
+              <div class="card-date">Feb 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-shipped">✓ Shipped</span>
+          <div class="card-detail">Visual diff for text file conflicts. Email notification on conflict. Manual resolution UI.</div>
+        </div>
+
+        <div class="milestone-card status-shipped" id="m-v12" data-status="shipped">
+          <div class="shipped-check">✓</div>
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill shipped" cx="20" cy="20" r="16" stroke-dasharray="100.53 100.53"/>
+              </svg>
+              <div class="ring-pct">100%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v1.2 — Performance</div>
+              <div class="card-date">Mar 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-shipped">✓ Shipped</span>
+          <div class="card-detail">Delta sync (only changed bytes). Batch upload optimization. Reduced CPU idle to &lt;0.2%.</div>
+        </div>
+
+        <!-- Phase 1 col 4 placeholder for grid alignment -->
+        <div></div>
+
+        <!-- Phase 2 row — need 4 cols, but phase 2 has 4 items spanning col 1 of phase 2 ... -->
+        <!-- We'll do a second row spanning all 4 columns for phase 2 milestones -->
+      </div>
+
+      <!-- Row 2: Phase 2 milestones (need separate row for layout) -->
+      <div class="milestones-grid" id="milestones-grid-2" style="padding-top:0;">
+
+        <div></div><!-- Phase 1 spacer -->
+
+        <div class="milestone-card status-shipped" id="m-v20" data-status="shipped">
+          <div class="shipped-check">✓</div>
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill shipped" cx="20" cy="20" r="16" stroke-dasharray="100.53 100.53"/>
+              </svg>
+              <div class="ring-pct">100%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v2.0 — Team Workspaces</div>
+              <div class="card-date">Apr 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-shipped">✓ Shipped</span>
+          <div class="card-detail">Shared workspaces. Role-based access (Owner / Editor / Viewer). Activity log.</div>
+        </div>
+
+        <div class="milestone-card status-planned" id="m-v30" data-status="planned">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill planned" cx="20" cy="20" r="16" stroke-dasharray="0 100.53"/>
+              </svg>
+              <div class="ring-pct">0%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v3.0 — SSO / SAML</div>
+              <div class="card-date">Jul 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-planned">Planned</span>
+          <div class="card-detail">SAML 2.0 integration. SCIM provisioning. Okta + Azure AD connectors.</div>
+        </div>
+
+        <div class="milestone-card status-planned" id="m-v40" data-status="planned">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill planned" cx="20" cy="20" r="16" stroke-dasharray="0 100.53"/>
+              </svg>
+              <div class="ring-pct">0%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v4.0 — iOS App</div>
+              <div class="card-date">Oct 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-planned">Planned</span>
+          <div class="card-detail">Native iOS app. Offline-first. Background sync. Face ID vault.</div>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="milestones-grid" style="padding-top:0;">
+
+        <div></div><!-- Phase 1 spacer -->
+
+        <div class="milestone-card status-shipped" id="m-v21" data-status="shipped">
+          <div class="shipped-check">✓</div>
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill shipped" cx="20" cy="20" r="16" stroke-dasharray="100.53 100.53"/>
+              </svg>
+              <div class="ring-pct">100%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v2.1 — Three-Way Merge</div>
+              <div class="card-date">Apr 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-shipped">✓ Shipped</span>
+          <div class="card-detail">Text file three-way merge. Ancestor snapshot lookup. Conflict hunk highlighting. <strong>Depends on v1.2.</strong></div>
+        </div>
+
+        <div class="milestone-card status-planned" id="m-v31" data-status="planned">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill planned" cx="20" cy="20" r="16" stroke-dasharray="0 100.53"/>
+              </svg>
+              <div class="ring-pct">0%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v3.1 — Audit Log Export</div>
+              <div class="card-date">Aug 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-planned">Planned</span>
+          <div class="card-detail">Full audit trail export (CSV / JSON). Retention policy config. SOC 2 evidence pack.</div>
+        </div>
+
+        <div class="milestone-card status-planned" id="m-v41" data-status="planned">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill planned" cx="20" cy="20" r="16" stroke-dasharray="0 100.53"/>
+              </svg>
+              <div class="ring-pct">0%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v4.1 — Android App</div>
+              <div class="card-date">Nov 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-planned">Planned</span>
+          <div class="card-detail">Android app. Adaptive battery sync. Material You theming.</div>
+        </div>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="milestones-grid" style="padding-top:0;">
+
+        <div></div>
+
+        <div class="milestone-card status-in-progress" id="m-v22" data-status="in-progress">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill in-progress" cx="20" cy="20" r="16" stroke-dasharray="65.34 100.53"/>
+              </svg>
+              <div class="ring-pct">65%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v2.2 — Selective Sync</div>
+              <div class="card-date">May 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-in-progress">In Progress</span>
+          <div class="card-detail">Choose which folders to sync per device. Smart bandwidth throttle. Mobile data detection.</div>
+        </div>
+
+        <div class="milestone-card status-planned" id="m-v32" data-status="planned">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill planned" cx="20" cy="20" r="16" stroke-dasharray="0 100.53"/>
+              </svg>
+              <div class="ring-pct">0%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v3.2 — Advanced Permissions</div>
+              <div class="card-date">Sep 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-planned">Planned</span>
+          <div class="card-detail">Per-file permission overrides. IP allowlist. DLP integration hooks.</div>
+        </div>
+
+        <div class="milestone-card status-deferred" id="m-v42" data-status="deferred">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill deferred" cx="20" cy="20" r="16" stroke-dasharray="0 100.53"/>
+              </svg>
+              <div class="ring-pct">0%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v4.2 — Web Fallback</div>
+              <div class="card-date">Dec 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-deferred">Deferred</span>
+          <div class="card-detail">Browser-based fallback for restricted devices. Read-only in free tier. Deferred pending mobile adoption data.</div>
+        </div>
+      </div>
+
+      <!-- Row 5: v2.3 -->
+      <div class="milestones-grid" style="padding-top:0; padding-bottom:24px;">
+        <div></div>
+        <div class="milestone-card status-in-progress" id="m-v23" data-status="in-progress">
+          <div class="card-top">
+            <div class="ring-wrap">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle class="ring-bg" cx="20" cy="20" r="16"/>
+                <circle class="ring-fill in-progress" cx="20" cy="20" r="16" stroke-dasharray="30.16 100.53"/>
+              </svg>
+              <div class="ring-pct">30%</div>
+            </div>
+            <div class="card-info">
+              <div class="card-title">v2.3 — Shared Invitations</div>
+              <div class="card-date">Jun 2026</div>
+            </div>
+          </div>
+          <span class="status-chip chip-in-progress">In Progress</span>
+          <div class="card-detail">Email invitations. Permission levels. Free tier: 3 collaborators. <strong>Depends on v2.0.</strong></div>
+        </div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+
+  </div><!-- timeline-scroll -->
+</div><!-- timeline-outer -->
+
+<div class="legend" style="padding-bottom:24px;">
+  <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-faint);margin-right:8px;">Card status</span>
+  <span class="legend-item"><span class="legend-dot ld-shipped"></span> Shipped</span>
+  <span class="legend-item"><span class="legend-dot ld-progress"></span> In Progress</span>
+  <span class="legend-item"><span class="legend-dot ld-planned"></span> Planned</span>
+  <span class="legend-item"><span class="legend-dot ld-deferred"></span> Deferred</span>
+</div>
+
+<!-- Dependencies section -->
+<div class="dep-section">
+  <h3>Dependencies</h3>
+  <div class="dep-list">
+    <div class="dep-item">
+      <strong>v1.2 — Performance</strong>
+      <span class="dep-arrow-icon">→</span>
+      <strong>v2.1 — Three-Way Merge</strong>
+      <span class="dep-note">Delta sync enables efficient ancestor-snapshot merge</span>
+    </div>
+    <div class="dep-item">
+      <strong>v2.0 — Team Workspaces</strong>
+      <span class="dep-arrow-icon">→</span>
+      <strong>v2.3 — Shared Invitations</strong>
+      <span class="dep-note">Team workspaces required before invitation flow</span>
+    </div>
+    <div class="dep-item">
+      <strong>v2.3 — Shared Invitations</strong>
+      <span class="dep-arrow-icon">→</span>
+      <strong>v3.0 — SSO / SAML</strong>
+      <span class="dep-note">User management needed before enterprise SSO</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+    if(t==='dark')document.documentElement.classList.add('dark');
+    document.getElementById('dm-toggle').addEventListener('click',function(){
+      var d=document.documentElement.classList.toggle('dark');
+      localStorage.setItem('ha-theme',d?'dark':'light');
+    });
+  })();
+
+  // Filter
+  var filterBtns = document.querySelectorAll('.filter-btn');
+  filterBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      filterBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var f = btn.getAttribute('data-filter');
+      var cards = document.querySelectorAll('.milestone-card');
+      cards.forEach(function(card) {
+        var s = card.getAttribute('data-status');
+        if (f === 'all' || s === f) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // Expand card on click
+  var cards = document.querySelectorAll('.milestone-card');
+  cards.forEach(function(card) {
+    card.addEventListener('click', function() {
+      card.classList.toggle('expanded');
+    });
+  });
+</script>
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Milestone Plan · May 2026
+</footer>
+</body>
+</html>

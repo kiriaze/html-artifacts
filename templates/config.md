@@ -6,46 +6,66 @@ project: YOUR_PROJECT_NAME
 # HTML Knowledge Hub — Config
 
 Copy this file to `docs/html/config.md` in your project. The `html-artifacts` skill reads it
-before generating any HTML artifact to pick up your project's design tokens, terminology,
-and the list of active HTML docs.
+before generating any HTML artifact. Fill in your project's values; delete rows that don't apply.
 
 ---
 
 ## Design Tokens
 
-Replace these with your project's values. The skill uses them as CSS variables in every
-generated file so the output looks native to your product.
+Override the skill's clean-white defaults with your project's palette. If you don't need custom
+tokens, delete this section — the skill will use clean white defaults automatically.
 
 ```css
---bg:        #FFFFFF;   /* Main background */
---fg:        #111111;   /* Primary text */
---accent:    #0066CC;   /* Primary accent — links, highlights, buttons */
---secondary: #F0F0F0;   /* Cards, section backgrounds */
---tertiary:  #4CAF50;   /* Secondary accents, tags, success states */
---g100:      #F8F8F8;   /* Lightest gray — hover states */
---g300:      #E0E0E0;   /* Borders */
---g500:      #888888;   /* Muted text */
---g700:      #444444;   /* Secondary text */
---font-serif:  Georgia, 'Times New Roman', serif;
---font-sans:   -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
---font-mono:   'SF Mono', Menlo, Monaco, 'Courier New', monospace;
---radius-sm:   4px;
---radius-md:   8px;
---radius-lg:   12px;
+/* Backgrounds */
+--bg:           #ffffff;   /* Page background */
+--bg-subtle:    #f9fafb;   /* Cards, section backgrounds */
+--bg-subtle-2:  #f3f4f6;   /* Nested cards, code blocks */
+
+/* Text */
+--fg:           #111827;   /* Primary text */
+--fg-muted:     #6b7280;   /* Secondary text, captions */
+--fg-faint:     #9ca3af;   /* Placeholder, timestamps */
+
+/* Accent — your primary brand color */
+--accent:       #2563eb;   /* Links, highlights, buttons */
+--accent-bg:    #eff6ff;   /* Accent tint backgrounds */
+--accent-border:#bfdbfe;   /* Accent tint borders */
+
+/* Semantic colors — usually leave as-is */
+--success:      #16a34a;
+--success-bg:   #f0fdf4;
+--warning:      #d97706;
+--warning-bg:   #fffbeb;
+--danger:       #dc2626;
+--danger-bg:    #fef2f2;
+
+/* Borders */
+--border:       #e5e7eb;
+--border-strong:#d1d5db;
+
+/* Typography */
+--font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+--font-mono:    'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+
+/* Shape */
+--radius-sm:    4px;
+--radius-md:    6px;
+--radius-lg:    10px;
+--shadow-sm:    0 1px 2px rgba(0,0,0,0.05);
+--shadow-md:    0 4px 6px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
 ```
 
-Spacing: 4pt scale. Use `4, 8, 12, 16, 24, 32, 48, 64px`. No arbitrary values.
+Spacing: 4pt scale only — `4, 8, 12, 16, 24, 32, 48, 64px`. No arbitrary values.
 
 ---
 
 ## Terminology
 
-Add your project's key terms so the skill uses the right vocabulary in generated docs.
-Delete rows that don't apply; add as many as needed.
+Add your project's key terms so the skill uses consistent language in generated docs.
 
 | Term | Meaning |
 |---|---|
-| [Product name] | [What the product is in one clause] |
+| [Product name] | [One-clause description] |
 | [Key concept 1] | [Definition] |
 | [Key concept 2] | [Definition] |
 
@@ -53,24 +73,30 @@ Delete rows that don't apply; add as many as needed.
 
 ## Active HTML Docs
 
-List every HTML file the skill manages in this project. The skill checks these when
-running `html-artifacts audit` and `html-artifacts refresh`.
+List every HTML file the skill manages. Used by `html-artifacts audit` and `html-artifacts refresh`.
 
 | File | Source | Pattern | Description |
 |---|---|---|---|
-| `index.html` | — | hub | Navigation hub linking all docs |
+| `index.html` | — | hub | Navigation hub |
+
+---
+
+## Recurring Artifact Directories
+
+Artifact types that accumulate over time go here:
+
+| Directory | Pattern | Naming |
+|---|---|---|
+| `reports/` | status-report | `YYYY-MM-DD.html` |
+| `reviews/` | code-review | `PR-NNN.html` |
+| `incidents/` | incident-report | `YYYY-MM-DD.html` |
 
 ---
 
 ## Refresh Rules
 
-When any of these source files change, the corresponding HTML doc is stale:
+| Source file | HTML doc | Notes |
+|---|---|---|
+| `docs/plans/PLAN.md` | `plan.html` | |
 
-| Source file | HTML doc |
-|---|---|
-| `docs/plans/PLAN.md` | `plan.html` |
-
-Add one row per source→doc pair. When any HTML doc is regenerated, also update the
-`index.html` card timestamp.
-
-Run `html-artifacts audit` to check freshness of all listed docs.
+Add one row per source→doc pair. Run `html-artifacts audit` to check freshness.

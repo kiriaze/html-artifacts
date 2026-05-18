@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>explore · index.html variations</title>
+  <style>
+    /* ─── Exploration page chrome ─────────────────────────────────────── */
+    :root {
+      --exp-bg: #f0efed;
+      --exp-border: #dddbd8;
+      --exp-label-fg: #888;
+      --frame-bg: #ffffff;
+      --accent: #2563eb;
+      --fg: #111827;
+      --fg-muted: #6b7280;
+      --fg-faint: #9ca3af;
+      --border: #e5e7eb;
+      --border-strong: #d1d5db;
+      --bg-subtle: #f9fafb;
+      --bg-subtle-2: #f3f4f6;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--exp-bg); font-family: var(--font-sans); color: var(--fg); -webkit-font-smoothing: antialiased; }
+
+    /* Exploration TOC */
+    .exp-toc {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(240,239,237,0.96); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--exp-border);
+      padding: 0 32px;
+      display: flex; align-items: center; gap: 0; height: 44px;
+      overflow-x: auto;
+    }
+    .exp-toc-title { font-size: 12px; font-weight: 700; color: var(--exp-label-fg); font-family: var(--font-mono); margin-right: 24px; white-space: nowrap; flex-shrink: 0; }
+    .exp-toc a { font-size: 12px; color: var(--fg-muted); text-decoration: none; padding: 0 12px; height: 44px; display: flex; align-items: center; white-space: nowrap; border-right: 1px solid var(--exp-border); flex-shrink: 0; }
+    .exp-toc a:hover { color: var(--fg); background: rgba(0,0,0,0.04); }
+    .exp-toc a:first-of-type { border-left: 1px solid var(--exp-border); }
+
+    /* Section wrapper */
+    .exp-section { padding: 48px 32px 0; }
+    .exp-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--exp-label-fg); margin-bottom: 20px;
+    }
+
+    /* Variant frame */
+    .variant { margin-bottom: 20px; }
+    .variant-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; color: var(--exp-label-fg);
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+    }
+    .variant-tag .vtag-name { color: var(--fg-muted); }
+    .variant-tag .vtag-sep { color: var(--exp-border); }
+    .variant-frame {
+      background: var(--frame-bg);
+      border: 1px solid var(--exp-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .exp-spacer { height: 64px; }
+
+
+    /* ─── HEADER VARIANTS ─────────────────────────────────────────────── */
+
+    /* H-Current */
+    .hdr-current {
+      padding: 12px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+    }
+    .hdr-current .wm { font-family: var(--font-mono); font-weight: 600; font-size: 14px; color: var(--fg); }
+    .hdr-current a { font-size: 13px; color: var(--fg-muted); text-decoration: none; }
+    .hdr-current .dm { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; color: var(--fg-muted); }
+
+    /* H-A: dogum-inspired — full GitHub URL + lineage reference */
+    .hdr-a {
+      padding: 0 40px;
+      display: flex; align-items: stretch;
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+      gap: 0;
+    }
+    .hdr-a .wm { font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--fg); display: flex; align-items: center; padding-right: 24px; border-right: 1px solid var(--border); }
+    .hdr-a .gh-url { font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); display: flex; align-items: center; padding: 0 24px; }
+    .hdr-a .gh-url .host { color: var(--fg-faint); }
+    .hdr-a .gh-url .path { color: var(--accent); font-weight: 600; }
+    .hdr-a .spacer { flex: 1; }
+    .hdr-a .lineage { font-size: 11px; color: var(--fg-faint); display: flex; align-items: center; gap: 4px; padding-left: 24px; border-left: 1px solid var(--border); }
+    .hdr-a .lineage strong { color: var(--fg-muted); }
+    .hdr-a .dm-sm { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; color: var(--fg-faint); margin-left: 16px; align-self: center; flex-shrink: 0; }
+
+    /* H-B: Pill navigation */
+    .hdr-b {
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    .hdr-b .wm { font-size: 14px; font-weight: 700; font-family: var(--font-mono); color: var(--fg); display: flex; align-items: center; gap: 6px; }
+    .hdr-b .wm-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .hdr-b nav { display: flex; gap: 2px; background: var(--bg-subtle-2); border-radius: 20px; padding: 3px; }
+    .hdr-b nav a { font-size: 12px; font-weight: 500; color: var(--fg-muted); text-decoration: none; padding: 4px 12px; border-radius: 16px; }
+    .hdr-b nav a.active { background: #fff; color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .hdr-b nav a:hover:not(.active) { color: var(--fg); }
+    .hdr-b .gh-link { font-size: 12px; color: var(--fg-muted); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+
+
+    /* ─── HERO VARIANTS ───────────────────────────────────────────────── */
+
+    /* H-Current */
+    .hero-current {
+      padding: 80px 48px 64px;
+      max-width: 720px; margin: 0 auto;
+      text-align: center;
+    }
+    .hero-current h1 { font-size: 48px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+    .hero-current .lead { font-size: 18px; color: var(--fg-muted); margin: 16px auto 0; max-width: 560px; line-height: 1.6; }
+    .hero-current hr { margin: 32px auto; width: 48px; border: none; border-top: 2px solid var(--border); }
+    .hero-current pre { background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px 18px; font-size: 12px; text-align: left; font-family: var(--font-mono); line-height: 1.7; }
+    .hero-current .hint { font-size: 13px; color: var(--fg-muted); margin-top: 12px; }
+    .hero-current .hint code { background: var(--bg-subtle-2); font-family: var(--font-mono); font-size: 12px; padding: 2px 5px; border-radius: 4px; }
+
+    /* H-A: dogum-inspired — eyebrow, large h1, lead, stats, CTAs */
+    .hero-a {
+      padding: 72px 64px 64px;
+      max-width: 900px; margin: 0 auto;
+    }
+    .hero-a .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 24px;
+    }
+    .hero-a .eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+    .hero-a h1 {
+      font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
+      color: var(--fg); margin-bottom: 24px; max-width: 680px;
+    }
+    .hero-a h1 .accent { color: var(--accent); }
+    .hero-a .lead { font-size: 20px; font-weight: 400; color: var(--fg-muted); line-height: 1.6; max-width: 540px; margin-bottom: 32px; }
+    .hero-a .stats { display: flex; align-items: center; gap: 0; margin-bottom: 40px; }
+    .hero-a .stat { font-size: 13px; font-weight: 500; color: var(--fg-muted); padding-right: 16px; margin-right: 16px; border-right: 1px solid var(--border); }
+    .hero-a .stat:last-child { border-right: none; margin-right: 0; }
+    .hero-a .stat strong { color: var(--fg); }
+    .hero-a .ctas { display: flex; gap: 12px; align-items: center; }
+    .hero-a .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 11px 22px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    .hero-a .btn-primary:hover { background: #1d4ed8; text-decoration: none; }
+    .hero-a .btn-secondary { background: none; color: var(--fg); border: 1.5px solid var(--border-strong); border-radius: 6px; padding: 10px 22px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; }
+    .hero-a .btn-secondary:hover { border-color: var(--fg-muted); text-decoration: none; }
+    .hero-a .install-row { margin-top: 40px; display: flex; align-items: center; gap: 12px; }
+    .hero-a .install-pre { background: #0d1117; color: #e6edf3; border-radius: 6px; padding: 10px 16px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; flex: 1; }
+    .hero-a .install-pre .cmd-prefix { color: #6e7681; }
+    .hero-a .install-pre .cmd { color: #79c0ff; }
+
+    /* H-B: split layout — text left, animated SVG right */
+    .hero-b {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 400px; align-items: center;
+    }
+    .hero-b .hero-b-text { padding: 64px 48px; }
+    .hero-b .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: block; }
+    .hero-b h1 { font-size: 40px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 16px; }
+    .hero-b .lead { font-size: 16px; color: var(--fg-muted); line-height: 1.65; margin-bottom: 28px; }
+    .hero-b .ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hero-b .btn-p { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .hero-b .btn-s { background: none; color: var(--fg-muted); border: 1.5px solid var(--border-strong); border-radius: 6px; padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; }
+    .hero-b .hero-b-visual { background: var(--bg-subtle); border-left: 1px solid var(--border); display: flex; align-items: center; justify-content: center; padding: 48px; min-height: 400px; }
+    .hero-b svg.hero-svg { width: 100%; max-width: 320px; }
+
+    /* SVG animations */
+    @keyframes node-pop { 0%{opacity:0;transform:scale(0.4)} 70%{transform:scale(1.05)} 100%{opacity:1;transform:scale(1)} }
+    @keyframes line-draw { from{stroke-dashoffset:60} to{stroke-dashoffset:0} }
+    @keyframes fade-in { from{opacity:0} to{opacity:1} }
+    @keyframes bar-rise { from{transform:scaleY(0)} to{transform:scaleY(1)} }
+    .hero-svg .n { animation: node-pop 0.4s ease both; }
+    .hero-svg .n2 { animation-delay: 0.1s; }
+    .hero-svg .n3 { animation-delay: 0.2s; }
+    .hero-svg .n4 { animation-delay: 0.3s; }
+    .hero-svg .n5 { animation-delay: 0.15s; }
+    .hero-svg .conn { stroke-dasharray: 60; animation: line-draw 0.5s ease 0.2s both; }
+    .hero-svg .conn2 { animation-delay: 0.35s; }
+    .hero-svg .conn3 { animation-delay: 0.5s; }
+    .hero-svg .lbl { animation: fade-in 0.3s ease 0.4s both; }
+
+    /* H-C: Tab-anchor nav (Thariq-inspired — pattern group tabs + counts) */
+    .hero-c {
+      padding: 56px 64px 40px;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .hero-c .eyebrow { font-size: 12px; color: var(--fg-faint); margin-bottom: 20px; display: block; }
+    .hero-c h1 { font-size: 52px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 16px; max-width: 640px; }
+    .hero-c .lead { font-size: 17px; color: var(--fg-muted); max-width: 520px; line-height: 1.65; margin-bottom: 40px; }
+    .hero-c .group-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .hero-c .gtab { font-size: 13px; font-weight: 500; color: var(--fg-muted); padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .hero-c .gtab.active { color: var(--fg); border-bottom-color: var(--fg); }
+    .hero-c .gtab:hover:not(.active) { color: var(--fg); }
+    .hero-c .gtab-count { background: var(--bg-subtle-2); color: var(--fg-muted); font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 8px; }
+    .hero-c .gtab.active .gtab-count { background: var(--fg); color: var(--bg-subtle); }
+
+
+    /* ─── CARD VARIANTS ───────────────────────────────────────────────── */
+    .cards-section-inner { padding: 28px 28px 0; }
+
+    /* C-Current */
+    .grid-current { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card-cur {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 20px; display: block; text-decoration: none; color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .card-cur:hover { border-color: var(--accent); box-shadow: 0 0 0 3px #eff6ff; }
+    .card-cur .ct { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .card-cur .pn { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); flex: 1; }
+    .card-cur .core-b { background: var(--fg); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .card-cur .auto-b { background: #eff6ff; color: var(--accent); font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; }
+    .card-cur .ttl { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .card-cur .dsc { font-size: 13px; color: var(--fg-muted); line-height: 1.5; }
+    .card-cur .cta { font-size: 12px; color: var(--accent); margin-top: 10px; }
+
+    /* C-A: Animated SVG cover cards */
+    .grid-svg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card-svg {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; display: block; text-decoration: none; color: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .card-svg:hover { border-color: var(--accent); box-shadow: 0 8px 24px rgba(37,99,235,0.12); transform: translateY(-2px); }
+    .card-svg .svg-cover { height: 110px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .card-svg .svg-cover svg { width: 80%; height: 80%; }
+    .card-svg .body { padding: 14px 16px 18px; }
+    .card-svg .pn { font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+    .card-svg .ttl { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--fg); }
+    .card-svg .dsc { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+    .card-svg .cta { font-size: 11px; color: var(--accent); margin-top: 10px; font-weight: 500; }
+
+    /* SVG cover colors */
+    .cov-blue { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); }
+    .cov-green { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+    .cov-amber { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); }
+    .cov-violet { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); }
+    .cov-rose { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); }
+    .cov-slate { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); }
+
+    /* Hover SVG animations */
+    .card-svg .bar { transform-origin: bottom; transition: transform 0.35s ease; transform: scaleY(0.2); }
+    .card-svg:hover .bar { transform: scaleY(1); }
+    .card-svg:hover .bar2 { transition-delay: 0.05s; }
+    .card-svg:hover .bar3 { transition-delay: 0.1s; }
+    .card-svg:hover .bar4 { transition-delay: 0.15s; }
+    .card-svg:hover .bar5 { transition-delay: 0.07s; }
+
+    .card-svg .gnode { transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0.4; transform: scale(0.85); }
+    .card-svg:hover .gnode { opacity: 1; transform: scale(1); }
+    .card-svg:hover .gnode2 { transition-delay: 0.07s; }
+    .card-svg:hover .gnode3 { transition-delay: 0.14s; }
+    .card-svg:hover .gnode4 { transition-delay: 0.21s; }
+    .card-svg:hover .gnode5 { transition-delay: 0.28s; }
+
+    .card-svg .gconn { stroke-dasharray: 40; stroke-dashoffset: 40; transition: stroke-dashoffset 0.4s ease 0.15s; }
+    .card-svg:hover .gconn { stroke-dashoffset: 0; }
+    .card-svg:hover .gconn2 { transition-delay: 0.3s; }
+
+    .card-svg .gcell { transition: opacity 0.25s ease, fill 0.25s ease; opacity: 0.2; }
+    .card-svg:hover .gcell { opacity: 1; }
+    .card-svg:hover .c2 { transition-delay: 0.04s; }
+    .card-svg:hover .c3 { transition-delay: 0.08s; }
+    .card-svg:hover .c4 { transition-delay: 0.12s; }
+    .card-svg:hover .c5 { transition-delay: 0.16s; }
+    .card-svg:hover .c6 { transition-delay: 0.20s; }
+
+    .card-svg .doc-line { transition: transform 0.3s ease, opacity 0.3s ease; transform: scaleX(0); transform-origin: left; opacity: 0; }
+    .card-svg:hover .doc-line { transform: scaleX(1); opacity: 1; }
+    .card-svg:hover .dl2 { transition-delay: 0.06s; }
+    .card-svg:hover .dl3 { transition-delay: 0.12s; }
+    .card-svg:hover .dl4 { transition-delay: 0.18s; }
+    .card-svg:hover .dl5 { transition-delay: 0.24s; }
+    .card-svg:hover .dl6 { transition-delay: 0.30s; }
+
+    /* C-B: Compact numbered list (Thariq-style) */
+    .list-compact { display: flex; flex-direction: column; }
+    .list-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      text-decoration: none; color: inherit;
+      transition: background 0.12s;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-item:hover { background: var(--bg-subtle); }
+    .list-item:hover .li-cta { opacity: 1; }
+    .li-num { font-family: var(--font-mono); font-size: 12px; color: var(--fg-faint); width: 28px; flex-shrink: 0; }
+    .li-name { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 500; width: 200px; flex-shrink: 0; }
+    .li-core { background: var(--fg); color: #fff; font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+    .li-title { font-size: 13px; font-weight: 500; color: var(--fg); flex: 1; }
+    .li-desc { font-size: 12px; color: var(--fg-muted); flex: 2; line-height: 1.4; display: none; }
+    .li-cta { font-size: 12px; color: var(--accent); font-weight: 500; opacity: 0; transition: opacity 0.12s; white-space: nowrap; flex-shrink: 0; }
+
+    /* C-C: Wide horizontal feature rows */
+    .grid-wide { display: flex; flex-direction: column; gap: 10px; }
+    .card-wide {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 18px 22px; display: flex; align-items: center; gap: 20px;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .card-wide:hover { border-color: var(--accent); box-shadow: 0 0 0 3px #eff6ff; }
+    .card-wide .cw-badge { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+    .card-wide .cw-info { flex: 1; min-width: 0; }
+    .card-wide .cw-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .card-wide .cw-title { font-size: 14px; font-weight: 600; }
+    .card-wide .cw-pn { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+    .card-wide .cw-desc { font-size: 13px; color: var(--fg-muted); line-height: 1.5; }
+    .card-wide .cw-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .card-wide .cw-cta { font-size: 12px; color: var(--accent); font-weight: 500; }
+    .cw-b1 { background: #eff6ff; }
+    .cw-b2 { background: #f0fdf4; }
+    .cw-b3 { background: #fffbeb; }
+    .cw-b4 { background: #fdf4ff; }
+    .cw-core { background: var(--fg); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; }
+    .cw-auto { background: #eff6ff; color: var(--accent); font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; }
+
+
+    /* ─── HOW-IT-WORKS VARIANTS ───────────────────────────────────────── */
+    .hiw-inner { padding: 36px 36px 8px; }
+
+    /* HIW-Current */
+    .hiw-cur { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .step-cur {
+      background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+    }
+    .step-num-cur { width: 32px; height: 32px; background: #eff6ff; color: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .step-title-cur { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .step-desc-cur { font-size: 13px; color: var(--fg-muted); line-height: 1.5; }
+    .step-desc-cur code { background: var(--bg-subtle-2); font-family: var(--font-mono); font-size: 11px; padding: 1px 4px; border-radius: 3px; }
+
+    /* HIW-A: Horizontal timeline */
+    .hiw-timeline { display: flex; align-items: flex-start; position: relative; padding-top: 28px; }
+    .hiw-timeline::before { content: ''; position: absolute; top: 44px; left: 48px; right: 48px; height: 2px; background: var(--border); }
+    .step-tl { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 16px; position: relative; }
+    .step-tl-dot { width: 20px; height: 20px; background: var(--accent); border-radius: 50%; margin-bottom: 16px; position: relative; z-index: 1; box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--border); }
+    .step-tl-dot.done { background: var(--accent); }
+    .step-tl-num { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+    .step-tl-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .step-tl-desc { font-size: 13px; color: var(--fg-muted); line-height: 1.5; }
+    .step-tl-desc code { font-family: var(--font-mono); font-size: 11px; background: var(--bg-subtle-2); padding: 1px 4px; border-radius: 3px; }
+
+    /* HIW-B: Large decorative numbers */
+    .hiw-big-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+    .step-bn {
+      padding: 32px 28px; position: relative; border-right: 1px solid var(--border);
+    }
+    .step-bn:last-child { border-right: none; }
+    .step-bn-bg { position: absolute; top: 16px; left: 16px; font-size: 96px; font-weight: 900; color: var(--bg-subtle-2); line-height: 1; pointer-events: none; font-variant-numeric: tabular-nums; letter-spacing: -0.04em; }
+    .step-bn-content { position: relative; z-index: 1; }
+    .step-bn-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step-bn-desc { font-size: 13px; color: var(--fg-muted); line-height: 1.6; }
+    .step-bn-desc code { font-family: var(--font-mono); font-size: 11px; background: var(--bg-subtle-2); padding: 1px 4px; border-radius: 3px; }
+
+    /* HIW-C: Terminal / CLI aesthetic */
+    .hiw-terminal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .step-term { background: #0d1117; border-radius: 8px; padding: 16px 18px; }
+    .step-term-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .td-r { background: #ff5f57; } .td-y { background: #febc2e; } .td-g { background: #28c840; }
+    .step-term-body { font-family: var(--font-mono); font-size: 12px; line-height: 1.8; }
+    .tc-prompt { color: #79c0ff; }
+    .tc-cmd { color: #e6edf3; }
+    .tc-comment { color: #6e7681; }
+    .tc-out { color: #3fb950; }
+    .tc-path { color: #d2a8ff; }
+
+
+    /* ─── Shared shared ────────────────────────────────────────────────── */
+    .variant-divider {
+      height: 1px; background: var(--exp-border); margin: 20px 0 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Exploration TOC -->
+<nav class="exp-toc">
+  <span class="exp-toc-title">explore · index.html</span>
+  <a href="#headers">Headers</a>
+  <a href="#heroes">Hero</a>
+  <a href="#cards">Cards</a>
+  <a href="#how-it-works">How it works</a>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SECTION 1 — HEADERS
+════════════════════════════════════════════════════════════════════════ -->
+<div class="exp-section" id="headers">
+  <p class="exp-section-label">01 · Header / Nav</p>
+
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">Current baseline</span></div>
+    <div class="variant-frame">
+      <header class="hdr-current">
+        <span class="wm">html-artifacts</span>
+        <a href="#">GitHub</a>
+        <button class="hdr-current dm">◐</button>
+      </header>
+    </div>
+  </div>
+
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-A · Full GitHub URL + lineage nod (dogum-inspired)</span></div>
+    <div class="variant-frame">
+      <header class="hdr-a">
+        <span class="wm">html-artifacts</span>
+        <span class="gh-url"><span class="host">github.com/</span><span class="path">YOUR_USERNAME/html-artifacts</span></span>
+        <span class="spacer"></span>
+        <span class="lineage">An extension of <strong>ThariqS/html-effectiveness</strong></span>
+        <button class="dm-sm">◐</button>
+      </header>
+    </div>
+  </div>
+
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-B · Pill nav with section anchors</span></div>
+    <div class="variant-frame">
+      <header class="hdr-b">
+        <span class="wm"><span class="wm-dot"></span>html-artifacts</span>
+        <nav>
+          <a href="#" class="gtab active">Examples</a>
+          <a href="#" class="gtab">Install</a>
+          <a href="#" class="gtab">Skill API</a>
+          <a href="#" class="gtab">Lineage</a>
+        </nav>
+        <a href="#" class="gh-link">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </header>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SECTION 2 — HEROES
+════════════════════════════════════════════════════════════════════════ -->
+<div class="exp-section" id="heroes">
+  <p class="exp-section-label">02 · Hero section</p>
+
+  <!-- Current -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">Current baseline</span></div>
+    <div class="variant-frame">
+      <div class="hero-current">
+        <h1>Interactive HTML docs for your codebase</h1>
+        <p class="lead">A Claude Code skill that generates self-contained, interactive HTML instead of Markdown walls — plans, analyses, diagrams, and reports that open directly in your browser.</p>
+        <hr>
+        <pre>git clone https://github.com/YOUR_USERNAME/html-artifacts ~/.agents/skills/html-artifacts
+ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts</pre>
+        <p class="hint">Then: <code>Use the html-artifacts skill to generate a [pattern] for [your project].</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-A: dogum-inspired -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-A · Eyebrow + large h1 + accent word + stats + dual CTA (dogum-inspired)</span></div>
+    <div class="variant-frame">
+      <div class="hero-a">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Claude Code Skill · An extension of html-effectiveness</div>
+        <h1>Stop writing docs.<br>Start <span class="accent">shipping HTML.</span></h1>
+        <p class="lead">18 self-contained patterns — plans, diagrams, code reviews, reports — that open directly in your browser. No build step. No server. No Markdown walls.</p>
+        <div class="stats">
+          <span class="stat"><strong>18</strong> patterns</span>
+          <span class="stat"><strong>0</strong> dependencies</span>
+          <span class="stat"><strong>Open in browser</strong></span>
+          <span class="stat">MIT License</span>
+        </div>
+        <div class="ctas">
+          <a href="#" class="btn-primary">Install the skill</a>
+          <a href="#" class="btn-secondary">Browse examples →</a>
+        </div>
+        <div class="install-row">
+          <pre class="install-pre"><span class="cmd-prefix">$</span> <span class="cmd">git clone</span> https://github.com/YOUR_USERNAME/html-artifacts ~/.agents/skills/html-artifacts
+<span class="cmd-prefix">$</span> <span class="cmd">ln -s</span> ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-B: Split layout with animated SVG -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-B · Split layout — text left, animated architecture SVG right</span></div>
+    <div class="variant-frame">
+      <div class="hero-b">
+        <div class="hero-b-text">
+          <span class="eyebrow">Claude Code Skill</span>
+          <h1>Interactive docs, not Markdown walls</h1>
+          <p class="lead">18 self-contained HTML patterns — plans, diagrams, reviews, reports — that open directly in your browser. Zero dependencies.</p>
+          <div class="ctas">
+            <a href="#" class="btn-p">Install</a>
+            <a href="#" class="btn-s">View examples →</a>
+          </div>
+        </div>
+        <div class="hero-b-visual">
+          <!-- Animated architecture SVG -->
+          <svg class="hero-svg" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Connections -->
+            <line class="conn" x1="80" y1="40" x2="140" y2="80" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="60"/>
+            <line class="conn conn2" x1="80" y1="100" x2="140" y2="80" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="60"/>
+            <line class="conn conn3" x1="80" y1="160" x2="140" y2="80" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="60"/>
+            <line class="conn" x1="140" y1="80" x2="200" y2="50" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="60"/>
+            <line class="conn conn2" x1="140" y1="80" x2="200" y2="110" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="60"/>
+            <!-- Source nodes -->
+            <rect class="n" x="20" y="24" width="60" height="32" rx="4" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+            <text x="50" y="44" font-size="9" fill="#6b7280" text-anchor="middle" font-family="monospace">PLAN.md</text>
+            <rect class="n n2" x="20" y="84" width="60" height="32" rx="4" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+            <text x="50" y="104" font-size="9" fill="#6b7280" text-anchor="middle" font-family="monospace">arch.md</text>
+            <rect class="n n3" x="20" y="144" width="60" height="32" rx="4" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5"/>
+            <text x="50" y="164" font-size="9" fill="#6b7280" text-anchor="middle" font-family="monospace">pr.diff</text>
+            <!-- Central skill node -->
+            <circle class="n n2" cx="140" cy="80" r="28" fill="#2563eb"/>
+            <text x="140" y="76" font-size="8" fill="white" text-anchor="middle" font-family="monospace" font-weight="700">html-</text>
+            <text x="140" y="87" font-size="8" fill="white" text-anchor="middle" font-family="monospace" font-weight="700">artifacts</text>
+            <!-- Output nodes -->
+            <rect class="n n4" x="196" y="30" width="68" height="40" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+            <text x="230" y="51" font-size="8" fill="#2563eb" text-anchor="middle" font-family="monospace">plan.html</text>
+            <rect class="n n5" x="196" y="90" width="68" height="40" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+            <text x="230" y="111" font-size="8" fill="#16a34a" text-anchor="middle" font-family="monospace">arch.html</text>
+            <!-- Labels -->
+            <text class="lbl" x="140" y="124" font-size="9" fill="#9ca3af" text-anchor="middle">skill routes &amp; generates</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-C: Thariq-inspired tab anchors -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-C · Pattern-group tab anchors with counts (Thariq-inspired)</span></div>
+    <div class="variant-frame">
+      <div class="hero-c">
+        <span class="eyebrow">An extension of ThariqS/html-effectiveness · Claude Code Skill</span>
+        <h1>18 HTML patterns.<br>Zero dependencies.</h1>
+        <p class="lead">Self-contained interactive docs for AI agents — plans, diagrams, code reviews, reports. Open directly in your browser, no server required.</p>
+        <div class="group-tabs">
+          <a href="#" class="gtab active">Planning &amp; Strategy <span class="gtab-count">5</span></a>
+          <a href="#" class="gtab">Code &amp; Architecture <span class="gtab-count">4</span></a>
+          <a href="#" class="gtab">Reporting &amp; Design <span class="gtab-count">3</span></a>
+          <a href="#" class="gtab">Prototyping <span class="gtab-count">3</span></a>
+          <a href="#" class="gtab">Docs &amp; Editing <span class="gtab-count">3</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SECTION 3 — CARDS
+════════════════════════════════════════════════════════════════════════ -->
+<div class="exp-section" id="cards">
+  <p class="exp-section-label">03 · Cards (example gallery)</p>
+
+  <!-- Current -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">Current baseline · border card grid</span></div>
+    <div class="variant-frame">
+      <div class="cards-section-inner" style="padding-bottom:28px;">
+        <div class="grid-current">
+          <a class="card-cur" href="#">
+            <div class="ct"><span class="pn">product-brief</span><span class="core-b">Core</span><span class="auto-b">Autogenerated</span></div>
+            <div class="ttl">Product brief</div>
+            <div class="dsc">Personas, architecture diagram, roadmap &amp; risk table in one shareable file.</div>
+            <div class="cta">View example →</div>
+          </a>
+          <a class="card-cur" href="#">
+            <div class="ct"><span class="pn">comparison-board</span><span class="core-b">Core</span><span class="auto-b">Autogenerated</span></div>
+            <div class="ttl">Competitor comparison</div>
+            <div class="dsc">Sortable feature matrix &amp; positioning map for evaluating alternatives.</div>
+            <div class="cta">View example →</div>
+          </a>
+          <a class="card-cur" href="#">
+            <div class="ct"><span class="pn">status-report</span><span class="core-b">Core</span><span class="auto-b">Autogenerated</span></div>
+            <div class="ttl">Sprint status report</div>
+            <div class="dsc">Metadata row, velocity chart, and shipped/slipped breakdown.</div>
+            <div class="cta">View example →</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-A: Animated SVG cover cards -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-A · Animated SVG cover cards (hover to animate)</span></div>
+    <div class="variant-frame">
+      <div class="cards-section-inner" style="padding-bottom:28px;">
+        <div class="grid-svg">
+
+          <!-- Product brief: stacked doc outline -->
+          <a class="card-svg" href="#">
+            <div class="svg-cover cov-blue">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="16" y="10" width="88" height="60" rx="4" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+                <line class="doc-line dl1" x1="26" y1="26" x2="94" y2="26" stroke="#93c5fd" stroke-width="2" stroke-linecap="round"/>
+                <line class="doc-line dl2" x1="26" y1="36" x2="80" y2="36" stroke="#bfdbfe" stroke-width="1.5" stroke-linecap="round"/>
+                <line class="doc-line dl3" x1="26" y1="44" x2="86" y2="44" stroke="#bfdbfe" stroke-width="1.5" stroke-linecap="round"/>
+                <line class="doc-line dl4" x1="26" y1="52" x2="72" y2="52" stroke="#bfdbfe" stroke-width="1.5" stroke-linecap="round"/>
+                <rect class="doc-line dl5" x="26" y="59" width="18" height="5" rx="2.5" fill="#2563eb"/>
+                <rect class="doc-line dl6" x="48" y="59" width="18" height="5" rx="2.5" fill="#93c5fd"/>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="pn">product-brief <span class="core-b" style="background:var(--fg);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;text-transform:uppercase;font-weight:700;">Core</span></div>
+              <div class="ttl">Product brief</div>
+              <div class="dsc">Personas, architecture, roadmap &amp; risk table in one file.</div>
+              <div class="cta">product-brief.html →</div>
+            </div>
+          </a>
+
+          <!-- Status report: bar chart -->
+          <a class="card-svg" href="#">
+            <div class="svg-cover cov-green">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="22" y1="14" x2="22" y2="64" stroke="#bbf7d0" stroke-width="1.5"/>
+                <line x1="22" y1="64" x2="98" y2="64" stroke="#bbf7d0" stroke-width="1.5"/>
+                <rect class="bar bar1" x="30" y="30" width="12" height="34" rx="2" fill="#4ade80" transform-origin="30px 64px"/>
+                <rect class="bar bar2" x="46" y="22" width="12" height="42" rx="2" fill="#16a34a" transform-origin="46px 64px"/>
+                <rect class="bar bar3" x="62" y="38" width="12" height="26" rx="2" fill="#4ade80" transform-origin="62px 64px"/>
+                <rect class="bar bar4" x="78" y="18" width="12" height="46" rx="2" fill="#16a34a" transform-origin="78px 64px"/>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="pn">status-report <span class="core-b" style="background:var(--fg);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;text-transform:uppercase;font-weight:700;">Core</span></div>
+              <div class="ttl">Sprint status report</div>
+              <div class="dsc">Velocity chart, shipped/slipped breakdown, risk table.</div>
+              <div class="cta">status-report.html →</div>
+            </div>
+          </a>
+
+          <!-- Architecture diagram: node graph -->
+          <a class="card-svg" href="#">
+            <div class="svg-cover cov-violet">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line class="gconn" x1="60" y1="28" x2="28" y2="56" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="40"/>
+                <line class="gconn gconn2" x1="60" y1="28" x2="92" y2="56" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="40"/>
+                <line class="gconn" x1="36" y1="20" x2="60" y2="28" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="40"/>
+                <circle class="gnode" cx="60" cy="28" r="14" fill="#7c3aed" transform-origin="60px 28px"/>
+                <circle class="gnode gnode2" cx="28" cy="56" r="10" fill="#a78bfa" transform-origin="28px 56px"/>
+                <circle class="gnode gnode3" cx="92" cy="56" r="10" fill="#a78bfa" transform-origin="92px 56px"/>
+                <circle class="gnode gnode4" cx="36" cy="20" r="7" fill="#ddd6fe" stroke="#a78bfa" stroke-width="1.5" transform-origin="36px 20px"/>
+                <text x="60" y="31" font-size="8" fill="white" text-anchor="middle" font-family="monospace" font-weight="700">API</text>
+                <text x="28" y="59" font-size="7" fill="white" text-anchor="middle" font-family="monospace">DB</text>
+                <text x="92" y="59" font-size="7" fill="white" text-anchor="middle" font-family="monospace">UI</text>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="pn">architecture-diagram <span class="core-b" style="background:var(--fg);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;text-transform:uppercase;font-weight:700;">Core</span></div>
+              <div class="ttl">Architecture diagram</div>
+              <div class="dsc">System overview with hot-path highlight &amp; click-to-expand.</div>
+              <div class="cta">architecture-diagram.html →</div>
+            </div>
+          </a>
+
+          <!-- Comparison board: grid cells -->
+          <a class="card-svg" href="#">
+            <div class="svg-cover cov-amber">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="14" y="16" width="92" height="14" rx="3" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+                <rect class="gcell c1" x="14" y="34" width="28" height="12" rx="2" fill="#4ade80" transform-origin="28px 40px"/>
+                <rect class="gcell c2" x="46" y="34" width="28" height="12" rx="2" fill="#f87171" transform-origin="60px 40px"/>
+                <rect class="gcell c3" x="78" y="34" width="28" height="12" rx="2" fill="#4ade80" transform-origin="92px 40px"/>
+                <rect class="gcell c4" x="14" y="50" width="28" height="12" rx="2" fill="#4ade80" transform-origin="28px 56px"/>
+                <rect class="gcell c5" x="46" y="50" width="28" height="12" rx="2" fill="#4ade80" transform-origin="60px 56px"/>
+                <rect class="gcell c6" x="78" y="50" width="28" height="12" rx="2" fill="#f87171" transform-origin="92px 56px"/>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="pn">comparison-board <span class="core-b" style="background:var(--fg);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;text-transform:uppercase;font-weight:700;">Core</span></div>
+              <div class="ttl">Competitor comparison</div>
+              <div class="dsc">Sortable feature matrix &amp; positioning map.</div>
+              <div class="cta">comparison-board.html →</div>
+            </div>
+          </a>
+
+          <!-- Flowchart: diamond chain -->
+          <a class="card-svg" href="#">
+            <div class="svg-cover cov-rose">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line class="gconn" x1="60" y1="14" x2="60" y2="28" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="40"/>
+                <line class="gconn gconn2" x1="60" y1="52" x2="60" y2="66" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="40"/>
+                <rect class="gnode" x="42" y="8" width="36" height="14" rx="7" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5" transform-origin="60px 15px"/>
+                <rect class="gnode gnode2" x="46" y="26" width="28" height="28" rx="3" fill="white" stroke="#fca5a5" stroke-width="1.5" transform="rotate(45, 60, 40)" transform-origin="60px 40px"/>
+                <rect class="gnode gnode3" x="42" y="58" width="36" height="14" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5" transform-origin="60px 65px"/>
+                <text x="60" y="17" font-size="7" fill="#dc2626" text-anchor="middle" font-family="monospace" font-weight="600">Start</text>
+                <text x="60" y="43" font-size="7" fill="#dc2626" text-anchor="middle" font-family="monospace" font-weight="600">?</text>
+                <text x="60" y="68" font-size="7" fill="#dc2626" text-anchor="middle" font-family="monospace" font-weight="600">End</text>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="pn">flowchart-diagram</div>
+              <div class="ttl">Flowchart diagram</div>
+              <div class="dsc">CSS+SVG decision tree with clickable nodes and detail panel.</div>
+              <div class="cta">flowchart-diagram.html →</div>
+            </div>
+          </a>
+
+          <!-- Editor board: kanban columns -->
+          <a class="card-svg" href="#">
+            <div class="svg-cover cov-slate">
+              <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect class="gnode" x="10" y="12" width="28" height="56" rx="4" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5" transform-origin="24px 40px"/>
+                <rect class="gnode gnode2" x="46" y="12" width="28" height="56" rx="4" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5" transform-origin="60px 40px"/>
+                <rect class="gnode gnode3" x="82" y="12" width="28" height="56" rx="4" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1.5" transform-origin="96px 40px"/>
+                <rect class="gcell c1" x="14" y="26" width="20" height="8" rx="2" fill="#bfdbfe" transform-origin="24px 30px"/>
+                <rect class="gcell c2" x="14" y="38" width="20" height="8" rx="2" fill="#bfdbfe" transform-origin="24px 42px"/>
+                <rect class="gcell c3" x="50" y="26" width="20" height="8" rx="2" fill="#fcd34d" transform-origin="60px 30px"/>
+                <rect class="gcell c4" x="86" y="26" width="20" height="8" rx="2" fill="#86efac" transform-origin="96px 30px"/>
+                <rect class="gcell c5" x="86" y="38" width="20" height="8" rx="2" fill="#86efac" transform-origin="96px 42px"/>
+              </svg>
+            </div>
+            <div class="body">
+              <div class="pn">editor-board <span class="core-b" style="background:var(--fg);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;text-transform:uppercase;font-weight:700;">Core</span></div>
+              <div class="ttl">4-column triage board</div>
+              <div class="dsc">Drag-and-drop Kanban with filter chips and Markdown export.</div>
+              <div class="cta">editor-board.html →</div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-B: Compact numbered list -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-B · Compact numbered list (Thariq-inspired — filename as CTA)</span></div>
+    <div class="variant-frame">
+      <div class="list-compact">
+        <a class="list-item" href="#"><span class="li-num">01</span><span class="li-name">product-brief.html</span><span class="li-core">Core</span><span class="li-title">Product brief</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">02</span><span class="li-name">comparison-board.html</span><span class="li-core">Core</span><span class="li-title">Competitor comparison</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">03</span><span class="li-name">code-review.html</span><span class="li-core">Core</span><span class="li-title">PR code review</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">04</span><span class="li-name">architecture-diagram.html</span><span class="li-core">Core</span><span class="li-title">Architecture diagram</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">05</span><span class="li-name">status-report.html</span><span class="li-core">Core</span><span class="li-title">Sprint status report</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">06</span><span class="li-name">design-explorer.html</span><span class="li-core">Core</span><span class="li-title">Design token explorer</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">07</span><span class="li-name">research-explainer.html</span><span class="li-core">Core</span><span class="li-title">Feature explainer</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">08</span><span class="li-name">editor-board.html</span><span class="li-core">Core</span><span class="li-title">4-column triage board</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">09</span><span class="li-name">milestone-plan.html</span><span class="li-title">Milestone plan</span><span class="li-cta">Open →</span></a>
+        <a class="list-item" href="#"><span class="li-num">10</span><span class="li-name">flowchart-diagram.html</span><span class="li-title">Flowchart diagram</span><span class="li-cta">Open →</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-C: Wide feature rows -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-C · Wide horizontal rows with emoji icon + badge row</span></div>
+    <div class="variant-frame">
+      <div class="cards-section-inner" style="padding-bottom:28px;">
+        <div class="grid-wide">
+          <a class="card-wide" href="#">
+            <div class="cw-badge cw-b1">📋</div>
+            <div class="cw-info">
+              <div class="cw-top"><span class="cw-title">Product brief</span><span class="cw-core">Core</span><span class="cw-auto">Autogenerated</span></div>
+              <div class="cw-desc">Personas, architecture diagram, roadmap &amp; risk table in one shareable file. Tabbed layout with timeline.</div>
+            </div>
+            <div class="cw-meta">
+              <span class="cw-pn">product-brief</span>
+              <span class="cw-cta">View example →</span>
+            </div>
+          </a>
+          <a class="card-wide" href="#">
+            <div class="cw-badge cw-b2">📊</div>
+            <div class="cw-info">
+              <div class="cw-top"><span class="cw-title">Sprint status report</span><span class="cw-core">Core</span><span class="cw-auto">Autogenerated</span></div>
+              <div class="cw-desc">Metadata row, velocity chart, shipped/slipped breakdown and risk-tagged PR table.</div>
+            </div>
+            <div class="cw-meta">
+              <span class="cw-pn">status-report</span>
+              <span class="cw-cta">View example →</span>
+            </div>
+          </a>
+          <a class="card-wide" href="#">
+            <div class="cw-badge cw-b3">🏗</div>
+            <div class="cw-info">
+              <div class="cw-top"><span class="cw-title">Architecture diagram</span><span class="cw-core">Core</span><span class="cw-auto">Autogenerated</span></div>
+              <div class="cw-desc">System diagram with hot-path highlight, click-to-expand service detail, and entrypoint list.</div>
+            </div>
+            <div class="cw-meta">
+              <span class="cw-pn">architecture-diagram</span>
+              <span class="cw-cta">View example →</span>
+            </div>
+          </a>
+          <a class="card-wide" href="#">
+            <div class="cw-badge cw-b4">🔍</div>
+            <div class="cw-info">
+              <div class="cw-top"><span class="cw-title">Competitor comparison</span><span class="cw-core">Core</span><span class="cw-auto">Autogenerated</span></div>
+              <div class="cw-desc">Sortable feature matrix and positioning map for evaluating alternatives across multiple dimensions.</div>
+            </div>
+            <div class="cw-meta">
+              <span class="cw-pn">comparison-board</span>
+              <span class="cw-cta">View example →</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SECTION 4 — HOW IT WORKS
+════════════════════════════════════════════════════════════════════════ -->
+<div class="exp-section" id="how-it-works">
+  <p class="exp-section-label">04 · "How it works"</p>
+
+  <!-- Current -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">Current baseline · numbered circle cards</span></div>
+    <div class="variant-frame">
+      <div class="hiw-inner" style="padding-bottom:36px;">
+        <div class="hiw-cur">
+          <div class="step-cur">
+            <div class="step-num-cur">1</div>
+            <div class="step-title-cur">Install</div>
+            <div class="step-desc-cur">Clone the repo and symlink it to <code>~/.claude/skills/</code> — no npm, no build step.</div>
+          </div>
+          <div class="step-cur">
+            <div class="step-num-cur">2</div>
+            <div class="step-title-cur">Invoke</div>
+            <div class="step-desc-cur">Ask Claude to generate a pattern for your project. The skill loads its 18-pattern framework automatically.</div>
+          </div>
+          <div class="step-cur">
+            <div class="step-num-cur">3</div>
+            <div class="step-title-cur">Browse</div>
+            <div class="step-desc-cur">Open the output HTML in your browser — fully self-contained, no server required.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-A: Horizontal timeline -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-A · Horizontal connected timeline</span></div>
+    <div class="variant-frame">
+      <div class="hiw-inner" style="padding-bottom:40px;">
+        <div class="hiw-timeline">
+          <div class="step-tl">
+            <div class="step-tl-dot"></div>
+            <div class="step-tl-num">Step 1</div>
+            <div class="step-tl-title">Install</div>
+            <div class="step-tl-desc">Clone and symlink to <code>~/.claude/skills/</code></div>
+          </div>
+          <div class="step-tl">
+            <div class="step-tl-dot"></div>
+            <div class="step-tl-num">Step 2</div>
+            <div class="step-tl-title">Invoke the skill</div>
+            <div class="step-tl-desc">Ask Claude to generate any of the 18 patterns for your project context.</div>
+          </div>
+          <div class="step-tl">
+            <div class="step-tl-dot"></div>
+            <div class="step-tl-num">Step 3</div>
+            <div class="step-tl-title">Open in browser</div>
+            <div class="step-tl-desc">Fully self-contained HTML — no server, no build, no dependencies.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-B: Large decorative numbers -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-B · Large decorative number background</span></div>
+    <div class="variant-frame">
+      <div class="hiw-big-nums">
+        <div class="step-bn">
+          <div class="step-bn-bg">01</div>
+          <div class="step-bn-content" style="padding-top:64px;">
+            <div class="step-bn-title">Install</div>
+            <div class="step-bn-desc">Clone and symlink to <code>~/.claude/skills/</code> — no npm, no build step required.</div>
+          </div>
+        </div>
+        <div class="step-bn">
+          <div class="step-bn-bg">02</div>
+          <div class="step-bn-content" style="padding-top:64px;">
+            <div class="step-bn-title">Invoke the skill</div>
+            <div class="step-bn-desc">Ask Claude to generate any of the 18 patterns. The skill auto-detects the right template.</div>
+          </div>
+        </div>
+        <div class="step-bn">
+          <div class="step-bn-bg">03</div>
+          <div class="step-bn-content" style="padding-top:64px;">
+            <div class="step-bn-title">Open in browser</div>
+            <div class="step-bn-desc">Self-contained HTML drops into <code>docs/html/</code>. Open directly — no server needed.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V-C: Terminal / CLI aesthetic -->
+  <div class="variant">
+    <div class="variant-tag"><span class="vtag-name">V-C · Terminal / CLI aesthetic</span></div>
+    <div class="variant-frame">
+      <div class="hiw-inner" style="padding-bottom:36px;">
+        <div class="hiw-terminal">
+          <div class="step-term">
+            <div class="step-term-bar"><span class="term-dot td-r"></span><span class="term-dot td-y"></span><span class="term-dot td-g"></span></div>
+            <div class="step-term-body">
+              <div><span class="tc-comment"># 1 — Install</span></div>
+              <div><span class="tc-prompt">$</span> <span class="tc-cmd">git clone</span></div>
+              <div style="padding-left:16px;"><span class="tc-path">github.com/…/html-artifacts</span></div>
+              <div style="padding-left:16px;"><span class="tc-path">~/.agents/skills/html-artifacts</span></div>
+              <div><span class="tc-prompt">$</span> <span class="tc-cmd">ln -s</span> ~/.agents/skills/<span class="tc-path">html-artifacts</span> ~/.claude/skills/<span class="tc-path">html-artifacts</span></div>
+            </div>
+          </div>
+          <div class="step-term">
+            <div class="step-term-bar"><span class="term-dot td-r"></span><span class="term-dot td-y"></span><span class="term-dot td-g"></span></div>
+            <div class="step-term-body">
+              <div><span class="tc-comment"># 2 — Invoke</span></div>
+              <div><span class="tc-prompt">claude</span> <span class="tc-cmd">"Use html-artifacts</span></div>
+              <div style="padding-left:16px;"><span class="tc-cmd">to generate a</span></div>
+              <div style="padding-left:16px;"><span class="tc-path">product-brief</span></div>
+              <div style="padding-left:16px;"><span class="tc-cmd">for my project"</span></div>
+              <div style="margin-top:4px;"><span class="tc-out">▸ Loading skill: html-artifacts</span></div>
+              <div><span class="tc-out">▸ Writing product-brief.html…</span></div>
+            </div>
+          </div>
+          <div class="step-term">
+            <div class="step-term-bar"><span class="term-dot td-r"></span><span class="term-dot td-y"></span><span class="term-dot td-g"></span></div>
+            <div class="step-term-body">
+              <div><span class="tc-comment"># 3 — Browse</span></div>
+              <div><span class="tc-out">✓ Done</span></div>
+              <div><span class="tc-prompt">$</span> <span class="tc-cmd">open</span></div>
+              <div style="padding-left:16px;"><span class="tc-path">docs/html/product-brief.html</span></div>
+              <div style="margin-top:8px;"><span class="tc-comment"># Self-contained.</span></div>
+              <div><span class="tc-comment"># No server. No deps.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="exp-spacer"></div>
+
+</body>
+</html>

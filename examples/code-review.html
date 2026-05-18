@@ -8,32 +8,31 @@
   <title>feat: add three-way merge for text file conflicts — Acme Sync</title>
   <style>
     :root {
-      --bg: #FAF9F5;
-      --fg: #141413;
-      --accent: #D97757;
-      --secondary: #E3DACC;
-      --tertiary: #788C5D;
-      --g100: #F5F4F0;
-      --g300: #D1CFC8;
-      --g500: #8A887F;
-      --g700: #3D3C38;
-      --font-serif: Georgia, 'Times New Roman', serif;
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
+      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
+      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
+      --success:#16a34a; --success-bg:#f0fdf4;
+      --warning:#d97706; --warning-bg:#fffbeb;
+      --danger:#dc2626; --danger-bg:#fef2f2;
+      --border:#e5e7eb; --border-strong:#d1d5db;
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
+      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1.6;
+    html.dark {
+      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
+      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
+      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
+      --success:#3fb950; --success-bg:#0f2c1a;
+      --warning:#d29922; --warning-bg:#2d1f00;
+      --danger:#f85149; --danger-bg:#3d0000;
+      --border:#30363d; --border-strong:#484f58;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
     /* ── Nav ── */
     nav {
@@ -41,17 +40,26 @@
       top: 0;
       z-index: 100;
       background: var(--bg);
-      border-bottom: 1px solid var(--g300);
+      border-bottom: 1px solid var(--border);
       padding: 0 24px;
       display: flex;
       align-items: center;
       gap: 24px;
       height: 48px;
     }
+    .back {
+      text-decoration: none;
+      color: var(--fg-muted);
+      font-size: 12px;
+      white-space: nowrap;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .back:hover { color: var(--fg); }
     .nav-brand {
       font-weight: 600;
       font-size: 13px;
-      color: var(--g700);
+      color: var(--fg);
       white-space: nowrap;
     }
     .nav-brand span { color: var(--accent); }
@@ -66,12 +74,12 @@
       padding: 4px 10px;
       border-radius: var(--radius-sm);
       text-decoration: none;
-      color: var(--g500);
+      color: var(--fg-muted);
       font-size: 12px;
       white-space: nowrap;
       transition: background 0.15s, color 0.15s;
     }
-    .nav-links a:hover { background: var(--g100); color: var(--fg); }
+    .nav-links a:hover { background: var(--bg-subtle-2); color: var(--fg); }
 
     /* ── Layout ── */
     main {
@@ -84,7 +92,7 @@
     .pr-header { margin-bottom: 32px; }
     .pr-badge {
       display: inline-block;
-      background: var(--tertiary);
+      background: var(--success);
       color: #fff;
       font-size: 11px;
       font-weight: 600;
@@ -95,9 +103,8 @@
       text-transform: uppercase;
     }
     h1 {
-      font-family: var(--font-serif);
       font-size: 22px;
-      font-weight: normal;
+      font-weight: 600;
       color: var(--fg);
       margin-bottom: 12px;
       line-height: 1.3;
@@ -107,19 +114,19 @@
       gap: 16px;
       flex-wrap: wrap;
       font-size: 12px;
-      color: var(--g500);
+      color: var(--fg-muted);
     }
-    .pr-meta strong { color: var(--g700); }
+    .pr-meta strong { color: var(--fg); }
 
     /* ── Motivation ── */
     .motivation {
-      background: var(--g100);
+      background: var(--bg-subtle);
       border-left: 3px solid var(--accent);
       border-radius: 0 var(--radius-md) var(--radius-md) 0;
       padding: 12px 16px;
       margin-bottom: 32px;
       font-size: 13px;
-      color: var(--g700);
+      color: var(--fg);
     }
     .motivation p + p { margin-top: 8px; }
 
@@ -130,7 +137,7 @@
       flex-wrap: wrap;
       margin-bottom: 24px;
       padding: 12px 16px;
-      background: var(--g100);
+      background: var(--bg-subtle);
       border-radius: var(--radius-md);
     }
     .legend-item {
@@ -138,7 +145,7 @@
       align-items: center;
       gap: 6px;
       font-size: 12px;
-      color: var(--g700);
+      color: var(--fg);
     }
     .severity-pill {
       display: inline-flex;
@@ -151,9 +158,9 @@
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
-    .sev-note   { background: #DBEAFE; color: #1E40AF; }
-    .sev-warn   { background: #FEF3C7; color: #92400E; }
-    .sev-crit   { background: #FEE2E2; color: #991B1B; }
+    .sev-note   { background: var(--accent-bg); color: var(--accent); }
+    .sev-warn   { background: var(--warning-bg); color: var(--warning); }
+    .sev-crit   { background: var(--danger-bg); color: var(--danger); }
 
     /* ── Files changed list ── */
     .files-list {
@@ -173,10 +180,10 @@
       color: var(--fg);
       font-family: var(--font-mono);
       font-size: 12px;
-      background: var(--g100);
+      background: var(--bg-subtle);
       transition: background 0.15s;
     }
-    .files-list li a:hover { background: var(--secondary); }
+    .files-list li a:hover { background: var(--bg-subtle-2); }
     .file-tag {
       font-size: 10px;
       font-family: var(--font-sans);
@@ -185,8 +192,8 @@
       border-radius: var(--radius-sm);
       text-transform: uppercase;
     }
-    .tag-new  { background: #D1FAE5; color: #065F46; }
-    .tag-mod  { background: #FEF3C7; color: #92400E; }
+    .tag-new  { background: var(--success-bg); color: var(--success); }
+    .tag-mod  { background: var(--warning-bg); color: var(--warning); }
 
     /* ── File sections ── */
     .file-section {
@@ -198,7 +205,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 14px;
-      background: var(--g700);
+      background: #1f2937;
       border-radius: var(--radius-md) var(--radius-md) 0 0;
       color: #fff;
     }
@@ -217,7 +224,7 @@
       overflow-x: auto;
       background: #1E1E1E;
       border-radius: 0 0 var(--radius-md) var(--radius-md);
-      border: 1px solid var(--g300);
+      border: 1px solid var(--border-strong);
       border-top: none;
     }
     .code-block {
@@ -236,10 +243,10 @@
       min-width: 0;
     }
     .code-line:hover { background: rgba(255,255,255,0.04); }
-    .code-line.line-add { background: rgba(120, 140, 93, 0.15); }
-    .code-line.line-add::before { color: var(--tertiary); }
-    .code-line.line-del { background: rgba(217, 119, 87, 0.12); }
-    .code-line.line-del::before { color: var(--accent); }
+    .code-line.line-add { background: rgba(22,163,74,0.12); }
+    .code-line.line-add::before { color: var(--success); }
+    .code-line.line-del { background: rgba(220,38,38,0.10); }
+    .code-line.line-del::before { color: var(--danger); }
     .line-num {
       min-width: 36px;
       color: #555;
@@ -254,8 +261,8 @@
       color: #888;
       flex-shrink: 0;
     }
-    .line-add .line-prefix { color: var(--tertiary); }
-    .line-del .line-prefix { color: var(--accent); }
+    .line-add .line-prefix { color: #4ade80; }
+    .line-del .line-prefix { color: #f87171; }
     .line-content { flex: 1; white-space: pre; }
 
     /* annotation trigger */
@@ -279,9 +286,9 @@
       font-family: var(--font-sans);
       flex-shrink: 0;
     }
-    .icon-note { background: #1E40AF; color: #fff; }
-    .icon-warn { background: #92400E; color: #fff; }
-    .icon-crit { background: #991B1B; color: #fff; }
+    .icon-note { background: var(--accent); color: #fff; }
+    .icon-warn { background: var(--warning); color: #fff; }
+    .icon-crit { background: var(--danger); color: #fff; }
 
     .annotation-bubble {
       display: none;
@@ -294,9 +301,9 @@
       color: var(--fg);
     }
     .annotation-bubble.visible { display: block; }
-    .bubble-note { background: #EFF6FF; border-left: 3px solid #3B82F6; }
-    .bubble-warn { background: #FFFBEB; border-left: 3px solid #F59E0B; }
-    .bubble-crit { background: #FEF2F2; border-left: 3px solid #EF4444; }
+    .bubble-note { background: var(--accent-bg); border-left: 3px solid var(--accent); }
+    .bubble-warn { background: var(--warning-bg); border-left: 3px solid var(--warning); }
+    .bubble-crit { background: var(--danger-bg); border-left: 3px solid var(--danger); }
 
     /* diff label */
     .diff-label {
@@ -305,7 +312,7 @@
       font-weight: 600;
       letter-spacing: 0.03em;
       text-transform: uppercase;
-      color: var(--g500);
+      color: var(--fg-faint);
       background: #282828;
       border-bottom: 1px solid #333;
     }
@@ -314,17 +321,128 @@
     .review-focus {
       margin-top: 32px;
       padding: 16px;
-      border: 1px solid var(--secondary);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      background: var(--g100);
+      background: var(--bg-subtle);
     }
     .review-focus h3 {
       font-size: 13px;
       font-weight: 600;
-      color: var(--g700);
+      color: var(--fg);
       margin-bottom: 6px;
     }
-    .review-focus p { font-size: 13px; color: var(--g500); }
+    .review-focus p { font-size: 13px; color: var(--fg-muted); }
+
+    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
+    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
+
+    /* ── Export button ── */
+    .btn-export {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      line-height: 1.6;
+      transition: opacity 0.15s;
+    }
+    .btn-export:hover { opacity: 0.85; }
+
+    /* ── Export modal ── */
+    .export-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .export-overlay.visible { display: flex; }
+    .export-modal {
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      width: 100%;
+      max-width: 640px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .export-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .export-modal-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .export-modal-header p {
+      font-size: 12px;
+      color: var(--fg-muted);
+      margin-top: 2px;
+    }
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+    .btn-close:hover { background: var(--bg-subtle-2); color: var(--fg); }
+    .export-pre {
+      flex: 1;
+      overflow-y: auto;
+      margin: 0;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--fg);
+      background: var(--bg-subtle);
+      white-space: pre-wrap;
+      word-break: break-word;
+      border-bottom: 1px solid var(--border);
+    }
+    .export-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      gap: 12px;
+    }
+    .export-hint {
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+    .btn-copy {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn-copy:hover { opacity: 0.85; }
+    .btn-copy.copied { background: var(--success); }
 
     /* keyword colors in code */
     .kw  { color: #C586C0; }
@@ -338,9 +456,30 @@
 <body>
 
 <nav>
+  <a href="index.html" class="back">← Acme Sync</a>
   <div class="nav-brand">Acme <span>Sync</span> · Code Review</div>
   <ul class="nav-links" id="nav-links"></ul>
+  <button class="btn-export" id="btn-export" type="button">Export annotations →</button>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>
+
+<!-- Export modal -->
+<div class="export-overlay" id="export-overlay" role="dialog" aria-modal="true" aria-labelledby="export-title">
+  <div class="export-modal">
+    <div class="export-modal-header">
+      <div>
+        <h2 id="export-title">Export annotations to Claude</h2>
+        <p>Copy this Markdown and paste it into Claude to discuss or iterate on the review.</p>
+      </div>
+      <button class="btn-close" id="btn-close" type="button" aria-label="Close">×</button>
+    </div>
+    <pre class="export-pre" id="export-pre"></pre>
+    <div class="export-modal-footer">
+      <span class="export-hint">Paste into Claude with: "Here are the code review annotations — let's work through them."</span>
+      <button class="btn-copy" id="btn-copy" type="button">Copy to clipboard</button>
+    </div>
+  </div>
+</div>
 
 <main>
   <!-- PR Header -->
@@ -363,7 +502,7 @@
 
   <!-- Legend -->
   <div class="legend">
-    <span style="font-size:12px;font-weight:600;color:var(--g700);margin-right:4px;">Annotations:</span>
+    <span style="font-size:12px;font-weight:600;color:var(--fg);margin-right:4px;">Annotations:</span>
     <div class="legend-item"><span class="severity-pill sev-note">NOTE</span> informational, no action needed</div>
     <div class="legend-item"><span class="severity-pill sev-warn">WARN</span> should address before merge</div>
     <div class="legend-item"><span class="severity-pill sev-crit">CRITICAL</span> must fix before merge</div>
@@ -414,6 +553,14 @@
 </main>
 
 <script>
+  (function(){
+    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+    if(t==='dark')document.documentElement.classList.add('dark');
+    document.getElementById('dm-toggle').addEventListener('click',function(){
+      var d=document.documentElement.classList.toggle('dark');
+      localStorage.setItem('ha-theme',d?'dark':'light');
+    });
+  })();
   // ── Data ──────────────────────────────────────────────────────────────────
 
   const FILES = [
@@ -588,6 +735,76 @@
   renderLines('code-conflict', CONFLICT_LINES);
   renderLines('code-watcher',  WATCHER_LINES);
   renderLines('code-test',     TEST_LINES);
+
+  // ── Annotation export ─────────────────────────────────────────────────────
+
+  const ANNOTATION_SOURCES = [
+    { file: 'src/conflict.ts',        lines: CONFLICT_LINES },
+    { file: 'src/watcher.ts',         lines: WATCHER_LINES  },
+    { file: 'tests/conflict.test.ts', lines: TEST_LINES     },
+  ];
+
+  function buildExportMarkdown() {
+    const pr = 'feat: add three-way merge for text file conflicts';
+    const lines = ['## Code Review: ' + pr, ''];
+    let count = 0;
+
+    ANNOTATION_SOURCES.forEach(function(src) {
+      src.lines.forEach(function(line) {
+        if (!line.annotation) return;
+        const sev = line.annotation.type.toUpperCase();
+        lines.push('### `' + src.file + '` — Line ' + line.num + ' [' + sev + ']');
+        lines.push(line.annotation.text);
+        lines.push('');
+        count++;
+      });
+    });
+
+    if (count === 0) {
+      lines.push('_No annotations found._');
+    } else {
+      lines.push('---');
+      lines.push('_' + count + ' annotation' + (count === 1 ? '' : 's') + ' exported from code-review.html_');
+    }
+
+    return lines.join('\n');
+  }
+
+  document.getElementById('btn-export').addEventListener('click', function() {
+    document.getElementById('export-pre').textContent = buildExportMarkdown();
+    document.getElementById('export-overlay').classList.add('visible');
+    document.getElementById('btn-copy').textContent = 'Copy to clipboard';
+    document.getElementById('btn-copy').classList.remove('copied');
+  });
+
+  document.getElementById('btn-close').addEventListener('click', function() {
+    document.getElementById('export-overlay').classList.remove('visible');
+  });
+
+  document.getElementById('export-overlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('visible');
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('export-overlay').classList.remove('visible');
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', function() {
+    const text = document.getElementById('export-pre').textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('btn-copy');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy to clipboard';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  });
 </script>
+
+<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  Generated by html-artifacts · Code Review · May 2026
+</footer>
 </body>
 </html>
