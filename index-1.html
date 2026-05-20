@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -144,11 +144,21 @@
       }
 
       /* Hero / Cover */
+      .hero-outer {
+        padding: 44px 0 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 72vh;
+        border-bottom: 1px solid var(--border);
+        width: min(960px, calc(100% - 80px));
+        margin: 0 auto;
+      }
       .hero {
         width: min(960px, calc(100% - 80px));
         margin: 0 auto;
-        padding: 64px 0 56px;
-        border-bottom: 1px solid var(--border);
+        /* padding: 64px 0 56px; */
+        /* border-bottom: 1px solid var(--border); */
       }
       .hero-eyebrow {
         font-family: var(--sans);
@@ -615,45 +625,67 @@
     </header>
 
     <!-- Hero / Cover -->
-    <div class="hero">
-      <p class="hero-eyebrow">
-        Claude Code Skill · 18 Patterns · Zero Dependencies
-      </p>
-      <h1>Interactive HTML docs for your codebase</h1>
-      <p class="hero-tagline">
-        A Claude Code skill that generates self-contained, interactive HTML
-        instead of Markdown walls — plans, analyses, diagrams, and reports that
-        open directly in your browser.
-      </p>
-      <div class="hero-rule"></div>
-      <div class="hero-install">
-        <div class="install-wrap">
-          <pre id="install-cmd">
+    <section class="hero-outer">
+      <div class="hero">
+        <p class="hero-eyebrow">
+          Claude Code Skill · 18 Patterns · Zero Dependencies
+        </p>
+        <h1>Interactive HTML docs for your codebase</h1>
+        <p class="hero-tagline">
+          A Claude Code skill that generates self-contained, interactive HTML
+          instead of Markdown walls — plans, analyses, diagrams, and reports
+          that open directly in your browser.
+        </p>
+        <div class="hero-rule"></div>
+        <div class="hero-install">
+          <div class="install-wrap">
+            <pre id="install-cmd">
 git clone https://github.com/kiriaze/html-artifacts ~/.agents/skills/html-artifacts
 ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts</pre
-          >
-          <button class="copy-btn" id="copy-btn" type="button">Copy</button>
+            >
+            <button class="copy-btn" id="copy-btn" type="button">Copy</button>
+          </div>
+          <p class="usage-hint">
+            Then:
+            <code
+              >Use the html-artifacts skill to generate a [pattern] for [your
+              project].</code
+            >
+          </p>
         </div>
-        <p class="usage-hint">
-          Then:
-          <code
-            >Use the html-artifacts skill to generate a [pattern] for [your
-            project].</code
-          >
-        </p>
       </div>
-    </div>
+    </section>
 
-    <!-- Decision tree -->
+    <!-- How it works -->
     <div class="page-inner">
-      <div class="decision-section">
-        <p class="section-label">When to use HTML</p>
-        <pre
-          class="decision-pre"
-        >Plan, analysis, report, diagram, or explainer?       <span class="arrow">→</span> <span class="label-html">HTML  ← this skill</span>
-Reviewed as git diff (HANDOFF.md, AGENT_TASKS.md)?   <span class="arrow">→</span> <span class="label-md">Markdown</span>
-Embedded in GitHub (README, PR body)?                <span class="arrow">→</span> <span class="label-md">Markdown</span>
-Commit message or chat reply?                        <span class="arrow">→</span> <span class="label-md">plain text</span></pre>
+      <div class="howitworks-section">
+        <p class="section-label">How it works</p>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-num">Step one</div>
+            <div class="step-title">Install</div>
+            <div class="step-desc">
+              Clone the repo and symlink it to <code>~/.claude/skills/</code> —
+              no npm, no build step.
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">Step two</div>
+            <div class="step-title">Invoke</div>
+            <div class="step-desc">
+              Ask Claude to generate a pattern for your project. The skill loads
+              its 18-pattern framework automatically.
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">Step three</div>
+            <div class="step-title">Browse</div>
+            <div class="step-desc">
+              Open the output HTML in your browser — fully self-contained, no
+              server required.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -909,36 +941,16 @@ Commit message or chat reply?                        <span class="arrow">→</sp
     </div>
     <!-- /.page-inner -->
 
-    <!-- How it works -->
+    <!-- Decision tree -->
     <div class="page-inner">
-      <div class="howitworks-section">
-        <p class="section-label">How it works</p>
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-num">Step one</div>
-            <div class="step-title">Install</div>
-            <div class="step-desc">
-              Clone the repo and symlink it to <code>~/.claude/skills/</code> —
-              no npm, no build step.
-            </div>
-          </div>
-          <div class="step-card">
-            <div class="step-num">Step two</div>
-            <div class="step-title">Invoke</div>
-            <div class="step-desc">
-              Ask Claude to generate a pattern for your project. The skill loads
-              its 18-pattern framework automatically.
-            </div>
-          </div>
-          <div class="step-card">
-            <div class="step-num">Step three</div>
-            <div class="step-title">Browse</div>
-            <div class="step-desc">
-              Open the output HTML in your browser — fully self-contained, no
-              server required.
-            </div>
-          </div>
-        </div>
+      <div class="decision-section">
+        <p class="section-label">When to use HTML</p>
+        <pre
+          class="decision-pre"
+        >Plan, analysis, report, diagram, or explainer?       <span class="arrow">→</span> <span class="label-html">HTML  ← this skill</span>
+Reviewed as git diff (HANDOFF.md, AGENT_TASKS.md)?   <span class="arrow">→</span> <span class="label-md">Markdown</span>
+Embedded in GitHub (README, PR body)?                <span class="arrow">→</span> <span class="label-md">Markdown</span>
+Commit message or chat reply?                        <span class="arrow">→</span> <span class="label-md">plain text</span></pre>
       </div>
     </div>
 
@@ -947,11 +959,12 @@ Commit message or chat reply?                        <span class="arrow">→</sp
       <div class="about-section">
         <h2 class="what-heading">What is this?</h2>
         <p class="what-body">
-          html-artifacts is a Claude Code skill. Skills are instructions loaded
-          into Claude's context at session start. When you invoke this skill,
-          Claude follows its 18-pattern framework to generate self-contained
-          HTML files — one for each documentation type — directly into your
-          project's <code>docs/html/</code> directory.
+          html-artifacts is an Agentic skill that generates self-contained,
+          interactive HTML files instead of Markdown walls for plans, competitor
+          analysis, architecture diagrams, code reviews, reports, and more. When
+          you invoke this skill, your model follows its 18-pattern framework to
+          generate self-contained HTML file(s) — one for each documentation type
+          — directly into your project's <code>docs/html/</code> directory.
         </p>
         <a class="what-link" href="SKILL.md">Read the SKILL.md →</a>
       </div>
@@ -963,7 +976,7 @@ Commit message or chat reply?                        <span class="arrow">→</sp
         <div class="footer-left">
           <span class="wordmark">html-artifacts</span>
           <p class="footer-desc">
-            A Claude Code skill for interactive HTML documentation.
+            An agentic skill for interactive HTML documentation.
           </p>
         </div>
         <div class="footer-links">
@@ -1032,7 +1045,6 @@ Commit message or chat reply?                        <span class="arrow">→</sp
           { passive: true },
         )
       })()
-
       ;(function () {
         var btn = document.getElementById('copy-btn')
         var pre = document.getElementById('install-cmd')
