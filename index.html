@@ -556,7 +556,7 @@
     <!-- Micro header -->
     <header class="site-header">
       <span class="wordmark">html-artifacts</span>
-      <a href="https://github.com/YOUR_USERNAME/html-artifacts">GitHub</a>
+      <a href="https://github.com/kiriaze/html-artifacts">GitHub</a>
       <button
         class="dm-toggle"
         id="dm-toggle"
@@ -578,7 +578,7 @@
       <hr />
       <div class="install-block">
         <pre id="install-cmd">
-git clone https://github.com/YOUR_USERNAME/html-artifacts ~/.agents/skills/html-artifacts
+git clone https://github.com/kiriaze/html-artifacts ~/.agents/skills/html-artifacts
 ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts</pre
         >
         <button class="copy-btn" id="copy-btn" type="button">Copy</button>
@@ -902,16 +902,18 @@ Commit message or chat reply?                        <span class="arrow">→</sp
         whenever a file under <code>docs/plans/</code> changes. Add the
         following to your <code>.claude/settings.json</code>:
       </p>
-      <div class="install-block" style="max-width:100%">
-        <pre id="hook-cmd" style="white-space:pre-wrap">"hooks": {
+      <div class="install-block" style="max-width: 100%">
+        <pre id="hook-cmd" style="white-space: pre-wrap">
+"hooks": {
   "PostToolUse": [{
     "matcher": "Write|Edit",
     "hooks": [{ "type": "command", "command": "node ~/.agents/skills/html-artifacts/hooks/regen.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\"" }]
   }]
-}</pre>
+}</pre
+        >
         <button class="copy-btn" id="copy-hook-btn" type="button">Copy</button>
       </div>
-      <p class="usage-hint" style="margin-top:12px">
+      <p class="usage-hint" style="margin-top: 12px">
         See <a href="hooks/">hooks/</a> for the regen script and setup guide.
       </p>
     </div>
@@ -925,7 +927,7 @@ Commit message or chat reply?                        <span class="arrow">→</sp
         the design tokens in <code>templates/config.md</code> to match your
         brand. Below are themed variants of this page to see what's possible:
       </p>
-      <div class="card-grid" style="margin-top:16px">
+      <div class="card-grid" style="margin-top: 16px">
         <a class="card" href="index.html">
           <div class="card-title">Default</div>
           <div class="card-desc">Clean monochrome. GitHub-inspired tokens.</div>
@@ -948,12 +950,12 @@ Commit message or chat reply?                        <span class="arrow">→</sp
         exploring layout variants for the index and the milestone-plan pattern
         side-by-side in the browser, the same way you'd use it for your project.
       </p>
-      <div class="card-grid" style="margin-top:16px">
+      <div class="card-grid" style="margin-top: 16px">
         <a class="card" href="explore-index.html">
           <div class="card-title">explore-index</div>
           <div class="card-desc">
-            Multiple index.html layout variants rendered side-by-side for
-            visual comparison.
+            Multiple index.html layout variants rendered side-by-side for visual
+            comparison.
           </div>
           <div class="card-cta">View exploration →</div>
         </a>
@@ -974,7 +976,24 @@ Commit message or chat reply?                        <span class="arrow">→</sp
         <div class="footer-left">
           <span class="wordmark">html-artifacts</span>
           <p class="footer-desc">
-            Built on <a href="https://github.com/ThariqS/html-effectiveness" style="color:var(--fg-muted);text-decoration:underline">"The Unreasonable Effectiveness of HTML"</a> by Thariq Shihipar (Anthropic). The thesis, the categories, and several of the example shapes are his — the recognition heuristic and the carve-outs are extensions, not the original.<br><br>This page is itself one of the skill's artifacts, in keeping with Thariq's companion site, which made the same gag first.
+            Built on "The Unreasonable Effectiveness of HTML" by Thariq Shihipar
+            (Anthropic). The thesis, the categories, and several example shapes
+            are his. The recognition heuristic and the carve-outs are
+            extensions. This page is itself one of the skill's artifacts —
+            Thariq's companion site made the same joke first. Option B
+            (credits-style) Inspired by "The Unreasonable Effectiveness of HTML"
+            — Thariq Shihipar, Anthropic. The core thesis and artifact
+            categories are his; the skill framing and heuristics are extensions.
+            This page is one of its own artifacts, which Thariq's site did
+            first. Option C (compact) Built on Thariq Shihipar's "The
+            Unreasonable Effectiveness of HTML." The thesis and example shapes
+            are his; the recognition heuristic is an extension. This page
+            follows his lead in being one of its own artifacts. Option D
+            (narrative) The thesis belongs to Thariq Shihipar (Anthropic), from
+            "The Unreasonable Effectiveness of HTML." The artifact categories
+            and several shapes are also his. What's added here — the recognition
+            heuristic, the skill scaffolding — builds on that foundation without
+            claiming to replace it.
           </p>
         </div>
         <div class="footer-links">
@@ -1009,8 +1028,20 @@ Commit message or chat reply?                        <span class="arrow">→</sp
         </div>
       </div>
       <div class="footer-bottom">
-        <span>MIT License — see <a href="LICENSE" style="color:inherit;text-decoration:underline">LICENSE</a> for details</span>
-        <span><a href="https://github.com/ThariqS/html-effectiveness" style="color:inherit;text-decoration:underline">ThariqS/html-effectiveness</a></span>
+        <span
+          >MIT License — see
+          <a href="LICENSE" style="color: inherit; text-decoration: underline"
+            >LICENSE</a
+          >
+          for details</span
+        >
+        <span
+          ><a
+            href="https://github.com/ThariqS/html-effectiveness"
+            style="color: inherit; text-decoration: underline"
+            >ThariqS/html-effectiveness</a
+          ></span
+        >
       </div>
     </footer>
 
@@ -1029,7 +1060,6 @@ Commit message or chat reply?                        <span class="arrow">→</sp
             localStorage.setItem('ha-theme', d ? 'dark' : 'light')
           })
       })()
-
       ;(function () {
         var btn = document.getElementById('copy-btn')
         var pre = document.getElementById('install-cmd')
@@ -1054,7 +1084,6 @@ Commit message or chat reply?                        <span class="arrow">→</sp
             })
         })
       })()
-
       ;(function () {
         var btn = document.getElementById('copy-hook-btn')
         if (!btn) return
@@ -1072,7 +1101,9 @@ Commit message or chat reply?                        <span class="arrow">→</sp
             })
             .catch(function () {
               btn.textContent = 'Error'
-              setTimeout(function () { btn.textContent = 'Copy' }, 2000)
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+              }, 2000)
             })
         })
       })()

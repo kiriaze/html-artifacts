@@ -1,611 +1,1020 @@
-<!-- html-artifacts: incident-report example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: incident-report example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/incident-report.html -->
-<!DOCTYPE html>
+<!doctype html>
 <!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Incident: Database Corruption 2026-04-15 — Acme Sync</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident: Database Corruption 2026-04-15 — Acme Sync</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    /* Nav */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg); border-bottom: 1px solid var(--border);
-      padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 48px;
-    }
-    .back { color: var(--fg-muted); text-decoration: none; font-size: 13px; flex-shrink: 0; }
-    .back:hover { color: var(--fg); }
-    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    .dm-toggle {
-      background: none; border: 1px solid var(--border); border-radius: var(--radius-sm);
-      padding: 4px 8px; font-size: 13px; cursor: pointer; color: var(--fg-muted);
-      line-height: 1; flex-shrink: 0;
-    }
-    .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
+      /* Nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 48px;
+      }
+      .back {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .back:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
 
-    /* Content wrapper */
-    main { max-width: 860px; margin: 0 auto; padding: 0 24px 64px; }
+      /* Content wrapper */
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 24px 64px;
+      }
 
-    /* Severity banner */
-    .severity-banner {
-      background: var(--danger-bg);
-      border: 1px solid var(--danger);
-      border-radius: var(--radius-lg);
-      padding: 20px 24px;
-      margin: 24px 0;
-      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-    }
-    .severity-badge {
-      font-size: 18px; font-weight: 800; letter-spacing: 0.04em;
-      padding: 4px 14px; border-radius: var(--radius-sm);
-      background: var(--danger); color: #fff;
-    }
-    .banner-title {
-      font-size: 17px; font-weight: 700; color: var(--fg); flex: 1;
-    }
-    .meta-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-    .meta-chip {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
-      border: 1px solid var(--border); background: var(--bg); color: var(--fg-muted);
-    }
-    .chip-icon { font-size: 11px; }
+      /* Severity banner */
+      .severity-banner {
+        background: var(--danger-bg);
+        border: 1px solid var(--danger);
+        border-radius: var(--radius-lg);
+        padding: 20px 24px;
+        margin: 24px 0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .severity-badge {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        padding: 4px 14px;
+        border-radius: var(--radius-sm);
+        background: var(--danger);
+        color: #fff;
+      }
+      .banner-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--fg);
+        flex: 1;
+      }
+      .meta-chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--fg-muted);
+      }
+      .chip-icon {
+        font-size: 11px;
+      }
 
-    /* Summary */
-    .summary-card {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin-bottom: 32px;
-      font-size: 14px; color: var(--fg-muted); line-height: 1.65;
-    }
-    .summary-card strong { color: var(--fg); }
+      /* Summary */
+      .summary-card {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 16px 20px;
+        margin-bottom: 32px;
+        font-size: 14px;
+        color: var(--fg-muted);
+        line-height: 1.65;
+      }
+      .summary-card strong {
+        color: var(--fg);
+      }
 
-    /* Section headings */
-    .section-title {
-      font-size: 13px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--fg-muted);
-      margin: 32px 0 16px; padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
+      /* Section headings */
+      .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--fg-muted);
+        margin: 32px 0 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    /* Timeline */
-    .timeline {
-      position: relative;
-      padding-left: 28px;
-    }
-    .timeline::before {
-      content: '';
-      position: absolute; left: 9px; top: 8px; bottom: 8px;
-      width: 2px; background: var(--border);
-    }
-    .tl-event {
-      position: relative;
-      margin-bottom: 4px;
-    }
-    .tl-dot {
-      position: absolute; left: -24px; top: 14px;
-      width: 12px; height: 12px; border-radius: 50%;
-      background: var(--bg); border: 2px solid var(--border-strong);
-      z-index: 1;
-    }
-    .tl-event.first .tl-dot { border-color: var(--danger); background: var(--danger); }
-    .tl-event.resolved .tl-dot { border-color: var(--success); background: var(--success); }
-    .tl-event.action .tl-dot { border-color: var(--accent); background: var(--accent); }
+      /* Timeline */
+      .timeline {
+        position: relative;
+        padding-left: 28px;
+      }
+      .timeline::before {
+        content: '';
+        position: absolute;
+        left: 9px;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: var(--border);
+      }
+      .tl-event {
+        position: relative;
+        margin-bottom: 4px;
+      }
+      .tl-dot {
+        position: absolute;
+        left: -24px;
+        top: 14px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--bg);
+        border: 2px solid var(--border-strong);
+        z-index: 1;
+      }
+      .tl-event.first .tl-dot {
+        border-color: var(--danger);
+        background: var(--danger);
+      }
+      .tl-event.resolved .tl-dot {
+        border-color: var(--success);
+        background: var(--success);
+      }
+      .tl-event.action .tl-dot {
+        border-color: var(--accent);
+        background: var(--accent);
+      }
 
-    .tl-details {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      margin-bottom: 8px;
-      overflow: hidden;
-    }
-    .tl-summary {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-    }
-    .tl-summary::-webkit-details-marker { display: none; }
-    .tl-time {
-      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
-      color: var(--fg-muted); flex-shrink: 0;
-      background: var(--bg-subtle-2); padding: 2px 7px;
-      border-radius: var(--radius-sm);
-    }
-    .tl-event.first .tl-time { background: var(--danger-bg); color: var(--danger); }
-    .tl-event.resolved .tl-time { background: var(--success-bg); color: var(--success); }
-    .tl-headline {
-      font-size: 13px; font-weight: 600; color: var(--fg); flex: 1;
-    }
-    .tl-chevron {
-      font-size: 11px; color: var(--fg-faint); transition: transform 0.2s; flex-shrink: 0;
-    }
-    details[open] .tl-chevron { transform: rotate(90deg); }
-    .tl-body {
-      padding: 0 14px 12px;
-      border-top: 1px solid var(--border);
-    }
-    .tl-row {
-      display: grid; grid-template-columns: 90px 1fr;
-      gap: 4px 12px; margin-top: 8px; font-size: 13px;
-    }
-    .tl-row-label { color: var(--fg-muted); font-weight: 500; padding-top: 1px; }
-    .tl-row-val { color: var(--fg); }
+      .tl-details {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--bg);
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .tl-summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+      }
+      .tl-summary::-webkit-details-marker {
+        display: none;
+      }
+      .tl-time {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--fg-muted);
+        flex-shrink: 0;
+        background: var(--bg-subtle-2);
+        padding: 2px 7px;
+        border-radius: var(--radius-sm);
+      }
+      .tl-event.first .tl-time {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+      .tl-event.resolved .tl-time {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .tl-headline {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg);
+        flex: 1;
+      }
+      .tl-chevron {
+        font-size: 11px;
+        color: var(--fg-faint);
+        transition: transform 0.2s;
+        flex-shrink: 0;
+      }
+      details[open] .tl-chevron {
+        transform: rotate(90deg);
+      }
+      .tl-body {
+        padding: 0 14px 12px;
+        border-top: 1px solid var(--border);
+      }
+      .tl-row {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 4px 12px;
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      .tl-row-label {
+        color: var(--fg-muted);
+        font-weight: 500;
+        padding-top: 1px;
+      }
+      .tl-row-val {
+        color: var(--fg);
+      }
 
-    /* 5 Whys */
-    .whys-chain { display: flex; flex-direction: column; gap: 4px; }
-    .why-item {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-    .why-summary {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 10px 14px;
-      cursor: pointer; list-style: none; user-select: none;
-    }
-    .why-summary::-webkit-details-marker { display: none; }
-    .why-num {
-      flex-shrink: 0;
-      width: 22px; height: 22px; border-radius: 50%;
-      background: var(--accent-bg); color: var(--accent);
-      font-size: 11px; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      margin-top: 1px;
-    }
-    .why-question { font-size: 13px; font-weight: 600; color: var(--fg); flex: 1; }
-    .why-chevron { font-size: 11px; color: var(--fg-faint); transition: transform 0.2s; flex-shrink: 0; margin-top: 3px; }
-    details[open] .why-chevron { transform: rotate(90deg); }
-    .why-body {
-      padding: 0 14px 12px 46px;
-      border-top: 1px solid var(--border);
-      font-size: 13px; color: var(--fg-muted); line-height: 1.55;
-    }
-    .why-connector {
-      width: 2px; height: 12px; background: var(--border-strong);
-      margin: 0 auto 0 21px;
-      border-radius: 1px;
-    }
+      /* 5 Whys */
+      .whys-chain {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .why-item {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      .why-summary {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+      }
+      .why-summary::-webkit-details-marker {
+        display: none;
+      }
+      .why-num {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--accent-bg);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+      .why-question {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg);
+        flex: 1;
+      }
+      .why-chevron {
+        font-size: 11px;
+        color: var(--fg-faint);
+        transition: transform 0.2s;
+        flex-shrink: 0;
+        margin-top: 3px;
+      }
+      details[open] .why-chevron {
+        transform: rotate(90deg);
+      }
+      .why-body {
+        padding: 0 14px 12px 46px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--fg-muted);
+        line-height: 1.55;
+      }
+      .why-connector {
+        width: 2px;
+        height: 12px;
+        background: var(--border-strong);
+        margin: 0 auto 0 21px;
+        border-radius: 1px;
+      }
 
-    /* Tables */
-    .data-table {
-      width: 100%; border-collapse: collapse;
-      font-size: 13px; margin-bottom: 8px;
-    }
-    .data-table th {
-      text-align: left; padding: 8px 12px;
-      background: var(--bg-subtle-2); color: var(--fg-muted);
-      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-      border-bottom: 2px solid var(--border);
-    }
-    .data-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
-    .data-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
-    .data-table td {
-      padding: 10px 12px; border-bottom: 1px solid var(--border);
-      vertical-align: top; color: var(--fg);
-    }
-    .data-table tr:last-child td { border-bottom: none; }
-    .data-table tr:hover td { background: var(--bg-subtle); }
+      /* Tables */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+      .data-table th {
+        text-align: left;
+        padding: 8px 12px;
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--border);
+      }
+      .data-table th:first-child {
+        border-radius: var(--radius-sm) 0 0 0;
+      }
+      .data-table th:last-child {
+        border-radius: 0 var(--radius-sm) 0 0;
+      }
+      .data-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        color: var(--fg);
+      }
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+      .data-table tr:hover td {
+        background: var(--bg-subtle);
+      }
 
-    /* Severity cell badges */
-    .sev-critical { color: var(--danger); font-weight: 600; }
-    .sev-high { color: var(--warning); font-weight: 600; }
-    .sev-medium { color: var(--accent); font-weight: 600; }
-    .sev-low { color: var(--success); font-weight: 600; }
+      /* Severity cell badges */
+      .sev-critical {
+        color: var(--danger);
+        font-weight: 600;
+      }
+      .sev-high {
+        color: var(--warning);
+        font-weight: 600;
+      }
+      .sev-medium {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .sev-low {
+        color: var(--success);
+        font-weight: 600;
+      }
 
-    /* Owner initials chip */
-    .owner-chip {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--accent-bg); color: var(--accent);
-      font-size: 10px; font-weight: 800;
-      border: 1px solid var(--accent-border);
-      font-family: var(--font-mono);
-    }
+      /* Owner initials chip */
+      .owner-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent-bg);
+        color: var(--accent);
+        font-size: 10px;
+        font-weight: 800;
+        border: 1px solid var(--accent-border);
+        font-family: var(--font-mono);
+      }
 
-    /* Status badge */
-    .badge {
-      display: inline-flex; align-items: center;
-      padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    }
-    .badge-open { background: var(--warning-bg); color: var(--warning); }
-    .badge-done { background: var(--success-bg); color: var(--success); }
-  </style>
-</head>
-<body>
+      /* Status badge */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .badge-open {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      .badge-done {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="back">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Incident Report</span>
+      <div style="flex: 1"></div>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
 
-<nav>
-  <a href="../index.html" class="back">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Incident Report</span>
-  <div style="flex:1"></div>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
-
-<main>
-
-  <!-- Severity banner -->
-  <div class="severity-banner">
-    <span class="severity-badge">P1</span>
-    <span class="banner-title">Database Corruption — 2026-04-15</span>
-    <div class="meta-chips">
-      <span class="meta-chip"><span class="chip-icon">⏱</span> 2h 18m</span>
-      <span class="meta-chip"><span class="chip-icon">👤</span> 47 users affected</span>
-      <span class="meta-chip"><span class="chip-icon">📅</span> 09:14 – 11:32 UTC</span>
-    </div>
-  </div>
-
-  <!-- Summary -->
-  <div class="summary-card">
-    A migration script run during routine maintenance corrupted the <code style="font-family:var(--font-mono);font-size:12px;background:var(--bg-subtle-2);padding:1px 5px;border-radius:3px;">file_versions</code> table on the primary SQLite database for <strong>47 accounts</strong>. Affected users could not access file history or resolve conflicts. <strong>No files were lost</strong>; sync continued in last-write-wins fallback mode.
-  </div>
-
-  <!-- Timeline -->
-  <div class="section-title">Incident Timeline</div>
-  <div class="timeline">
-
-    <div class="tl-event first">
-      <div class="tl-dot"></div>
-      <details class="tl-details" open>
-        <summary class="tl-summary">
-          <span class="tl-time">09:14</span>
-          <span class="tl-headline">Automated monitor fires sync_error_rate &gt; 5% alert</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who noticed</span>
-            <span class="tl-row-val">PagerDuty → @marco (on-call)</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Acknowledged; started investigating error logs</span>
-          </div>
+    <main>
+      <!-- Severity banner -->
+      <div class="severity-banner">
+        <span class="severity-badge">P1</span>
+        <span class="banner-title">Database Corruption — 2026-04-15</span>
+        <div class="meta-chips">
+          <span class="meta-chip"><span class="chip-icon">⏱</span> 2h 18m</span>
+          <span class="meta-chip"
+            ><span class="chip-icon">👤</span> 47 users affected</span
+          >
+          <span class="meta-chip"
+            ><span class="chip-icon">📅</span> 09:14 – 11:32 UTC</span
+          >
         </div>
-      </details>
-    </div>
+      </div>
 
-    <div class="tl-event action">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">09:22</span>
-          <span class="tl-headline">Root cause identified: migration 0041 corrupted SQLite WAL</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who noticed</span>
-            <span class="tl-row-val">@marco + @priya</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Migration halted; database put in read-only mode. Migration <code style="font-family:var(--font-mono);font-size:12px;background:var(--bg-subtle-2);padding:1px 5px;border-radius:3px;">0041_add_version_index</code> ran DROP INDEX before confirming recreation; WAL checkpointing failed midway.</span>
-          </div>
+      <!-- Summary -->
+      <div class="summary-card">
+        A migration script run during routine maintenance corrupted the
+        <code
+          style="
+            font-family: var(--font-mono);
+            font-size: 12px;
+            background: var(--bg-subtle-2);
+            padding: 1px 5px;
+            border-radius: 3px;
+          "
+          >file_versions</code
+        >
+        table on the primary SQLite database for <strong>47 accounts</strong>.
+        Affected users could not access file history or resolve conflicts.
+        <strong>No files were lost</strong>; sync continued in last-write-wins
+        fallback mode.
+      </div>
+
+      <!-- Timeline -->
+      <div class="section-title">Incident Timeline</div>
+      <div class="timeline">
+        <div class="tl-event first">
+          <div class="tl-dot"></div>
+          <details class="tl-details" open>
+            <summary class="tl-summary">
+              <span class="tl-time">09:14</span>
+              <span class="tl-headline"
+                >Automated monitor fires sync_error_rate &gt; 5% alert</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who noticed</span>
+                <span class="tl-row-val">PagerDuty → @marco (on-call)</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Acknowledged; started investigating error logs</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-    <div class="tl-event">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">09:35</span>
-          <span class="tl-headline">Incident declared P1; customer comms drafted</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who</span>
-            <span class="tl-row-val">@dean (eng lead)</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Status page updated; affected users notified by email</span>
-          </div>
+        <div class="tl-event action">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">09:22</span>
+              <span class="tl-headline"
+                >Root cause identified: migration 0041 corrupted SQLite
+                WAL</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who noticed</span>
+                <span class="tl-row-val">@marco + @priya</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Migration halted; database put in read-only mode. Migration
+                  <code
+                    style="
+                      font-family: var(--font-mono);
+                      font-size: 12px;
+                      background: var(--bg-subtle-2);
+                      padding: 1px 5px;
+                      border-radius: 3px;
+                    "
+                    >0041_add_version_index</code
+                  >
+                  ran DROP INDEX before confirming recreation; WAL checkpointing
+                  failed midway.</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-    <div class="tl-event">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">09:48</span>
-          <span class="tl-headline">Clean backup from 08:50 UTC identified</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who</span>
-            <span class="tl-row-val">@priya</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Began restore for 47 affected accounts individually — no bulk restore tooling available</span>
-          </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">09:35</span>
+              <span class="tl-headline"
+                >Incident declared P1; customer comms drafted</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who</span>
+                <span class="tl-row-val">@dean (eng lead)</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Status page updated; affected users notified by email</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-    <div class="tl-event action">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">10:15</span>
-          <span class="tl-headline">Ad-hoc restore script written and tested</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who</span>
-            <span class="tl-row-val">@marco</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Script copies clean file_versions rows from backup to prod. Tested on 3 staging accounts; output verified correct.</span>
-          </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">09:48</span>
+              <span class="tl-headline"
+                >Clean backup from 08:50 UTC identified</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who</span>
+                <span class="tl-row-val">@priya</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Began restore for 47 affected accounts individually — no bulk
+                  restore tooling available</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-    <div class="tl-event action">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">10:40</span>
-          <span class="tl-headline">Bulk restore started for all 47 accounts</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who</span>
-            <span class="tl-row-val">@marco + @priya</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Monitoring error rate continuously during restore execution</span>
-          </div>
+        <div class="tl-event action">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">10:15</span>
+              <span class="tl-headline"
+                >Ad-hoc restore script written and tested</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who</span>
+                <span class="tl-row-val">@marco</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Script copies clean file_versions rows from backup to prod.
+                  Tested on 3 staging accounts; output verified correct.</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-    <div class="tl-event">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">11:20</span>
-          <span class="tl-headline">All 47 accounts restored; error rate at baseline</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who</span>
-            <span class="tl-row-val">@dean</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Verified each account can access file history via spot checks</span>
-          </div>
+        <div class="tl-event action">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">10:40</span>
+              <span class="tl-headline"
+                >Bulk restore started for all 47 accounts</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who</span>
+                <span class="tl-row-val">@marco + @priya</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Monitoring error rate continuously during restore
+                  execution</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-    <div class="tl-event resolved">
-      <div class="tl-dot"></div>
-      <details class="tl-details">
-        <summary class="tl-summary">
-          <span class="tl-time">11:32</span>
-          <span class="tl-headline">Incident resolved; all-clear posted on status page</span>
-          <span class="tl-chevron">▶</span>
-        </summary>
-        <div class="tl-body">
-          <div class="tl-row">
-            <span class="tl-row-label">Who</span>
-            <span class="tl-row-val">@dean</span>
-          </div>
-          <div class="tl-row">
-            <span class="tl-row-label">Action taken</span>
-            <span class="tl-row-val">Post-mortem scheduled for 2026-04-17</span>
-          </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">11:20</span>
+              <span class="tl-headline"
+                >All 47 accounts restored; error rate at baseline</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who</span>
+                <span class="tl-row-val">@dean</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Verified each account can access file history via spot
+                  checks</span
+                >
+              </div>
+            </div>
+          </details>
         </div>
-      </details>
-    </div>
 
-  </div><!-- .timeline -->
+        <div class="tl-event resolved">
+          <div class="tl-dot"></div>
+          <details class="tl-details">
+            <summary class="tl-summary">
+              <span class="tl-time">11:32</span>
+              <span class="tl-headline"
+                >Incident resolved; all-clear posted on status page</span
+              >
+              <span class="tl-chevron">▶</span>
+            </summary>
+            <div class="tl-body">
+              <div class="tl-row">
+                <span class="tl-row-label">Who</span>
+                <span class="tl-row-val">@dean</span>
+              </div>
+              <div class="tl-row">
+                <span class="tl-row-label">Action taken</span>
+                <span class="tl-row-val"
+                  >Post-mortem scheduled for 2026-04-17</span
+                >
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+      <!-- .timeline -->
 
-  <!-- 5 Whys -->
-  <div class="section-title">5 Whys — Root Cause Analysis</div>
-  <div class="whys-chain">
+      <!-- 5 Whys -->
+      <div class="section-title">5 Whys — Root Cause Analysis</div>
+      <div class="whys-chain">
+        <details class="why-item" open>
+          <summary class="why-summary">
+            <span class="why-num">1</span>
+            <span class="why-question"
+              >Why did users lose access to file history?</span
+            >
+            <span class="why-chevron">▶</span>
+          </summary>
+          <div class="why-body">
+            The
+            <code
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                background: var(--bg-subtle-2);
+                padding: 1px 5px;
+                border-radius: 3px;
+              "
+              >file_versions</code
+            >
+            table was corrupted during a migration, making all version lookups
+            fail with a database error.
+          </div>
+        </details>
 
-    <details class="why-item" open>
-      <summary class="why-summary">
-        <span class="why-num">1</span>
-        <span class="why-question">Why did users lose access to file history?</span>
-        <span class="why-chevron">▶</span>
-      </summary>
-      <div class="why-body">The <code style="font-family:var(--font-mono);font-size:12px;background:var(--bg-subtle-2);padding:1px 5px;border-radius:3px;">file_versions</code> table was corrupted during a migration, making all version lookups fail with a database error.</div>
-    </details>
+        <div class="why-connector"></div>
 
-    <div class="why-connector"></div>
+        <details class="why-item">
+          <summary class="why-summary">
+            <span class="why-num">2</span>
+            <span class="why-question">Why was the table corrupted?</span>
+            <span class="why-chevron">▶</span>
+          </summary>
+          <div class="why-body">
+            Migration
+            <code
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                background: var(--bg-subtle-2);
+                padding: 1px 5px;
+                border-radius: 3px;
+              "
+              >0041_add_version_index</code
+            >
+            dropped a write-ahead-log index before confirming the replacement
+            was created. The WAL checkpoint failed midway, leaving the table in
+            an inconsistent state.
+          </div>
+        </details>
 
-    <details class="why-item">
-      <summary class="why-summary">
-        <span class="why-num">2</span>
-        <span class="why-question">Why was the table corrupted?</span>
-        <span class="why-chevron">▶</span>
-      </summary>
-      <div class="why-body">Migration <code style="font-family:var(--font-mono);font-size:12px;background:var(--bg-subtle-2);padding:1px 5px;border-radius:3px;">0041_add_version_index</code> dropped a write-ahead-log index before confirming the replacement was created. The WAL checkpoint failed midway, leaving the table in an inconsistent state.</div>
-    </details>
+        <div class="why-connector"></div>
 
-    <div class="why-connector"></div>
+        <details class="why-item">
+          <summary class="why-summary">
+            <span class="why-num">3</span>
+            <span class="why-question"
+              >Why did the migration run without validation?</span
+            >
+            <span class="why-chevron">▶</span>
+          </summary>
+          <div class="why-body">
+            The migration script had no rollback guard. It did not check that
+            the new index existed before proceeding to the DROP statement.
+          </div>
+        </details>
 
-    <details class="why-item">
-      <summary class="why-summary">
-        <span class="why-num">3</span>
-        <span class="why-question">Why did the migration run without validation?</span>
-        <span class="why-chevron">▶</span>
-      </summary>
-      <div class="why-body">The migration script had no rollback guard. It did not check that the new index existed before proceeding to the DROP statement.</div>
-    </details>
+        <div class="why-connector"></div>
 
-    <div class="why-connector"></div>
+        <details class="why-item">
+          <summary class="why-summary">
+            <span class="why-num">4</span>
+            <span class="why-question">Why was there no rollback guard?</span>
+            <span class="why-chevron">▶</span>
+          </summary>
+          <div class="why-body">
+            Our migration review checklist did not require "verify new object
+            exists before dropping old." This check existed for column changes
+            but not index changes — a gap in the checklist introduced when index
+            migrations were added as a pattern.
+          </div>
+        </details>
 
-    <details class="why-item">
-      <summary class="why-summary">
-        <span class="why-num">4</span>
-        <span class="why-question">Why was there no rollback guard?</span>
-        <span class="why-chevron">▶</span>
-      </summary>
-      <div class="why-body">Our migration review checklist did not require "verify new object exists before dropping old." This check existed for column changes but not index changes — a gap in the checklist introduced when index migrations were added as a pattern.</div>
-    </details>
+        <div class="why-connector"></div>
 
-    <div class="why-connector"></div>
+        <details class="why-item">
+          <summary class="why-summary">
+            <span class="why-num">5</span>
+            <span class="why-question"
+              >Why was there no bulk restore tooling?</span
+            >
+            <span class="why-chevron">▶</span>
+          </summary>
+          <div class="why-body">
+            Database restores have historically been manual (1–2 per quarter).
+            The time cost of a bulk restore script was deprioritized in
+            planning. This incident exposed the gap: manual restore at scale
+            took over an hour that bulk tooling would have compressed to
+            minutes.
+          </div>
+        </details>
+      </div>
 
-    <details class="why-item">
-      <summary class="why-summary">
-        <span class="why-num">5</span>
-        <span class="why-question">Why was there no bulk restore tooling?</span>
-        <span class="why-chevron">▶</span>
-      </summary>
-      <div class="why-body">Database restores have historically been manual (1–2 per quarter). The time cost of a bulk restore script was deprioritized in planning. This incident exposed the gap: manual restore at scale took over an hour that bulk tooling would have compressed to minutes.</div>
-    </details>
+      <!-- Impact table -->
+      <div class="section-title">Impact by System</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>Severity</th>
+            <th>User-Facing Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>File sync</td>
+            <td><span class="sev-low">Low</span></td>
+            <td>Continued in last-write-wins fallback; no files lost</td>
+          </tr>
+          <tr>
+            <td>File history / versions</td>
+            <td><span class="sev-critical">Critical</span></td>
+            <td>Unavailable for 47 accounts for 2h 18m</td>
+          </tr>
+          <tr>
+            <td>Conflict resolution UI</td>
+            <td><span class="sev-high">High</span></td>
+            <td>Could not resolve conflicts without version history</td>
+          </tr>
+          <tr>
+            <td>Dashboard</td>
+            <td><span class="sev-medium">Medium</span></td>
+            <td>"File History" tab showed error state for affected accounts</td>
+          </tr>
+        </tbody>
+      </table>
 
-  </div>
+      <!-- Action items -->
+      <div class="section-title">Action Items</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Owner</th>
+            <th>Due</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Add "verify new object before DROP" to migration review checklist
+            </td>
+            <td><span class="owner-chip" title="@priya">PR</span></td>
+            <td
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: var(--fg-muted);
+              "
+            >
+              2026-04-22
+            </td>
+            <td><span class="badge badge-done">✓ Done</span></td>
+          </tr>
+          <tr>
+            <td>
+              Build automated migration rollback test harness (run migrations
+              against prod clone in CI)
+            </td>
+            <td><span class="owner-chip" title="@marco">MA</span></td>
+            <td
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: var(--fg-muted);
+              "
+            >
+              2026-05-01
+            </td>
+            <td><span class="badge badge-done">✓ Done</span></td>
+          </tr>
+          <tr>
+            <td>Write bulk account restore script and add to runbooks</td>
+            <td><span class="owner-chip" title="@marco">MA</span></td>
+            <td
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: var(--fg-muted);
+              "
+            >
+              2026-04-22
+            </td>
+            <td><span class="badge badge-done">✓ Done</span></td>
+          </tr>
+          <tr>
+            <td>Add SQLite WAL checkpoint health check to monitoring</td>
+            <td><span class="owner-chip" title="@dean">DE</span></td>
+            <td
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: var(--fg-muted);
+              "
+            >
+              2026-04-29
+            </td>
+            <td><span class="badge badge-open">Open</span></td>
+          </tr>
+          <tr>
+            <td>
+              Evaluate migration to Postgres for primary store (eliminates WAL
+              checkpoint failure mode)
+            </td>
+            <td><span class="owner-chip" title="@dean">DE</span></td>
+            <td
+              style="
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: var(--fg-muted);
+              "
+            >
+              2026-05-30
+            </td>
+            <td><span class="badge badge-open">Open</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
 
-  <!-- Impact table -->
-  <div class="section-title">Impact by System</div>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>System</th>
-        <th>Severity</th>
-        <th>User-Facing Effect</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>File sync</td>
-        <td><span class="sev-low">Low</span></td>
-        <td>Continued in last-write-wins fallback; no files lost</td>
-      </tr>
-      <tr>
-        <td>File history / versions</td>
-        <td><span class="sev-critical">Critical</span></td>
-        <td>Unavailable for 47 accounts for 2h 18m</td>
-      </tr>
-      <tr>
-        <td>Conflict resolution UI</td>
-        <td><span class="sev-high">High</span></td>
-        <td>Could not resolve conflicts without version history</td>
-      </tr>
-      <tr>
-        <td>Dashboard</td>
-        <td><span class="sev-medium">Medium</span></td>
-        <td>"File History" tab showed error state for affected accounts</td>
-      </tr>
-    </tbody>
-  </table>
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+    </script>
 
-  <!-- Action items -->
-  <div class="section-title">Action Items</div>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th>Owner</th>
-        <th>Due</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Add "verify new object before DROP" to migration review checklist</td>
-        <td><span class="owner-chip" title="@priya">PR</span></td>
-        <td style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);">2026-04-22</td>
-        <td><span class="badge badge-done">✓ Done</span></td>
-      </tr>
-      <tr>
-        <td>Build automated migration rollback test harness (run migrations against prod clone in CI)</td>
-        <td><span class="owner-chip" title="@marco">MA</span></td>
-        <td style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);">2026-05-01</td>
-        <td><span class="badge badge-done">✓ Done</span></td>
-      </tr>
-      <tr>
-        <td>Write bulk account restore script and add to runbooks</td>
-        <td><span class="owner-chip" title="@marco">MA</span></td>
-        <td style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);">2026-04-22</td>
-        <td><span class="badge badge-done">✓ Done</span></td>
-      </tr>
-      <tr>
-        <td>Add SQLite WAL checkpoint health check to monitoring</td>
-        <td><span class="owner-chip" title="@dean">DE</span></td>
-        <td style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);">2026-04-29</td>
-        <td><span class="badge badge-open">Open</span></td>
-      </tr>
-      <tr>
-        <td>Evaluate migration to Postgres for primary store (eliminates WAL checkpoint failure mode)</td>
-        <td><span class="owner-chip" title="@dean">DE</span></td>
-        <td style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);">2026-05-30</td>
-        <td><span class="badge badge-open">Open</span></td>
-      </tr>
-    </tbody>
-  </table>
-
-</main>
-
-<script>
-  (function(){
-    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-    if(t==='dark')document.documentElement.classList.add('dark');
-    document.getElementById('dm-toggle').addEventListener('click',function(){
-      var d=document.documentElement.classList.toggle('dark');
-      localStorage.setItem('ha-theme',d?'dark':'light');
-    });
-  })();
-</script>
-
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Incident Report · May 2026
-</footer>
-</body>
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Incident Report · May 2026
+    </footer>
+  </body>
 </html>

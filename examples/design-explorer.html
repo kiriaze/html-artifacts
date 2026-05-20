@@ -1,626 +1,780 @@
-<!-- html-artifacts: design-explorer example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: design-explorer example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-16T00:00:00Z | source: examples/design-explorer.html -->
-<!DOCTYPE html>
+<!doctype html>
 <!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Design Explorer — Acme Sync</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Design Explorer — Acme Sync</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    /* ── Nav ── */
-    nav {
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      height: 48px;
-      z-index: 10;
-    }
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 32px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 48px;
+        z-index: 10;
+      }
 
-    nav .back-link { font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0; }
-    nav .back-link:hover { color: var(--fg); }
-    nav .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    nav .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    nav .nav-spacer { flex: 1; }
+      nav .back-link {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      nav .back-link:hover {
+        color: var(--fg);
+      }
+      nav .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      nav .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      nav .nav-spacer {
+        flex: 1;
+      }
 
-    nav a.nav-link {
-      color: var(--fg-muted);
-      text-decoration: none;
-      font-size: 13px;
-    }
-    nav a.nav-link:hover { color: var(--fg); }
+      nav a.nav-link {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      nav a.nav-link:hover {
+        color: var(--fg);
+      }
 
-    /* ── Page shell ── */
-    main {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 24px 96px;
-    }
+      /* ── Page shell ── */
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
 
-    /* ── Page title ── */
-    .page-title { margin-bottom: 64px; }
+      /* ── Page title ── */
+      .page-title {
+        margin-bottom: 64px;
+      }
 
-    .page-label {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 8px;
-    }
+      .page-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 8px;
+      }
 
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      color: var(--fg);
-      line-height: 1.25;
-    }
+      h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--fg);
+        line-height: 1.25;
+      }
 
-    /* ── Section ── */
-    section { margin-bottom: 64px; }
+      /* ── Section ── */
+      section {
+        margin-bottom: 64px;
+      }
 
-    h2 {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 24px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
+      h2 {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 24px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    .section-hint {
-      font-size: 13px;
-      color: var(--fg-faint);
-      margin-bottom: 20px;
-      margin-top: -16px;
-    }
+      .section-hint {
+        font-size: 13px;
+        color: var(--fg-faint);
+        margin-bottom: 20px;
+        margin-top: -16px;
+      }
 
-    /* ── Color swatches ── */
-    .swatch-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-    }
+      /* ── Color swatches ── */
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+      }
 
-    .swatch-card {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 4px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.1s;
-      user-select: none;
-    }
+      .swatch-card {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition:
+          transform 0.1s,
+          box-shadow 0.1s;
+        user-select: none;
+      }
 
-    .swatch-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
+      .swatch-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
 
-    .swatch-color {
-      height: 56px;
-      position: relative;
-      flex-shrink: 0;
-    }
+      .swatch-color {
+        height: 56px;
+        position: relative;
+        flex-shrink: 0;
+      }
 
-    .swatch-copied {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-family: var(--font-mono);
-      background: rgba(0,0,0,0.55);
-      color: #fff;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
+      .swatch-copied {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
 
-    .swatch-card.flash .swatch-copied { opacity: 1; }
+      .swatch-card.flash .swatch-copied {
+        opacity: 1;
+      }
 
-    .swatch-info {
-      padding: 10px 12px;
-      background: var(--bg-subtle);
-    }
+      .swatch-info {
+        padding: 10px 12px;
+        background: var(--bg-subtle);
+      }
 
-    .swatch-name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--fg);
-      display: block;
-    }
+      .swatch-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        display: block;
+      }
 
-    .swatch-hex {
-      font-size: 12px;
-      font-family: var(--font-mono);
-      color: var(--fg-muted);
-      display: block;
-      margin-top: 2px;
-    }
+      .swatch-hex {
+        font-size: 12px;
+        font-family: var(--font-mono);
+        color: var(--fg-muted);
+        display: block;
+        margin-top: 2px;
+      }
 
-    .swatch-var {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--fg-faint);
-      display: block;
-      margin-top: 2px;
-    }
+      .swatch-var {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        color: var(--fg-faint);
+        display: block;
+        margin-top: 2px;
+      }
 
-    /* ── Typography specimens ── */
-    .type-scale {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+      /* ── Typography specimens ── */
+      .type-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-    .type-row {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      transition: background 0.1s;
-    }
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        transition: background 0.1s;
+      }
 
-    .type-row:hover { background: var(--bg-subtle); }
+      .type-row:hover {
+        background: var(--bg-subtle);
+      }
 
-    .type-meta {
-      width: 100px;
-      flex-shrink: 0;
-    }
+      .type-meta {
+        width: 100px;
+        flex-shrink: 0;
+      }
 
-    .type-size-label {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--fg-muted);
-      display: block;
-    }
+      .type-size-label {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        color: var(--fg-muted);
+        display: block;
+      }
 
-    .type-role {
-      font-size: 11px;
-      color: var(--fg-faint);
-      display: block;
-      margin-top: 2px;
-    }
+      .type-role {
+        font-size: 11px;
+        color: var(--fg-faint);
+        display: block;
+        margin-top: 2px;
+      }
 
-    .type-specimen {
-      flex: 1;
-      outline: none;
-    }
+      .type-specimen {
+        flex: 1;
+        outline: none;
+      }
 
-    .type-specimen:focus {
-      border-bottom: 1px dashed var(--border-strong);
-    }
+      .type-specimen:focus {
+        border-bottom: 1px dashed var(--border-strong);
+      }
 
-    .type-specimen.mono {
-      font-family: var(--font-mono);
-      background: var(--bg-subtle);
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      color: var(--fg);
-    }
+      .type-specimen.mono {
+        font-family: var(--font-mono);
+        background: var(--bg-subtle);
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        color: var(--fg);
+      }
 
-    .type-specimen.mono:focus {
-      border-bottom: none;
-      outline: 1px dashed var(--border-strong);
-      outline-offset: 2px;
-    }
+      .type-specimen.mono:focus {
+        border-bottom: none;
+        outline: 1px dashed var(--border-strong);
+        outline-offset: 2px;
+      }
 
-    /* ── CLI states ── */
-    .cli-states {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+      /* ── CLI states ── */
+      .cli-states {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-    .cli-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #1e293b;
-      color: #e2e8f0;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-    }
+      .cli-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #1e293b;
+        color: #e2e8f0;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+      }
 
-    .cli-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+      .cli-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
 
-    .cli-dot.idle     { background: var(--fg-faint); }
-    .cli-dot.syncing  { background: var(--warning); }
-    .cli-dot.done     { background: var(--success); }
-    .cli-dot.conflict { background: var(--danger); }
+      .cli-dot.idle {
+        background: var(--fg-faint);
+      }
+      .cli-dot.syncing {
+        background: var(--warning);
+      }
+      .cli-dot.done {
+        background: var(--success);
+      }
+      .cli-dot.conflict {
+        background: var(--danger);
+      }
 
-    .cli-text { flex: 1; }
+      .cli-text {
+        flex: 1;
+      }
 
-    .cli-state-label {
-      font-size: 11px;
-      color: #64748b;
-      margin-left: 4px;
-    }
+      .cli-state-label {
+        font-size: 11px;
+        color: #64748b;
+        margin-left: 4px;
+      }
 
-    .copy-btn {
-      background: transparent;
-      border: 1px solid #475569;
-      color: #94a3b8;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: border-color 0.1s, color 0.1s;
-      flex-shrink: 0;
-    }
+      .copy-btn {
+        background: transparent;
+        border: 1px solid #475569;
+        color: #94a3b8;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition:
+          border-color 0.1s,
+          color 0.1s;
+        flex-shrink: 0;
+      }
 
-    .copy-btn:hover {
-      border-color: #e2e8f0;
-      color: #e2e8f0;
-    }
+      .copy-btn:hover {
+        border-color: #e2e8f0;
+        color: #e2e8f0;
+      }
 
-    .copy-btn.copied {
-      border-color: var(--success);
-      color: var(--success);
-    }
+      .copy-btn.copied {
+        border-color: var(--success);
+        color: var(--success);
+      }
 
-    /* ── Spacing scale ── */
-    .spacing-scale {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+      /* ── Spacing scale ── */
+      .spacing-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
 
-    .space-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+      .space-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-    .space-label {
-      width: 80px;
-      flex-shrink: 0;
-      font-size: 13px;
-      color: var(--fg-muted);
-    }
+      .space-label {
+        width: 80px;
+        flex-shrink: 0;
+        font-size: 13px;
+        color: var(--fg-muted);
+      }
 
-    .space-bar {
-      background: var(--accent-bg);
-      border: 1px solid var(--accent-border);
-      height: 20px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
+      .space-bar {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        height: 20px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
 
-    .space-var {
-      font-size: 13px;
-      font-family: var(--font-mono);
-      color: var(--fg-muted);
-      flex-shrink: 0;
-    }
+      .space-var {
+        font-size: 13px;
+        font-family: var(--font-mono);
+        color: var(--fg-muted);
+        flex-shrink: 0;
+      }
 
-    /* ── Footer ── */
-    footer {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 24px;
-      border-top: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--fg-faint);
-      font-family: var(--font-mono);
-    }
-    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-  </style>
-</head>
-<body>
+      /* ── Footer ── */
+      footer {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 24px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--fg-faint);
+        font-family: var(--font-mono);
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="back-link" href="../index.html">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Design Token Explorer</span>
+      <span class="nav-spacer"></span>
+      <a class="nav-link" href="#colors">Colors</a>
+      <a class="nav-link" href="#type">Typography</a>
+      <a class="nav-link" href="#cli-states">CLI States</a>
+      <a class="nav-link" href="#spacing">Spacing</a>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
 
-<nav>
-  <a class="back-link" href="../index.html">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Design Token Explorer</span>
-  <span class="nav-spacer"></span>
-  <a class="nav-link" href="#colors">Colors</a>
-  <a class="nav-link" href="#type">Typography</a>
-  <a class="nav-link" href="#cli-states">CLI States</a>
-  <a class="nav-link" href="#spacing">Spacing</a>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
-
-<main>
-
-  <div class="page-title">
-    <p class="page-label">Design System</p>
-    <h1>Design Explorer</h1>
-  </div>
-
-  <!-- Color swatches -->
-  <section id="colors">
-    <h2>Color Palette — click to copy hex</h2>
-    <div class="swatch-grid" id="swatchGrid"></div>
-  </section>
-
-  <!-- Typography -->
-  <section id="type">
-    <h2>Typography Scale</h2>
-    <p class="section-hint">Click any specimen to edit it</p>
-    <div class="type-scale">
-
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">28px</span>
-          <span class="type-role">heading</span>
-        </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:28px;font-weight:600;">Page heading — large, clear, confident</span>
+    <main>
+      <div class="page-title">
+        <p class="page-label">Design System</p>
+        <h1>Design Explorer</h1>
       </div>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">20px</span>
-          <span class="type-role">heading-sm</span>
+      <!-- Color swatches -->
+      <section id="colors">
+        <h2>Color Palette — click to copy hex</h2>
+        <div class="swatch-grid" id="swatchGrid"></div>
+      </section>
+
+      <!-- Typography -->
+      <section id="type">
+        <h2>Typography Scale</h2>
+        <p class="section-hint">Click any specimen to edit it</p>
+        <div class="type-scale">
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">28px</span>
+              <span class="type-role">heading</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 28px; font-weight: 600"
+              >Page heading — large, clear, confident</span
+            >
+          </div>
+
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">20px</span>
+              <span class="type-role">heading-sm</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 20px; font-weight: 500"
+              >Section heading or card title with moderate weight</span
+            >
+          </div>
+
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">16px</span>
+              <span class="type-role">body</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 16px"
+              >Primary body text. Clear, readable prose at default size with
+              sufficient line height.</span
+            >
+          </div>
+
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">14px</span>
+              <span class="type-role">body-sm</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 14px; color: var(--fg-muted)"
+              >Secondary body text for captions, descriptions, and supporting
+              detail.</span
+            >
+          </div>
+
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">12px</span>
+              <span class="type-role">caption</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 12px; color: var(--fg-faint)"
+              >Timestamp · category tag · metadata label</span
+            >
+          </div>
+
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">14px mono</span>
+              <span class="type-role">code</span>
+            </div>
+            <span class="type-specimen mono" contenteditable="true"
+              >$ acmesync push --dry-run --verbose</span
+            >
+          </div>
         </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:20px;font-weight:500;">Section heading or card title with moderate weight</span>
-      </div>
+      </section>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">16px</span>
-          <span class="type-role">body</span>
-        </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:16px;">Primary body text. Clear, readable prose at default size with sufficient line height.</span>
-      </div>
+      <!-- CLI states -->
+      <section id="cli-states">
+        <h2>CLI Status Component — 4 States</h2>
+        <div class="cli-states" id="cliStates"></div>
+      </section>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">14px</span>
-          <span class="type-role">body-sm</span>
-        </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:14px;color:var(--fg-muted);">Secondary body text for captions, descriptions, and supporting detail.</span>
-      </div>
+      <!-- Spacing scale -->
+      <section id="spacing">
+        <h2>Spacing Scale — 4pt base</h2>
+        <div class="spacing-scale" id="spacingScale"></div>
+      </section>
+    </main>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">12px</span>
-          <span class="type-role">caption</span>
-        </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:12px;color:var(--fg-faint);">Timestamp · category tag · metadata label</span>
-      </div>
+    <footer>generated 2026-05-16 · Acme Sync · Design Explorer</footer>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">14px mono</span>
-          <span class="type-role">code</span>
-        </div>
-        <span class="type-specimen mono" contenteditable="true">$ acmesync push --dry-run --verbose</span>
-      </div>
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
 
-    </div>
-  </section>
+      /* ── Color swatches ── */
+      ;(function () {
+        var swatches = [
+          { name: 'Background', hex: '#ffffff', varName: '--bg' },
+          { name: 'Bg Subtle', hex: '#f9fafb', varName: '--bg-subtle' },
+          { name: 'Bg Subtle 2', hex: '#f3f4f6', varName: '--bg-subtle-2' },
+          { name: 'Foreground', hex: '#111827', varName: '--fg' },
+          { name: 'Fg Muted', hex: '#6b7280', varName: '--fg-muted' },
+          { name: 'Fg Faint', hex: '#9ca3af', varName: '--fg-faint' },
+          { name: 'Accent', hex: '#2563eb', varName: '--accent' },
+          { name: 'Accent Bg', hex: '#eff6ff', varName: '--accent-bg' },
+          { name: 'Accent Border', hex: '#bfdbfe', varName: '--accent-border' },
+          { name: 'Success', hex: '#16a34a', varName: '--success' },
+          { name: 'Success Bg', hex: '#f0fdf4', varName: '--success-bg' },
+          { name: 'Warning', hex: '#d97706', varName: '--warning' },
+          { name: 'Warning Bg', hex: '#fffbeb', varName: '--warning-bg' },
+          { name: 'Danger', hex: '#dc2626', varName: '--danger' },
+          { name: 'Danger Bg', hex: '#fef2f2', varName: '--danger-bg' },
+          { name: 'Border', hex: '#e5e7eb', varName: '--border' },
+          { name: 'Border Strong', hex: '#d1d5db', varName: '--border-strong' },
+        ]
 
-  <!-- CLI states -->
-  <section id="cli-states">
-    <h2>CLI Status Component — 4 States</h2>
-    <div class="cli-states" id="cliStates"></div>
-  </section>
+        var grid = document.getElementById('swatchGrid')
 
-  <!-- Spacing scale -->
-  <section id="spacing">
-    <h2>Spacing Scale — 4pt base</h2>
-    <div class="spacing-scale" id="spacingScale"></div>
-  </section>
+        swatches.forEach(function (s) {
+          var card = document.createElement('div')
+          card.className = 'swatch-card'
 
-</main>
+          var colorDiv = document.createElement('div')
+          colorDiv.className = 'swatch-color'
+          colorDiv.style.background = s.hex
 
-<footer>generated 2026-05-16 · Acme Sync · Design Explorer</footer>
+          var copiedDiv = document.createElement('div')
+          copiedDiv.className = 'swatch-copied'
+          copiedDiv.textContent = 'Copied!'
+          colorDiv.appendChild(copiedDiv)
 
-<script>
-(function(){
-  var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  if(t==='dark')document.documentElement.classList.add('dark');
-  document.getElementById('dm-toggle').addEventListener('click',function(){
-    var d=document.documentElement.classList.toggle('dark');
-    localStorage.setItem('ha-theme',d?'dark':'light');
-  });
-})();
+          var info = document.createElement('div')
+          info.className = 'swatch-info'
 
-  /* ── Color swatches ── */
-  (function () {
-    var swatches = [
-      { name: 'Background',     hex: '#ffffff', varName: '--bg' },
-      { name: 'Bg Subtle',      hex: '#f9fafb', varName: '--bg-subtle' },
-      { name: 'Bg Subtle 2',    hex: '#f3f4f6', varName: '--bg-subtle-2' },
-      { name: 'Foreground',     hex: '#111827', varName: '--fg' },
-      { name: 'Fg Muted',       hex: '#6b7280', varName: '--fg-muted' },
-      { name: 'Fg Faint',       hex: '#9ca3af', varName: '--fg-faint' },
-      { name: 'Accent',         hex: '#2563eb', varName: '--accent' },
-      { name: 'Accent Bg',      hex: '#eff6ff', varName: '--accent-bg' },
-      { name: 'Accent Border',  hex: '#bfdbfe', varName: '--accent-border' },
-      { name: 'Success',        hex: '#16a34a', varName: '--success' },
-      { name: 'Success Bg',     hex: '#f0fdf4', varName: '--success-bg' },
-      { name: 'Warning',        hex: '#d97706', varName: '--warning' },
-      { name: 'Warning Bg',     hex: '#fffbeb', varName: '--warning-bg' },
-      { name: 'Danger',         hex: '#dc2626', varName: '--danger' },
-      { name: 'Danger Bg',      hex: '#fef2f2', varName: '--danger-bg' },
-      { name: 'Border',         hex: '#e5e7eb', varName: '--border' },
-      { name: 'Border Strong',  hex: '#d1d5db', varName: '--border-strong' },
-    ];
+          var nameEl = document.createElement('span')
+          nameEl.className = 'swatch-name'
+          nameEl.textContent = s.name
 
-    var grid = document.getElementById('swatchGrid');
+          var hexEl = document.createElement('span')
+          hexEl.className = 'swatch-hex'
+          hexEl.textContent = s.hex
 
-    swatches.forEach(function (s) {
-      var card = document.createElement('div');
-      card.className = 'swatch-card';
+          var varEl = document.createElement('span')
+          varEl.className = 'swatch-var'
+          varEl.textContent = s.varName
 
-      var colorDiv = document.createElement('div');
-      colorDiv.className = 'swatch-color';
-      colorDiv.style.background = s.hex;
+          info.appendChild(nameEl)
+          info.appendChild(hexEl)
+          info.appendChild(varEl)
+          card.appendChild(colorDiv)
+          card.appendChild(info)
+          grid.appendChild(card)
 
-      var copiedDiv = document.createElement('div');
-      copiedDiv.className = 'swatch-copied';
-      copiedDiv.textContent = 'Copied!';
-      colorDiv.appendChild(copiedDiv);
+          card.addEventListener('click', function () {
+            navigator.clipboard.writeText(s.hex).then(function () {
+              card.classList.add('flash')
+              setTimeout(function () {
+                card.classList.remove('flash')
+              }, 900)
+            })
+          })
+        })
+      })()
 
-      var info = document.createElement('div');
-      info.className = 'swatch-info';
+      /* ── CLI states ── */
+      ;(function () {
+        var states = [
+          {
+            dotClass: 'idle',
+            label: 'Idle',
+            text: 'Watching...',
+            stateText: 'IDLE',
+          },
+          {
+            dotClass: 'syncing',
+            label: 'Syncing',
+            text: 'Syncing 3 files...',
+            stateText: 'SYNC',
+          },
+          {
+            dotClass: 'done',
+            label: 'Complete',
+            text: 'All files synced',
+            stateText: 'OK',
+          },
+          {
+            dotClass: 'conflict',
+            label: 'Conflict',
+            text: '1 conflict needs resolution',
+            stateText: 'ERR',
+          },
+        ]
 
-      var nameEl = document.createElement('span');
-      nameEl.className = 'swatch-name';
-      nameEl.textContent = s.name;
+        var container = document.getElementById('cliStates')
 
-      var hexEl = document.createElement('span');
-      hexEl.className = 'swatch-hex';
-      hexEl.textContent = s.hex;
+        states.forEach(function (s) {
+          var row = document.createElement('div')
+          row.className = 'cli-row'
 
-      var varEl = document.createElement('span');
-      varEl.className = 'swatch-var';
-      varEl.textContent = s.varName;
+          var dot = document.createElement('span')
+          dot.className = 'cli-dot ' + s.dotClass
 
-      info.appendChild(nameEl);
-      info.appendChild(hexEl);
-      info.appendChild(varEl);
-      card.appendChild(colorDiv);
-      card.appendChild(info);
-      grid.appendChild(card);
+          var textEl = document.createElement('span')
+          textEl.className = 'cli-text'
+          textEl.textContent = s.text
 
-      card.addEventListener('click', function () {
-        navigator.clipboard.writeText(s.hex).then(function () {
-          card.classList.add('flash');
-          setTimeout(function () { card.classList.remove('flash'); }, 900);
-        });
-      });
-    });
-  }());
+          var stateLabel = document.createElement('span')
+          stateLabel.className = 'cli-state-label'
+          stateLabel.textContent = '[' + s.stateText + ']'
 
-  /* ── CLI states ── */
-  (function () {
-    var states = [
-      { dotClass: 'idle',     label: 'Idle',     text: 'Watching...',                 stateText: 'IDLE' },
-      { dotClass: 'syncing',  label: 'Syncing',  text: 'Syncing 3 files...',          stateText: 'SYNC' },
-      { dotClass: 'done',     label: 'Complete', text: 'All files synced',            stateText: 'OK' },
-      { dotClass: 'conflict', label: 'Conflict', text: '1 conflict needs resolution', stateText: 'ERR' },
-    ];
+          var btn = document.createElement('button')
+          btn.className = 'copy-btn'
+          btn.textContent = 'Copy'
+          btn.type = 'button'
 
-    var container = document.getElementById('cliStates');
+          btn.addEventListener('click', function () {
+            navigator.clipboard.writeText(s.text).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 1200)
+            })
+          })
 
-    states.forEach(function (s) {
-      var row = document.createElement('div');
-      row.className = 'cli-row';
+          row.appendChild(dot)
+          row.appendChild(textEl)
+          row.appendChild(stateLabel)
+          row.appendChild(btn)
+          container.appendChild(row)
+        })
+      })()
 
-      var dot = document.createElement('span');
-      dot.className = 'cli-dot ' + s.dotClass;
+      /* ── Spacing scale ── */
+      ;(function () {
+        var steps = [
+          { px: 4, varName: '--space-1' },
+          { px: 8, varName: '--space-2' },
+          { px: 12, varName: '--space-3' },
+          { px: 16, varName: '--space-4' },
+          { px: 24, varName: '--space-6' },
+          { px: 32, varName: '--space-8' },
+          { px: 48, varName: '--space-12' },
+          { px: 64, varName: '--space-16' },
+        ]
 
-      var textEl = document.createElement('span');
-      textEl.className = 'cli-text';
-      textEl.textContent = s.text;
+        var maxPx = 64
+        var container = document.getElementById('spacingScale')
 
-      var stateLabel = document.createElement('span');
-      stateLabel.className = 'cli-state-label';
-      stateLabel.textContent = '[' + s.stateText + ']';
+        steps.forEach(function (s) {
+          var row = document.createElement('div')
+          row.className = 'space-row'
 
-      var btn = document.createElement('button');
-      btn.className = 'copy-btn';
-      btn.textContent = 'Copy';
-      btn.type = 'button';
+          var label = document.createElement('span')
+          label.className = 'space-label'
+          label.textContent = s.px + 'px'
 
-      btn.addEventListener('click', function () {
-        navigator.clipboard.writeText(s.text).then(function () {
-          btn.textContent = 'Copied!';
-          btn.classList.add('copied');
-          setTimeout(function () {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-          }, 1200);
-        });
-      });
+          var bar = document.createElement('div')
+          bar.className = 'space-bar'
+          bar.style.width = Math.round((s.px / maxPx) * 400) + 'px'
 
-      row.appendChild(dot);
-      row.appendChild(textEl);
-      row.appendChild(stateLabel);
-      row.appendChild(btn);
-      container.appendChild(row);
-    });
-  }());
+          var varLabel = document.createElement('span')
+          varLabel.className = 'space-var'
+          varLabel.textContent = s.varName
 
-  /* ── Spacing scale ── */
-  (function () {
-    var steps = [
-      { px: 4,  varName: '--space-1' },
-      { px: 8,  varName: '--space-2' },
-      { px: 12, varName: '--space-3' },
-      { px: 16, varName: '--space-4' },
-      { px: 24, varName: '--space-6' },
-      { px: 32, varName: '--space-8' },
-      { px: 48, varName: '--space-12' },
-      { px: 64, varName: '--space-16' },
-    ];
-
-    var maxPx = 64;
-    var container = document.getElementById('spacingScale');
-
-    steps.forEach(function (s) {
-      var row = document.createElement('div');
-      row.className = 'space-row';
-
-      var label = document.createElement('span');
-      label.className = 'space-label';
-      label.textContent = s.px + 'px';
-
-      var bar = document.createElement('div');
-      bar.className = 'space-bar';
-      bar.style.width = Math.round((s.px / maxPx) * 400) + 'px';
-
-      var varLabel = document.createElement('span');
-      varLabel.className = 'space-var';
-      varLabel.textContent = s.varName;
-
-      row.appendChild(label);
-      row.appendChild(bar);
-      row.appendChild(varLabel);
-      container.appendChild(row);
-    });
-  }());
-</script>
-
-</body>
+          row.appendChild(label)
+          row.appendChild(bar)
+          row.appendChild(varLabel)
+          container.appendChild(row)
+        })
+      })()
+    </script>
+  </body>
 </html>
