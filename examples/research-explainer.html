@@ -412,6 +412,57 @@
         background: var(--bg-subtle);
         color: var(--fg);
       }
+      /* ── Prompt callout ── */
+      .prompt-callout {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 20px 24px;
+        margin-bottom: 40px;
+        position: relative;
+      }
+      .prompt-callout-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .prompt-callout-text {
+        font-size: 14px;
+        color: var(--fg);
+        line-height: 1.7;
+        font-family: var(--font-mono);
+        white-space: pre-wrap;
+      }
+      .prompt-copy-btn {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--accent);
+        border: 1px solid var(--accent-border);
+        border-radius: 5px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-family: var(--font-sans);
+      }
+      .prompt-copy-btn:hover {
+        background: rgba(37, 99, 235, 0.18);
+      }
+      .prompt-copy-btn.copied {
+        color: var(--success);
+        border-color: #86efac;
+        background: var(--success-bg);
+      }
     </style>
   </head>
   <body>
@@ -435,6 +486,14 @@
     </nav>
 
     <main>
+      <aside class="prompt-callout">
+        <div class="prompt-callout-label">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4.5" stroke="currentColor" stroke-width="1"/><line x1="5" y1="3" x2="5" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5" cy="7" r="0.6" fill="currentColor"/></svg>
+          Prompt that generated this
+        </div>
+        <p class="prompt-callout-text">I can't tell from our codebase how the three-way merge actually handles edge cases. Read through the sync logic in `src/` and generate a single HTML explainer: walk through the merge flow step by step, annotate the key decision points with the actual code, and add a 'gotchas' section for cases that catch people off guard. Optimize it for someone who needs to understand it once and remember it.</p>
+        <button class="prompt-copy-btn" onclick="(function(btn){const t=btn.previousElementSibling.textContent.trim();navigator.clipboard.writeText(t).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy prompt';btn.classList.remove('copied')},2000)})})(this)">Copy prompt</button>
+      </aside>
       <h1>Three-Way Merge Conflict Resolution</h1>
       <p class="subtitle">Last updated 2026-05-15 · Acme Sync v1.2</p>
 
