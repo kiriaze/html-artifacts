@@ -72,13 +72,13 @@
     /* H-Current */
     .hdr-current {
       padding: 12px 48px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; gap: 16px;
       border-bottom: 1px solid var(--border);
       background: rgba(255,255,255,0.95);
       backdrop-filter: blur(8px);
     }
-    .hdr-current .wm { font-family: var(--font-mono); font-weight: 600; font-size: 14px; color: var(--fg); }
-    .hdr-current a { font-size: 13px; color: var(--fg-muted); text-decoration: none; }
+    .hdr-current .wm { font-family: var(--font-mono); font-weight: 600; font-size: 14px; color: var(--fg); margin-right: auto; }
+    .hdr-current a { font-size: 13px; color: var(--fg-muted); text-decoration: none; display: flex; align-items: center; gap: 4px; }
     .hdr-current .dm { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; color: var(--fg-muted); }
 
     /* H-A: dogum-inspired — full GitHub URL + lineage reference */
@@ -102,14 +102,14 @@
     /* H-B: Pill navigation */
     .hdr-b {
       padding: 0 40px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center;
       height: 52px;
       border-bottom: 1px solid var(--border);
       background: #fff;
+      gap: 16px;
     }
-    .hdr-b .wm { font-size: 14px; font-weight: 700; font-family: var(--font-mono); color: var(--fg); display: flex; align-items: center; gap: 6px; }
-    .hdr-b .wm-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-    .hdr-b nav { display: flex; gap: 2px; background: var(--bg-subtle-2); border-radius: 20px; padding: 3px; }
+    .hdr-b .wm { font-size: 14px; font-weight: 700; font-family: var(--font-mono); color: var(--fg); display: flex; align-items: center; }
+    .hdr-b nav { display: flex; gap: 2px; background: var(--bg-subtle-2); border-radius: 20px; padding: 3px; flex: 1; justify-content: center; }
     .hdr-b nav a { font-size: 12px; font-weight: 500; color: var(--fg-muted); text-decoration: none; padding: 4px 12px; border-radius: 16px; }
     .hdr-b nav a.active { background: #fff; color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
     .hdr-b nav a:hover:not(.active) { color: var(--fg); }
@@ -143,7 +143,7 @@
     }
     .hero-a .eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
     .hero-a h1 {
-      font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
+      font-size: 68px; font-weight: 300; letter-spacing: -0.03em; line-height: 1.05;
       color: var(--fg); margin-bottom: 24px; max-width: 680px;
     }
     .hero-a h1 .accent { color: var(--accent); }
@@ -408,7 +408,10 @@
     <div class="variant-frame">
       <header class="hdr-current">
         <span class="wm">html-artifacts</span>
-        <a href="#">GitHub</a>
+        <a href="#">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
         <button class="hdr-current dm">◐</button>
       </header>
     </div>
@@ -431,7 +434,7 @@
     <div class="variant-tag"><span class="vtag-name">V-B · Pill nav with section anchors</span></div>
     <div class="variant-frame">
       <header class="hdr-b">
-        <span class="wm"><span class="wm-dot"></span>html-artifacts</span>
+        <span class="wm">html-artifacts</span>
         <nav>
           <a href="#" class="gtab active">Examples</a>
           <a href="#" class="gtab">Install</a>

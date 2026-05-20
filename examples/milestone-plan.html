@@ -50,8 +50,8 @@
     }
     .back { color: var(--fg-muted); text-decoration: none; font-size: 13px; flex-shrink: 0; }
     .back:hover { color: var(--fg); }
-    .nav-brand { font-size: 14px; font-weight: 600; color: var(--fg); }
-    .nav-brand span { color: var(--accent); }
+    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
+    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
     .dm-toggle {
       background: none; border: 1px solid var(--border); border-radius: var(--radius-sm);
       padding: 4px 8px; font-size: 13px; cursor: pointer; color: var(--fg-muted);
@@ -187,7 +187,7 @@
     .milestone-card.status-in-progress { border-left: 3px solid var(--accent); }
     .milestone-card.status-planned { border-left: 3px solid var(--border-strong); }
     .milestone-card.status-deferred { border-left: 3px solid var(--fg-faint); opacity: 0.7; }
-    .milestone-card.hidden { display: none; }
+    .milestone-card.hidden { visibility: hidden; }
 
     .card-top {
       display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
@@ -302,8 +302,9 @@
 <body>
 
 <nav>
-  <a href="index.html" class="back">← Acme Sync</a>
-  <div class="nav-brand">Acme <span>Sync</span> · Milestone Plan</div>
+  <a href="../index.html" class="back">← Acme Sync</a>
+  <span class="nav-sep">|</span>
+  <span class="nav-brand">Milestone Plan</span>
   <div style="flex:1"></div>
   <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>

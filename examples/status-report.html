@@ -44,6 +44,8 @@
     }
     nav a{color:var(--fg-muted);text-decoration:none;font-size:13px}
     nav a:hover{color:var(--fg)}
+    nav .nav-sep{color:var(--fg-faint);font-size:13px;flex-shrink:0}
+    nav .nav-brand{font-size:13px;font-weight:500;color:var(--fg);flex-shrink:0}
     nav .spacer{flex:1}
     nav .dm-toggle{
       background:none;border:1px solid var(--border);border-radius:var(--radius-sm);
@@ -228,7 +230,9 @@
 <body>
 
 <nav>
-  <a href="index.html">← Acme Sync</a>
+  <a href="../index.html">← Acme Sync</a>
+  <span class="nav-sep">|</span>
+  <span class="nav-brand">Sprint Status Report</span>
   <span class="spacer"></span>
   <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>

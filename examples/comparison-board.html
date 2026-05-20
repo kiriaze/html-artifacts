@@ -40,9 +40,10 @@
       background: var(--bg); border-bottom: 1px solid var(--border);
       padding: 0 32px; display: flex; align-items: center; gap: 24px; height: 48px;
     }
-    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; margin-right: auto; }
+    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; flex-shrink: 0; }
     .back-link:hover { color: var(--fg); }
-    .nav-brand { font-size: 15px; font-weight: 600; color: var(--fg); }
+    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
+    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
     .nav-links { display: flex; gap: 20px; list-style: none; }
     .nav-links a { color: var(--fg-muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
     .nav-links a:hover { color: var(--accent); }
@@ -163,8 +164,10 @@
 <body>
 
 <nav>
-  <a href="index.html" class="back-link">← Acme Sync</a>
+  <a href="../index.html" class="back-link">← Acme Sync</a>
+  <span class="nav-sep">|</span>
   <span class="nav-brand">Comparison Board</span>
+  <div style="flex:1"></div>
   <ul class="nav-links">
     <li><a href="#matrix">Feature Matrix</a></li>
     <li><a href="#map">Positioning Map</a></li>

@@ -24,8 +24,11 @@
 html{scroll-behavior:smooth}
 body{background:var(--bg-subtle);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
-.back-link{display:inline-block;padding:12px 24px;font-size:13px;color:var(--fg-muted);text-decoration:none}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:48px;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--border)}
+.back-link{font-size:13px;color:var(--fg-muted);text-decoration:none;flex-shrink:0}
 .back-link:hover{color:var(--fg)}
+.nav-sep{color:var(--fg-faint);font-size:13px;flex-shrink:0}
+.nav-brand{font-size:13px;font-weight:500;color:var(--fg);flex-shrink:0}
 
 .board-header{background:var(--bg);padding:24px 24px 16px;border-bottom:1px solid var(--border)}
 .board-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
@@ -93,12 +96,17 @@ html.dark {
 </head>
 <body>
 
-<a class="back-link" href="index.html">← Acme Sync</a>
+<nav>
+  <a class="back-link" href="../index.html">← Acme Sync</a>
+  <span class="nav-sep">|</span>
+  <span class="nav-brand">Feature Triage</span>
+  <div style="flex:1"></div>
+  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
+</nav>
 
 <div class="board-header">
   <div class="board-header-top">
     <h1>Acme Sync v1.2 — Feature Triage</h1>
-    <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
     <span class="date-chip">May 2026</span>
   </div>
   <p>Drag tickets between columns to set priority. Use the filters below to focus on specific areas. Copy the final ordering as Markdown for your planning doc.</p>

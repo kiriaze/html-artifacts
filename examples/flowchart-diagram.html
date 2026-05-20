@@ -55,9 +55,8 @@
       display: flex; align-items: center; gap: 4px; flex-shrink: 0;
     }
     nav a.back:hover { color: var(--fg); }
-    nav .brand {
-      font-size: 14px; font-weight: 600; color: var(--fg);
-    }
+    nav .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
+    nav .brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
     nav .spacer { flex: 1; }
     nav .dm-toggle {
       background: none; border: 1px solid var(--border);
@@ -286,7 +285,8 @@
 <body>
 
 <nav>
-  <a href="index.html" class="back">← Acme Sync</a>
+  <a href="../index.html" class="back">← Acme Sync</a>
+  <span class="nav-sep">|</span>
   <span class="brand">File Change Processing Flow</span>
   <span class="spacer"></span>
   <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>

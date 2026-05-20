@@ -47,13 +47,11 @@
       padding: 0 32px;
       height: 48px;
     }
-    nav .back-link {
-      font-size: 13px;
-      color: var(--fg-muted);
-      text-decoration: none;
-      margin-right: auto;
-    }
+    nav .back-link { font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0; }
     nav .back-link:hover { color: var(--fg); }
+    nav .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
+    nav .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
+    nav .nav-spacer { flex: 1; }
     nav a.nav-link {
       font-size: 13px;
       color: var(--fg-muted);
@@ -300,7 +298,10 @@
 <body>
 
 <nav>
-  <a class="back-link" href="index.html">← Acme Sync</a>
+  <a class="back-link" href="../index.html">← Acme Sync</a>
+  <span class="nav-sep">|</span>
+  <span class="nav-brand">Feature Explainer</span>
+  <span class="nav-spacer"></span>
   <a class="nav-link" href="#how-it-works">How it works</a>
   <a class="nav-link" href="#config">Config</a>
   <a class="nav-link" href="#glossary">Glossary</a>

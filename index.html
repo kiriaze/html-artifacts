@@ -1,778 +1,1081 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>html-artifacts — Interactive HTML docs for AI agents</title>
-  <meta name="description" content="A Claude Code skill that generates interactive, self-contained HTML files instead of Markdown walls. Plans, competitor analysis, architecture diagrams, code reviews, reports.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #ffffff;
-      --bg-subtle: #f9fafb;
-      --bg-subtle-2: #f3f4f6;
-      --fg: #111827;
-      --fg-muted: #6b7280;
-      --fg-faint: #9ca3af;
-      --accent: #2563eb;
-      --accent-bg: #eff6ff;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --border: #e5e7eb;
-      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-      --font-mono: 'SF Mono', Menlo, Monaco, monospace;
-    }
-
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-
-    html.dark .site-header {
-      background: rgba(13, 17, 23, 0.95);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    code {
-      font-family: var(--font-mono);
-      font-size: 0.875em;
-      background: var(--bg-subtle-2);
-      padding: 2px 5px;
-      border-radius: 4px;
-    }
-
-    /* Micro header */
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .wordmark {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--fg);
-      letter-spacing: -0.01em;
-    }
-
-    .site-header a {
-      font-size: 13px;
-      color: var(--fg-muted);
-      text-decoration: none;
-    }
-
-    .site-header a:hover {
-      color: var(--fg);
-      text-decoration: none;
-    }
-
-    /* Hero */
-    .hero {
-      padding: 80px 48px 64px;
-      max-width: 720px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 48px;
-      font-weight: 600;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      color: var(--fg);
-    }
-
-    .hero p {
-      font-size: 18px;
-      font-weight: 400;
-      color: var(--fg-muted);
-      max-width: 560px;
-      margin: 16px auto 0;
-      line-height: 1.6;
-    }
-
-    .hero hr {
-      margin: 32px auto;
-      width: 48px;
-      border: none;
-      border-top: 2px solid var(--border);
-    }
-
-    .install-block {
-      position: relative;
-      max-width: 560px;
-      margin: 0 auto;
-    }
-
-    .install-block pre {
-      background: #111827;
-      color: #f9fafb;
-      border-radius: 8px;
-      padding: 16px 20px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      text-align: left;
-      overflow-x: auto;
-      line-height: 1.7;
-    }
-
-    .copy-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #9ca3af;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 5px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-family: var(--font-sans);
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.18);
-      color: #f9fafb;
-    }
-
-    .copy-btn.copied {
-      color: #4ade80;
-    }
-
-    .usage-hint {
-      font-size: 13px;
-      color: var(--fg-muted);
-      margin-top: 12px;
-    }
-
-    /* Section shared */
-    .section {
-      padding: 0 48px 64px;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-
-    .section-wide {
-      padding: 0 48px 64px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      font-weight: 600;
-      color: var(--fg-faint);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-
-    /* Decision tree */
-    .decision-pre {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.8;
-      overflow-x: auto;
-      color: var(--fg);
-    }
-
-    .decision-pre .arrow {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .decision-pre .label-html {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .decision-pre .label-md {
-      color: var(--fg-muted);
-    }
-
-    /* Examples */
-    .group-heading {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--fg-muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    .card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-bg);
-      text-decoration: none;
-    }
-
-.card-top {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .pattern-name {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--fg-muted);
-      flex: 1;
-    }
-
-    /* Core badge — original 8 patterns */
-    .core-badge {
-      background: var(--fg);
-      color: var(--bg);
-      font-size: 9px;
-      font-weight: 700;
-      padding: 2px 5px;
-      border-radius: 4px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* Auto-generated badge */
-    .ai-badge {
-      background: var(--accent-bg);
-      color: var(--accent);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 10px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* User-invoked badge */
-    .user-badge {
-      background: var(--bg-subtle-2);
-      color: var(--fg-muted);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 10px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .card-title {
-      font-size: 15px;
-      font-weight: 500;
-      margin: 8px 0 4px;
-      color: var(--fg);
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--fg-muted);
-      line-height: 1.5;
-    }
-
-    .card-cta {
-      font-size: 12px;
-      color: var(--accent);
-      margin-top: 12px;
-    }
-
-    /* How it works */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .step-card {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .step-num {
-      width: 32px;
-      height: 32px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .step-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--fg);
-    }
-
-    .step-desc {
-      font-size: 13px;
-      color: var(--fg-muted);
-      line-height: 1.5;
-    }
-
-    /* What is this */
-    .what-heading {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--fg);
-    }
-
-    .what-body {
-      font-size: 15px;
-      color: var(--fg-muted);
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-
-    /* Footer */
-    .site-footer {
-      background: var(--bg-subtle);
-      border-top: 1px solid var(--border);
-      padding: 48px 48px;
-      margin-top: 32px;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 32px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .footer-left .wordmark {
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .footer-desc {
-      font-size: 13px;
-      color: var(--fg-muted);
-      margin-top: 8px;
-      max-width: 260px;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 48px;
-    }
-
-    .footer-col h4 {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--fg);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .footer-col ul {
-      list-style: none;
-    }
-
-    .footer-col li {
-      margin-bottom: 6px;
-    }
-
-    .footer-col a {
-      font-size: 13px;
-      color: var(--fg-muted);
-      text-decoration: none;
-    }
-
-    .footer-col a:hover {
-      color: var(--fg);
-      text-decoration: none;
-    }
-
-    .footer-bottom {
-      border-top: 1px solid var(--border);
-      padding-top: 24px;
-      margin-top: 32px;
-      max-width: 1100px;
-      margin-left: auto;
-      margin-right: auto;
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: var(--fg-faint);
-    }
-
-    .dm-toggle{background:none;border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .site-header {
-        padding: 12px 24px;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>html-artifacts — Interactive HTML docs for AI agents</title>
+    <meta
+      name="description"
+      content="A Claude Code skill that generates interactive, self-contained HTML files instead of Markdown walls. Plans, competitor analysis, architecture diagrams, code reviews, reports."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --border: #e5e7eb;
+        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-mono: 'SF Mono', Menlo, Monaco, monospace;
       }
 
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+
+      html.dark .site-header {
+        background: rgba(13, 17, 23, 0.95);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.875em;
+        background: var(--bg-subtle-2);
+        padding: 2px 5px;
+        border-radius: 4px;
+      }
+
+      /* Micro header */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 48px;
+        display: flex;
+        align-items: center;
+      }
+
+      .wordmark {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--fg);
+        letter-spacing: -0.01em;
+        margin-right: auto;
+      }
+
+      .site-header a {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+      }
+
+      .site-header a:hover {
+        color: var(--fg);
+        text-decoration: none;
+      }
+
+      /* Hero */
       .hero {
-        padding: 48px 24px 40px;
+        padding: 80px 48px 64px;
+        max-width: 720px;
+        margin: 0 auto;
+        text-align: center;
       }
 
       .hero h1 {
-        font-size: 32px;
+        font-size: 48px;
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        color: var(--fg);
       }
 
       .hero p {
-        font-size: 16px;
+        font-size: 18px;
+        font-weight: 400;
+        color: var(--fg-muted);
+        max-width: 560px;
+        margin: 16px auto 0;
+        line-height: 1.6;
       }
 
-      .section,
+      .hero hr {
+        margin: 32px auto;
+        width: 48px;
+        border: none;
+        border-top: 2px solid var(--border);
+      }
+
+      .install-block {
+        position: relative;
+        max-width: 560px;
+        margin: 0 auto;
+      }
+
+      .install-block pre {
+        background: #111827;
+        color: #f9fafb;
+        border-radius: 8px;
+        padding: 16px 20px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        text-align: left;
+        overflow-x: auto;
+        line-height: 1.7;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #9ca3af;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 5px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-family: var(--font-sans);
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+
+      .copy-btn:hover {
+        background: rgba(255, 255, 255, 0.18);
+        color: #f9fafb;
+      }
+
+      .copy-btn.copied {
+        color: #4ade80;
+      }
+
+      .usage-hint {
+        font-size: 13px;
+        color: var(--fg-muted);
+        margin-top: 12px;
+      }
+
+      /* Section shared */
+      .section {
+        padding: 0 48px 64px;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
       .section-wide {
-        padding: 0 24px 48px;
+        padding: 0 48px 64px;
+        max-width: 1100px;
+        margin: 0 auto;
       }
 
+      .section-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        color: var(--fg-faint);
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      /* Decision tree */
+      .decision-pre {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px 20px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        line-height: 1.8;
+        overflow-x: auto;
+        color: var(--fg);
+      }
+
+      .decision-pre .arrow {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .decision-pre .label-html {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .decision-pre .label-md {
+        color: var(--fg-muted);
+      }
+
+      /* Examples */
+      .group-heading {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+
+      .card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+
+      .card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-bg);
+        text-decoration: none;
+      }
+
+      .card-top {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .pattern-name {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--fg-muted);
+        flex: 1;
+      }
+
+      /* Core badge — original 8 patterns */
+      .core-badge {
+        background: var(--fg);
+        color: var(--bg);
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 4px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* Auto-generated badge */
+      .ai-badge {
+        background: var(--accent-bg);
+        color: var(--accent);
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* User-invoked badge */
+      .user-badge {
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .card-title {
+        font-size: 15px;
+        font-weight: 500;
+        margin: 8px 0 4px;
+        color: var(--fg);
+      }
+
+      .card-desc {
+        font-size: 13px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+      }
+
+      .card-cta {
+        font-size: 12px;
+        color: var(--accent);
+        margin-top: 12px;
+      }
+
+      /* How it works */
       .steps-grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .step-card {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .step-num {
+        width: 32px;
+        height: 32px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .step-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--fg);
+      }
+
+      .step-desc {
+        font-size: 13px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+      }
+
+      /* What is this */
+      .what-heading {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--fg);
+      }
+
+      .what-body {
+        font-size: 15px;
+        color: var(--fg-muted);
+        line-height: 1.7;
+        margin-bottom: 16px;
+      }
+
+      /* Footer */
+      .site-footer {
+        background: var(--bg-subtle);
+        border-top: 1px solid var(--border);
+        padding: 48px 48px;
+        margin-top: 32px;
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 32px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .footer-left .wordmark {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .footer-desc {
+        font-size: 13px;
+        color: var(--fg-muted);
+        margin-top: 8px;
+        max-width: 260px;
       }
 
       .footer-links {
-        flex-direction: column;
-        gap: 24px;
+        display: flex;
+        gap: 48px;
       }
 
-      .site-footer {
-        padding: 40px 24px;
+      .footer-col h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--fg);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .footer-col ul {
+        list-style: none;
+      }
+
+      .footer-col li {
+        margin-bottom: 6px;
+      }
+
+      .footer-col a {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+      }
+
+      .footer-col a:hover {
+        color: var(--fg);
+        text-decoration: none;
       }
 
       .footer-bottom {
-        flex-direction: column;
-        gap: 8px;
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+        margin-top: 32px;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--fg-faint);
       }
-    }
-  </style>
-</head>
-<body>
 
-  <!-- Micro header -->
-  <header class="site-header">
-    <span class="wordmark">html-artifacts</span>
-    <a href="https://github.com/YOUR_USERNAME/html-artifacts">GitHub</a>
-    <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-  </header>
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+        margin-left: 0.75rem;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1>Interactive HTML docs for your codebase</h1>
-    <p>A Claude Code skill that generates self-contained, interactive HTML instead of Markdown walls — plans, analyses, diagrams, and reports that open directly in your browser.</p>
-    <hr>
-    <div class="install-block">
-      <pre id="install-cmd">git clone https://github.com/YOUR_USERNAME/html-artifacts ~/.agents/skills/html-artifacts
-ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts</pre>
-      <button class="copy-btn" id="copy-btn" type="button">Copy</button>
-    </div>
-    <p class="usage-hint">Then: <code>Use the html-artifacts skill to generate a [pattern] for [your project].</code></p>
-  </section>
+      /* Responsive */
+      @media (max-width: 768px) {
+        .site-header {
+          padding: 12px 24px;
+        }
 
-  <!-- Decision tree -->
-  <div class="section">
-    <p class="section-label">When to use HTML</p>
-    <pre class="decision-pre">Plan, analysis, report, diagram, or explainer?       <span class="arrow">→</span> <span class="label-html">HTML  ← this skill</span>
+        .hero {
+          padding: 48px 24px 40px;
+        }
+
+        .hero h1 {
+          font-size: 32px;
+        }
+
+        .hero p {
+          font-size: 16px;
+        }
+
+        .section,
+        .section-wide {
+          padding: 0 24px 48px;
+        }
+
+        .steps-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-links {
+          flex-direction: column;
+          gap: 24px;
+        }
+
+        .site-footer {
+          padding: 40px 24px;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Micro header -->
+    <header class="site-header">
+      <span class="wordmark">html-artifacts</span>
+      <a href="https://github.com/YOUR_USERNAME/html-artifacts">GitHub</a>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>Interactive HTML docs for your codebase</h1>
+      <p>
+        A Claude Code skill that generates self-contained, interactive HTML
+        instead of Markdown walls — plans, analyses, diagrams, and reports that
+        open directly in your browser.
+      </p>
+      <hr />
+      <div class="install-block">
+        <pre id="install-cmd">
+git clone https://github.com/YOUR_USERNAME/html-artifacts ~/.agents/skills/html-artifacts
+ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts</pre
+        >
+        <button class="copy-btn" id="copy-btn" type="button">Copy</button>
+      </div>
+      <p class="usage-hint">
+        Then:
+        <code
+          >Use the html-artifacts skill to generate a [pattern] for [your
+          project].</code
+        >
+      </p>
+    </section>
+
+    <!-- Decision tree -->
+    <div class="section">
+      <p class="section-label">When to use HTML</p>
+      <pre
+        class="decision-pre"
+      >Plan, analysis, report, diagram, or explainer?       <span class="arrow">→</span> <span class="label-html">HTML  ← this skill</span>
 Reviewed as git diff (HANDOFF.md, AGENT_TASKS.md)?   <span class="arrow">→</span> <span class="label-md">Markdown</span>
 Embedded in GitHub (README, PR body)?                <span class="arrow">→</span> <span class="label-md">Markdown</span>
 Commit message or chat reply?                        <span class="arrow">→</span> <span class="label-md">plain text</span></pre>
-  </div>
-
-  <!-- Examples -->
-  <div class="section-wide">
-    <p class="section-label">Examples — 18 patterns, 0 dependencies</p>
-
-    <p class="group-heading">Planning &amp; Strategy</p>
-    <div class="card-grid">
-      <a class="card core" href="examples/product-brief.html">
-        <div class="card-top"><span class="pattern-name">product-brief</span><span class="core-badge">Core</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Product brief</div>
-        <div class="card-desc">Personas, architecture diagram, roadmap &amp; risk table in one shareable file.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card core" href="examples/comparison-board.html">
-        <div class="card-top"><span class="pattern-name">comparison-board</span><span class="core-badge">Core</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Competitor comparison</div>
-        <div class="card-desc">Sortable feature matrix &amp; positioning map for evaluating alternatives.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/approach-explorer.html">
-        <div class="card-top"><span class="pattern-name">approach-explorer</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Approach explorer</div>
-        <div class="card-desc">Side-by-side criteria grid with traffic-light ratings and recommendation callout for 2–4 implementation options.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/feature-spec.html">
-        <div class="card-top"><span class="pattern-name">feature-spec</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Feature spec</div>
-        <div class="card-desc">User stories with checkbox AC, edge cases table, open questions, and out-of-scope list.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/milestone-plan.html">
-        <div class="card-top"><span class="pattern-name">milestone-plan</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Milestone plan</div>
-        <div class="card-desc">Product roadmap with SVG completion rings, phase bands, dependency connectors, and filter by status.</div>
-        <div class="card-cta">View example →</div>
-      </a>
     </div>
 
-    <p class="group-heading">Code &amp; Architecture</p>
-    <div class="card-grid">
-      <a class="card core" href="examples/code-review.html">
-        <div class="card-top"><span class="pattern-name">code-review</span><span class="core-badge">Core</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">PR code review</div>
-        <div class="card-desc">Annotated diff with severity tags, file tour, and export-to-Claude button.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card core" href="examples/architecture-diagram.html">
-        <div class="card-top"><span class="pattern-name">architecture-diagram</span><span class="core-badge">Core</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Architecture diagram</div>
-        <div class="card-desc">System diagram with hot-path highlight &amp; click-to-expand service detail.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/flowchart-diagram.html">
-        <div class="card-top"><span class="pattern-name">flowchart-diagram</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Flowchart diagram</div>
-        <div class="card-desc">CSS+SVG decision tree with terminal, process, decision, and note nodes. Click any node to expand detail.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/incident-report.html">
-        <div class="card-top"><span class="pattern-name">incident-report</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Incident report</div>
-        <div class="card-desc">Post-mortem with severity banner, timeline ruler, 5-whys chain, impact table, and action items.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-    </div>
+    <!-- Examples -->
+    <div class="section-wide">
+      <p class="section-label">Examples — 18 patterns, 0 dependencies</p>
 
-    <p class="group-heading">Reporting &amp; Design</p>
-    <div class="card-grid">
-      <a class="card core" href="examples/status-report.html">
-        <div class="card-top"><span class="pattern-name">status-report</span><span class="core-badge">Core</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Sprint status report</div>
-        <div class="card-desc">Metadata row, velocity chart, and shipped/slipped breakdown.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card core" href="examples/design-explorer.html">
-        <div class="card-top"><span class="pattern-name">design-explorer</span><span class="core-badge">Core</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">Design token explorer</div>
-        <div class="card-desc">Live color swatches, editable typography scale, and shadow preview.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/exploration-visual-designs.html">
-        <div class="card-top"><span class="pattern-name">exploration-visual-designs</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">Visual design exploration</div>
-        <div class="card-desc">Compare 2–4 UI variants side-by-side with draggable annotation sticky notes and export to Claude.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-    </div>
-
-    <p class="group-heading">Prototyping &amp; Interaction</p>
-    <div class="card-grid">
-      <a class="card" href="examples/prototype-interaction.html">
-        <div class="card-top"><span class="pattern-name">prototype-interaction</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">Clickable prototype</div>
-        <div class="card-desc">State machine UI mockup with device frame, annotation mode, history nav, and export to Claude.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/prototype-animation.html">
-        <div class="card-top"><span class="pattern-name">prototype-animation</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">Animation explorer</div>
-        <div class="card-desc">Live duration/easing editor, draggable cubic-bezier visualizer, before/after scrubber, and copy CSS.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/slide-deck.html">
-        <div class="card-top"><span class="pattern-name">slide-deck</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">Slide deck</div>
-        <div class="card-desc">Full-viewport slides with keyboard + swipe navigation, speaker notes panel, and progress bar.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-    </div>
-
-    <p class="group-heading">Docs &amp; Editing</p>
-    <div class="card-grid">
-      <a class="card core" href="examples/research-explainer.html">
-        <div class="card-top"><span class="pattern-name">research-explainer</span><span class="core-badge">Core</span><span class="ai-badge">Autogenerated</span></div>
-        <div class="card-title">Feature explainer</div>
-        <div class="card-desc">Collapsible steps, tabbed sections, and on-hover glossary definitions.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card core" href="examples/editor-board.html">
-        <div class="card-top"><span class="pattern-name">editor-board</span><span class="core-badge">Core</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">4-column triage board</div>
-        <div class="card-desc">Drag-and-drop Kanban with click-to-filter chips and Markdown export.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-      <a class="card" href="examples/editor-feature-flags.html">
-        <div class="card-top"><span class="pattern-name">editor-feature-flags</span><span class="user-badge">User-invoked</span></div>
-        <div class="card-title">Feature flag manager</div>
-        <div class="card-desc">Toggle, rollout %, targeting segments, kill switch, and copy as JSON — before you write a line of code.</div>
-        <div class="card-cta">View example →</div>
-      </a>
-    </div>
-  </div>
-
-  <!-- How it works -->
-  <div class="section">
-    <p class="section-label">How it works</p>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <div class="step-title">Install</div>
-        <div class="step-desc">Clone the repo and symlink it to <code>~/.claude/skills/</code> — no npm, no build step.</div>
+      <p class="group-heading">Planning &amp; Strategy</p>
+      <div class="card-grid">
+        <a class="card core" href="examples/product-brief.html">
+          <div class="card-top">
+            <span class="pattern-name">product-brief</span
+            ><span class="core-badge">Core</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Product brief</div>
+          <div class="card-desc">
+            Personas, architecture diagram, roadmap &amp; risk table in one
+            shareable file.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card core" href="examples/comparison-board.html">
+          <div class="card-top">
+            <span class="pattern-name">comparison-board</span
+            ><span class="core-badge">Core</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Competitor comparison</div>
+          <div class="card-desc">
+            Sortable feature matrix &amp; positioning map for evaluating
+            alternatives.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/approach-explorer.html">
+          <div class="card-top">
+            <span class="pattern-name">approach-explorer</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Approach explorer</div>
+          <div class="card-desc">
+            Side-by-side criteria grid with traffic-light ratings and
+            recommendation callout for 2–4 implementation options.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/feature-spec.html">
+          <div class="card-top">
+            <span class="pattern-name">feature-spec</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Feature spec</div>
+          <div class="card-desc">
+            User stories with checkbox AC, edge cases table, open questions, and
+            out-of-scope list.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/milestone-plan.html">
+          <div class="card-top">
+            <span class="pattern-name">milestone-plan</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Milestone plan</div>
+          <div class="card-desc">
+            Product roadmap with SVG completion rings, phase bands, dependency
+            connectors, and filter by status.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
       </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <div class="step-title">Invoke</div>
-        <div class="step-desc">Ask Claude to generate a pattern for your project. The skill loads its 18-pattern framework automatically.</div>
+
+      <p class="group-heading">Code &amp; Architecture</p>
+      <div class="card-grid">
+        <a class="card core" href="examples/code-review.html">
+          <div class="card-top">
+            <span class="pattern-name">code-review</span
+            ><span class="core-badge">Core</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">PR code review</div>
+          <div class="card-desc">
+            Annotated diff with severity tags, file tour, and export-to-Claude
+            button.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card core" href="examples/architecture-diagram.html">
+          <div class="card-top">
+            <span class="pattern-name">architecture-diagram</span
+            ><span class="core-badge">Core</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Architecture diagram</div>
+          <div class="card-desc">
+            System diagram with hot-path highlight &amp; click-to-expand service
+            detail.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/flowchart-diagram.html">
+          <div class="card-top">
+            <span class="pattern-name">flowchart-diagram</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Flowchart diagram</div>
+          <div class="card-desc">
+            CSS+SVG decision tree with terminal, process, decision, and note
+            nodes. Click any node to expand detail.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/incident-report.html">
+          <div class="card-top">
+            <span class="pattern-name">incident-report</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Incident report</div>
+          <div class="card-desc">
+            Post-mortem with severity banner, timeline ruler, 5-whys chain,
+            impact table, and action items.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
       </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <div class="step-title">Browse</div>
-        <div class="step-desc">Open the output HTML in your browser — fully self-contained, no server required.</div>
+
+      <p class="group-heading">Reporting &amp; Design</p>
+      <div class="card-grid">
+        <a class="card core" href="examples/status-report.html">
+          <div class="card-top">
+            <span class="pattern-name">status-report</span
+            ><span class="core-badge">Core</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Sprint status report</div>
+          <div class="card-desc">
+            Metadata row, velocity chart, and shipped/slipped breakdown.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card core" href="examples/design-explorer.html">
+          <div class="card-top">
+            <span class="pattern-name">design-explorer</span
+            ><span class="core-badge">Core</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">Design token explorer</div>
+          <div class="card-desc">
+            Live color swatches, editable typography scale, and shadow preview.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/exploration-visual-designs.html">
+          <div class="card-top">
+            <span class="pattern-name">exploration-visual-designs</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">Visual design exploration</div>
+          <div class="card-desc">
+            Compare 2–4 UI variants side-by-side with draggable annotation
+            sticky notes and export to Claude.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+      </div>
+
+      <p class="group-heading">Prototyping &amp; Interaction</p>
+      <div class="card-grid">
+        <a class="card" href="examples/prototype-interaction.html">
+          <div class="card-top">
+            <span class="pattern-name">prototype-interaction</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">Clickable prototype</div>
+          <div class="card-desc">
+            State machine UI mockup with device frame, annotation mode, history
+            nav, and export to Claude.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/prototype-animation.html">
+          <div class="card-top">
+            <span class="pattern-name">prototype-animation</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">Animation explorer</div>
+          <div class="card-desc">
+            Live duration/easing editor, draggable cubic-bezier visualizer,
+            before/after scrubber, and copy CSS.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/slide-deck.html">
+          <div class="card-top">
+            <span class="pattern-name">slide-deck</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">Slide deck</div>
+          <div class="card-desc">
+            Full-viewport slides with keyboard + swipe navigation, speaker notes
+            panel, and progress bar.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+      </div>
+
+      <p class="group-heading">Docs &amp; Editing</p>
+      <div class="card-grid">
+        <a class="card core" href="examples/research-explainer.html">
+          <div class="card-top">
+            <span class="pattern-name">research-explainer</span
+            ><span class="core-badge">Core</span
+            ><span class="ai-badge">Autogenerated</span>
+          </div>
+          <div class="card-title">Feature explainer</div>
+          <div class="card-desc">
+            Collapsible steps, tabbed sections, and on-hover glossary
+            definitions.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card core" href="examples/editor-board.html">
+          <div class="card-top">
+            <span class="pattern-name">editor-board</span
+            ><span class="core-badge">Core</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">4-column triage board</div>
+          <div class="card-desc">
+            Drag-and-drop Kanban with click-to-filter chips and Markdown export.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
+        <a class="card" href="examples/editor-feature-flags.html">
+          <div class="card-top">
+            <span class="pattern-name">editor-feature-flags</span
+            ><span class="user-badge">User-invoked</span>
+          </div>
+          <div class="card-title">Feature flag manager</div>
+          <div class="card-desc">
+            Toggle, rollout %, targeting segments, kill switch, and copy as JSON
+            — before you write a line of code.
+          </div>
+          <div class="card-cta">View example →</div>
+        </a>
       </div>
     </div>
-  </div>
 
-  <!-- What is this -->
-  <div class="section">
-    <h2 class="what-heading">What is this?</h2>
-    <p class="what-body">html-artifacts is a Claude Code skill. Skills are instructions loaded into Claude's context at session start. When you invoke this skill, Claude follows its 18-pattern framework to generate self-contained HTML files — one for each documentation type — directly into your project's <code>docs/html/</code> directory.</p>
-    <a href="SKILL.md">Read the SKILL.md →</a>
-  </div>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-left">
-        <span class="wordmark">html-artifacts</span>
-        <p class="footer-desc">A Claude Code skill for interactive HTML documentation.</p>
-      </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <h4>Skill</h4>
-          <ul>
-            <li><a href="SKILL.md">SKILL.md</a></li>
-            <li><a href="README.md">README.md</a></li>
-            <li><a href="templates/config.md">templates/config.md</a></li>
-          </ul>
+    <!-- How it works -->
+    <div class="section">
+      <p class="section-label">How it works</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-title">Install</div>
+          <div class="step-desc">
+            Clone the repo and symlink it to <code>~/.claude/skills/</code> — no
+            npm, no build step.
+          </div>
         </div>
-        <div class="footer-col">
-          <h4>Related</h4>
-          <ul>
-            <li><a href="https://github.com/ThariqS/html-effectiveness">ThariqS/html-effectiveness</a></li>
-            <li><a href="https://github.com/dogum/html-artifacts">dogum/html-artifacts</a></li>
-            <li><a href="https://github.com/anthropics/awesome-claude-skills">awesome-claude-skills</a></li>
-          </ul>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-title">Invoke</div>
+          <div class="step-desc">
+            Ask Claude to generate a pattern for your project. The skill loads
+            its 18-pattern framework automatically.
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-title">Browse</div>
+          <div class="step-desc">
+            Open the output HTML in your browser — fully self-contained, no
+            server required.
+          </div>
         </div>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>MIT License</span>
-      <span>Built on ideas from ThariqS/html-effectiveness</span>
+
+    <!-- What is this -->
+    <div class="section">
+      <h2 class="what-heading">What is this?</h2>
+      <p class="what-body">
+        html-artifacts is a Claude Code skill. Skills are instructions loaded
+        into Claude's context at session start. When you invoke this skill,
+        Claude follows its 18-pattern framework to generate self-contained HTML
+        files — one for each documentation type — directly into your project's
+        <code>docs/html/</code> directory.
+      </p>
+      <a href="SKILL.md">Read the SKILL.md →</a>
     </div>
-  </footer>
 
-  <script>
-    (function(){
-      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-      if(t==='dark')document.documentElement.classList.add('dark');
-      document.getElementById('dm-toggle').addEventListener('click',function(){
-        var d=document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ha-theme',d?'dark':'light');
-      });
-    })();
+    <!-- Hook-driven -->
+    <div class="section">
+      <p class="section-label">Hook-driven (optional)</p>
+      <h2 class="what-heading">Auto-generate on file save</h2>
+      <p class="what-body">
+        Wire up a Claude Code hook so artifacts regenerate automatically
+        whenever a file under <code>docs/plans/</code> changes. Add the
+        following to your <code>.claude/settings.json</code>:
+      </p>
+      <div class="install-block" style="max-width:100%">
+        <pre id="hook-cmd" style="white-space:pre-wrap">"hooks": {
+  "PostToolUse": [{
+    "matcher": "Write|Edit",
+    "hooks": [{ "type": "command", "command": "node ~/.agents/skills/html-artifacts/hooks/regen.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\"" }]
+  }]
+}</pre>
+        <button class="copy-btn" id="copy-hook-btn" type="button">Copy</button>
+      </div>
+      <p class="usage-hint" style="margin-top:12px">
+        See <a href="hooks/">hooks/</a> for the regen script and setup guide.
+      </p>
+    </div>
 
-    (function () {
-      var btn = document.getElementById('copy-btn');
-      var pre = document.getElementById('install-cmd');
+    <!-- Styling & config -->
+    <div class="section">
+      <p class="section-label">Styling &amp; config</p>
+      <h2 class="what-heading">Make it yours</h2>
+      <p class="what-body">
+        Every artifact is self-contained CSS — no framework, no build step. Swap
+        the design tokens in <code>templates/config.md</code> to match your
+        brand. Below are themed variants of this page to see what's possible:
+      </p>
+      <div class="card-grid" style="margin-top:16px">
+        <a class="card" href="index.html">
+          <div class="card-title">Default</div>
+          <div class="card-desc">Clean monochrome. GitHub-inspired tokens.</div>
+          <div class="card-cta">You are here →</div>
+        </a>
+        <a class="card" href="index-1.html">
+          <div class="card-title">index-1</div>
+          <div class="card-desc">Alternative layout and visual style.</div>
+          <div class="card-cta">View variant →</div>
+        </a>
+      </div>
+    </div>
 
-      btn.addEventListener('click', function () {
-        var text = pre.textContent;
-        navigator.clipboard.writeText(text).then(function () {
-          btn.textContent = 'Copied!';
-          btn.classList.add('copied');
-          setTimeout(function () {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-          }, 2000);
-        }).catch(function () {
-          btn.textContent = 'Error';
-          setTimeout(function () {
-            btn.textContent = 'Copy';
-          }, 2000);
-        });
-      });
-    })();
-  </script>
+    <!-- Design explorations -->
+    <div class="section">
+      <p class="section-label">Design explorations</p>
+      <h2 class="what-heading">See the skill designing itself</h2>
+      <p class="what-body">
+        These pages were generated by the skill while iterating on its own UI —
+        exploring layout variants for the index and the milestone-plan pattern
+        side-by-side in the browser, the same way you'd use it for your project.
+      </p>
+      <div class="card-grid" style="margin-top:16px">
+        <a class="card" href="explore-index.html">
+          <div class="card-title">explore-index</div>
+          <div class="card-desc">
+            Multiple index.html layout variants rendered side-by-side for
+            visual comparison.
+          </div>
+          <div class="card-cta">View exploration →</div>
+        </a>
+        <a class="card" href="explore-milestone.html">
+          <div class="card-title">explore-milestone</div>
+          <div class="card-desc">
+            Milestone-plan pattern variants: timeline spine, diamond nodes, and
+            alternate column layouts.
+          </div>
+          <div class="card-cta">View exploration →</div>
+        </a>
+      </div>
+    </div>
 
-</body>
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="wordmark">html-artifacts</span>
+          <p class="footer-desc">
+            Built on <a href="https://github.com/ThariqS/html-effectiveness" style="color:var(--fg-muted);text-decoration:underline">"The Unreasonable Effectiveness of HTML"</a> by Thariq Shihipar (Anthropic). The thesis, the categories, and several of the example shapes are his — the recognition heuristic and the carve-outs are extensions, not the original.<br><br>This page is itself one of the skill's artifacts, in keeping with Thariq's companion site, which made the same gag first.
+          </p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Skill</h4>
+            <ul>
+              <li><a href="SKILL.md">SKILL.md</a></li>
+              <li><a href="README.md">README.md</a></li>
+              <li><a href="templates/config.md">templates/config.md</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Related</h4>
+            <ul>
+              <li>
+                <a href="https://github.com/ThariqS/html-effectiveness"
+                  >ThariqS/html-effectiveness</a
+                >
+              </li>
+              <li>
+                <a href="https://github.com/dogum/html-artifacts"
+                  >dogum/html-artifacts</a
+                >
+              </li>
+              <li>
+                <a href="https://github.com/anthropics/awesome-claude-skills"
+                  >awesome-claude-skills</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>MIT License — see <a href="LICENSE" style="color:inherit;text-decoration:underline">LICENSE</a> for details</span>
+        <span><a href="https://github.com/ThariqS/html-effectiveness" style="color:inherit;text-decoration:underline">ThariqS/html-effectiveness</a></span>
+      </div>
+    </footer>
+
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+
+      ;(function () {
+        var btn = document.getElementById('copy-btn')
+        var pre = document.getElementById('install-cmd')
+
+        btn.addEventListener('click', function () {
+          var text = pre.textContent
+          navigator.clipboard
+            .writeText(text)
+            .then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+            .catch(function () {
+              btn.textContent = 'Error'
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+              }, 2000)
+            })
+        })
+      })()
+
+      ;(function () {
+        var btn = document.getElementById('copy-hook-btn')
+        if (!btn) return
+        var pre = document.getElementById('hook-cmd')
+        btn.addEventListener('click', function () {
+          navigator.clipboard
+            .writeText(pre.textContent)
+            .then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+            .catch(function () {
+              btn.textContent = 'Error'
+              setTimeout(function () { btn.textContent = 'Copy' }, 2000)
+            })
+        })
+      })()
+    </script>
+  </body>
 </html>

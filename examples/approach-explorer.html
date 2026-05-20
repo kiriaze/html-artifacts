@@ -51,10 +51,8 @@
       font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0;
     }
     .back:hover { color: var(--fg); }
-    .nav-brand {
-      font-size: 14px; font-weight: 600; color: var(--fg); white-space: nowrap;
-    }
-    .nav-brand span { color: var(--accent); }
+    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
+    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); white-space: nowrap; flex-shrink: 0; }
     .dm-toggle {
       background: none; border: 1px solid var(--border);
       border-radius: var(--radius-sm); padding: 4px 8px;
@@ -167,8 +165,9 @@
 </head>
 <body>
   <nav>
-    <a href="index.html" class="back">← Acme Sync</a>
-    <div class="nav-brand">Acme <span>Sync</span> · Approach Explorer</div>
+    <a href="../index.html" class="back">← Acme Sync</a>
+    <span class="nav-sep">|</span>
+    <span class="nav-brand">Approach Explorer</span>
     <div style="flex:1"></div>
     <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
   </nav>

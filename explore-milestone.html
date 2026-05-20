@@ -205,7 +205,7 @@
     /* Dot + connector on the spine */
     .vtl-m-dot-wrap {
       position: absolute;
-      left: -37px; /* (48px padding - 11px spine center = 37px) back from left edge */
+      left: -41px; /* dot center = (48-41)+5 = 12px, matching spine center at left:11px + 1px half-width */
       top: 14px;
       display: flex;
       align-items: center;
@@ -320,9 +320,10 @@
     }
     .vtl2-m-dot {
       width: 10px; height: 10px; border-radius: 50%;
-      flex-shrink: 0; margin-left: -5px; /* overlap spine */
+      flex-shrink: 0; margin-left: -30px; /* pull dot back to spine center: content at 224px, spine center at 199px, so -(224-194)=-30 */
       border: 2px solid var(--frame-bg);
       z-index: 1;
+      position: relative;
     }
     .vtl2-m-dot.ds { background: var(--success); box-shadow: 0 0 0 1.5px var(--success); }
     .vtl2-m-dot.dp { background: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }

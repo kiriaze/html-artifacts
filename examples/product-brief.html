@@ -40,13 +40,13 @@
       background: var(--bg); border-bottom: 1px solid var(--border);
       padding: 0 32px; display: flex; align-items: center; gap: 32px; height: 48px;
     }
-    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; margin-right: auto; }
+    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; flex-shrink: 0; }
     .back-link:hover { color: var(--fg); }
-    .nav-brand { font-size: 15px; font-weight: 600; color: var(--fg); text-decoration: none; white-space: nowrap; }
+    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
+    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); white-space: nowrap; flex-shrink: 0; }
     .nav-links { display: flex; gap: 24px; list-style: none; }
     .nav-links a { color: var(--fg-muted); text-decoration: none; font-size: 13px; letter-spacing: 0.02em; transition: color 0.15s; }
     .nav-links a:hover { color: var(--accent); }
-    .nav-badge { background: var(--accent); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); letter-spacing: 0.05em; }
 
     /* Layout */
     main { max-width: 860px; margin: 0 auto; padding: 48px 32px 96px; }
@@ -191,7 +191,10 @@
 <body>
 
 <nav>
-  <a href="index.html" class="back-link">← Acme Sync</a>
+  <a href="../index.html" class="back-link">← Acme Sync</a>
+  <span class="nav-sep">|</span>
+  <span class="nav-brand">Product Brief</span>
+  <div style="flex:1"></div>
   <ul class="nav-links">
     <li><a href="#overview">Overview</a></li>
     <li><a href="#personas">Personas</a></li>
@@ -199,7 +202,6 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#risks">Risks</a></li>
   </ul>
-  <span class="nav-badge">v1.0</span>
   <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
 </nav>
 

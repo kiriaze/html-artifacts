@@ -524,25 +524,6 @@
     .modal-hint strong { color: var(--fg-muted); }
     .modal-footer { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
 
-    /* ── Export button (fixed) ── */
-    .export-btn-fixed {
-      position: fixed;
-      bottom: 20px; right: 20px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-md);
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      box-shadow: var(--shadow-md);
-      transition: opacity 0.15s;
-      z-index: 90;
-    }
-    .export-btn-fixed:hover { opacity: 0.88; }
-
     /* ── Outer wrapper ── */
     .outer-body {
       max-width: 960px;
@@ -555,10 +536,11 @@
 
   <!-- Outer nav -->
   <nav class="outer-nav">
-    <a href="index.html">← Acme Sync Examples</a>
+    <a href="../index.html">← Acme Sync</a>
     <span class="nav-sep">|</span>
-    <span class="nav-title">Prototype: Conflict Resolution Flow</span>
+    <span class="nav-title">Conflict Resolution Flow</span>
     <button class="btn-sm" id="annotate-toggle" type="button">Annotate</button>
+    <button class="btn-sm" id="export-btn" type="button">Export annotations →</button>
     <button class="btn-sm" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
   </nav>
 
@@ -754,9 +736,6 @@ Deliverables: Logo variants, color system, type scale</textarea>
     </div>
 
   </div><!-- .outer-body -->
-
-  <!-- Export annotations button -->
-  <button class="export-btn-fixed" type="button" id="export-btn">Export annotations →</button>
 
   <!-- Export modal -->
   <div class="modal-overlay hidden" id="export-modal" role="dialog" aria-modal="true" aria-label="Export annotations">
