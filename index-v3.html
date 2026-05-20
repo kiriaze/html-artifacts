@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -24,7 +25,7 @@
 
     /* ── V-A Header ─────────────────────────────────────────────────── */
     .hdr-a {
-      position: sticky; top: 0; z-index: 100;
+      z-index: 100;
       padding: 0 40px;
       display: flex; align-items: stretch;
       height: 52px;
@@ -43,11 +44,11 @@
 
     /* ── V-B Pill Nav ────────────────────────────────────────────────── */
     .pill-nav {
-      position: sticky; top: 52px; z-index: 99;
+      position: sticky; top: 0; z-index: 99;
       background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
-      padding: 0 40px; height: 44px;
-      display: flex; align-items: center;
+      height: 52px;
+      display: flex; align-items: center; justify-content: center;
     }
     .pill-nav-inner { display: flex; gap: 2px; background: var(--bg-subtle-2); border-radius: 20px; padding: 3px; }
     .pill-nav a { font-size: 12px; font-weight: 500; color: var(--fg-muted); text-decoration: none; padding: 4px 14px; border-radius: 16px; transition: color 0.1s; }

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -130,7 +131,7 @@
     /* The spine — a continuous vertical line */
     .vtl-spine {
       position: absolute;
-      left: 11px; /* center of the 24px dot column */
+      left: 59px; /* center at 60px — gives visual breathing room */
       top: 28px;
       bottom: 0;
       width: 2px;
@@ -147,7 +148,7 @@
     /* Phase group */
     .vtl-phase {
       margin-bottom: 8px;
-      padding-left: 48px; /* space for spine + dot */
+      padding-left: 65px; /* C = S+5 = 65px; ensures connector start = dot right edge */
       position: relative;
     }
 
@@ -159,8 +160,8 @@
       padding: 14px 20px;
       border-radius: 8px;
       margin-bottom: 12px;
-      margin-left: -48px; /* extend back to left edge */
-      padding-left: 60px; /* accommodate spine area */
+      margin-left: -65px; /* extend back to left edge */
+      padding-left: 80px; /* accommodate spine area, text past diamond */
       position: relative;
     }
     .vtl-phase-header.ph1 { background: var(--ph1-bg); border: 1px solid #c7d2fe; }
@@ -171,7 +172,7 @@
     /* Diamond marker on the spine for each phase */
     .vtl-phase-diamond {
       position: absolute;
-      left: 4px; /* centered on spine (spine at 11px - 7px radius = 4px) */
+      left: 53px; /* center at 60px = spine center */
       top: 50%; transform: translateY(-50%) rotate(45deg);
       width: 14px; height: 14px;
       border-radius: 2px;
@@ -205,7 +206,7 @@
     /* Dot + connector on the spine */
     .vtl-m-dot-wrap {
       position: absolute;
-      left: -41px; /* dot center = (48-41)+5 = 12px, matching spine center at left:11px + 1px half-width */
+      left: -10px; /* dot left = C-10 = 55px, center = 60px = spine center; dot right = 65px = C, so connector starts exactly at dot edge */
       top: 14px;
       display: flex;
       align-items: center;
@@ -274,53 +275,53 @@
     .vtl2-wrap { padding: 32px 40px 40px; }
     .vtl2 { display: grid; grid-template-columns: 200px 1fr; gap: 0; }
 
-    .vtl2-left { position: relative; padding-right: 24px; }
-    .vtl2-spine {
-      position: absolute;
-      right: 0; top: 28px; bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom,
-        var(--ph1) 0%, var(--ph1) 25%,
-        var(--ph2) 25%, var(--ph2) 50%,
-        var(--ph3) 50%, var(--ph3) 75%,
-        var(--ph4) 75%, var(--ph4) 100%
-      );
-    }
-    .vtl2-right { padding-left: 24px; }
-
-    .vtl2-phase-block { margin-bottom: 0; }
-    .vtl2-phase-label {
-      padding: 14px 0 10px;
-      position: relative;
+    /* Phase label cell (left column) — border-right IS the spine */
+    .vtl2-ph-label {
+      padding: 16px 28px 16px 0;
+      border-right: 2px solid;
       text-align: right;
+      position: relative;
     }
-    .vtl2-phase-label::after { /* diamond on spine */
+    .vtl2-ph-label.ph1 { border-right-color: var(--ph1); }
+    .vtl2-ph-label.ph2 { border-right-color: var(--ph2); }
+    .vtl2-ph-label.ph3 { border-right-color: var(--ph3); }
+    .vtl2-ph-label.ph4 { border-right-color: var(--ph4); }
+    /* Diamond sits on the spine */
+    .vtl2-ph-label::after {
       content: '';
       position: absolute;
-      right: -7px; top: 50%;
-      transform: translateY(-50%) rotate(45deg);
+      right: -7px; top: 18px;
+      transform: rotate(45deg);
       width: 12px; height: 12px;
       border-radius: 1px;
     }
-    .vtl2-phase-label.ph1::after { background: var(--ph1); }
-    .vtl2-phase-label.ph2::after { background: var(--ph2); }
-    .vtl2-phase-label.ph3::after { background: var(--ph3); }
-    .vtl2-phase-label.ph4::after { background: var(--ph4); }
+    .vtl2-ph-label.ph1::after { background: var(--ph1); }
+    .vtl2-ph-label.ph2::after { background: var(--ph2); }
+    .vtl2-ph-label.ph3::after { background: var(--ph3); }
+    .vtl2-ph-label.ph4::after { background: var(--ph4); }
+
+    /* Cards cell (right column) */
+    .vtl2-ph-cards {
+      padding: 12px 16px 12px 24px;
+    }
+
+    /* Horizontal divider between phase rows (all but first pair) */
+    .vtl2 > :nth-child(n+3) { border-top: 1px solid var(--border); }
     .vtl2-pnum { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
-    .vtl2-phase-label.ph1 .vtl2-pnum { color: var(--ph1); }
-    .vtl2-phase-label.ph2 .vtl2-pnum { color: var(--ph2); }
-    .vtl2-phase-label.ph3 .vtl2-pnum { color: var(--ph3); }
-    .vtl2-phase-label.ph4 .vtl2-pnum { color: var(--ph4); }
+    .vtl2-ph-label.ph1 .vtl2-pnum { color: var(--ph1); }
+    .vtl2-ph-label.ph2 .vtl2-pnum { color: var(--ph2); }
+    .vtl2-ph-label.ph3 .vtl2-pnum { color: var(--ph3); }
+    .vtl2-ph-label.ph4 .vtl2-pnum { color: var(--ph4); }
     .vtl2-pname { font-size: 14px; font-weight: 700; color: var(--fg); }
     .vtl2-pdates { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
 
-    .vtl2-milestones-right { padding-top: 14px; padding-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .vtl2-milestones { display: flex; flex-direction: column; gap: 8px; }
     .vtl2-m {
       display: flex; align-items: center; gap: 0; position: relative;
     }
     .vtl2-m-dot {
       width: 10px; height: 10px; border-radius: 50%;
-      flex-shrink: 0; margin-left: -30px; /* pull dot back to spine center: content at 224px, spine center at 199px, so -(224-194)=-30 */
+      flex-shrink: 0; margin-left: -30px; /* pull dot center onto spine: cards padding=24px, dot half=5px, so -30px = center at spine right-border */
       border: 2px solid var(--frame-bg);
       z-index: 1;
       position: relative;
@@ -343,9 +344,6 @@
     .vtl2-m-row { display: flex; align-items: center; gap: 10px; }
     .vtl2-m-title { font-size: 13px; font-weight: 600; flex: 1; }
     .vtl2-m-date { font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono); }
-
-    /* Phase divider in right column */
-    .vtl2-right .vtl2-phase-block + .vtl2-phase-block { border-top: 1px solid var(--border); padding-top: 0; }
   </style>
 </head>
 <body>
@@ -769,56 +767,15 @@
     <div class="variant-frame">
       <div class="vtl2-wrap">
         <div class="vtl2">
-          <!-- Left: Phase labels -->
-          <div class="vtl2-left">
-            <div class="vtl2-spine"></div>
 
-            <!-- Phase 1 -->
-            <div class="vtl2-phase-block">
-              <div class="vtl2-phase-label ph1">
-                <div class="vtl2-pnum">Phase 1</div>
-                <div class="vtl2-pname">Core</div>
-                <div class="vtl2-pdates">Jan–Mar 2026</div>
-              </div>
-            </div>
-            <!-- spacer matching 3 milestone cards -->
-            <div style="height:128px;"></div>
-
-            <!-- Phase 2 -->
-            <div class="vtl2-phase-block" style="border-top:1px solid var(--border);padding-top:0;">
-              <div class="vtl2-phase-label ph2" style="margin-top:0;">
-                <div class="vtl2-pnum">Phase 2</div>
-                <div class="vtl2-pname">Teams</div>
-                <div class="vtl2-pdates">Apr–Jun 2026</div>
-              </div>
-            </div>
-            <div style="height:172px;"></div>
-
-            <!-- Phase 3 -->
-            <div class="vtl2-phase-block" style="border-top:1px solid var(--border);">
-              <div class="vtl2-phase-label ph3">
-                <div class="vtl2-pnum">Phase 3</div>
-                <div class="vtl2-pname">Enterprise</div>
-                <div class="vtl2-pdates">Jul–Sep 2026</div>
-              </div>
-            </div>
-            <div style="height:128px;"></div>
-
-            <!-- Phase 4 -->
-            <div class="vtl2-phase-block" style="border-top:1px solid var(--border);">
-              <div class="vtl2-phase-label ph4">
-                <div class="vtl2-pnum">Phase 4</div>
-                <div class="vtl2-pname">Mobile</div>
-                <div class="vtl2-pdates">Oct–Dec 2026</div>
-              </div>
-            </div>
+          <!-- Phase 1 -->
+          <div class="vtl2-ph-label ph1">
+            <div class="vtl2-pnum">Phase 1</div>
+            <div class="vtl2-pname">Core</div>
+            <div class="vtl2-pdates">Jan–Mar 2026</div>
           </div>
-
-          <!-- Right: Cards -->
-          <div class="vtl2-right">
-
-            <!-- Phase 1 milestones -->
-            <div class="vtl2-milestones-right" style="padding-top:8px;">
+          <div class="vtl2-ph-cards">
+            <div class="vtl2-milestones">
               <div class="vtl2-m">
                 <div class="vtl2-m-dot ds"></div>
                 <div class="vtl2-m-line"></div>
@@ -841,9 +798,16 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Phase 2 milestones -->
-            <div class="vtl2-milestones-right" style="border-top:1px solid var(--border);">
+          <!-- Phase 2 -->
+          <div class="vtl2-ph-label ph2">
+            <div class="vtl2-pnum">Phase 2</div>
+            <div class="vtl2-pname">Teams</div>
+            <div class="vtl2-pdates">Apr–Jun 2026</div>
+          </div>
+          <div class="vtl2-ph-cards">
+            <div class="vtl2-milestones">
               <div class="vtl2-m">
                 <div class="vtl2-m-dot ds"></div>
                 <div class="vtl2-m-line"></div>
@@ -873,9 +837,16 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Phase 3 milestones -->
-            <div class="vtl2-milestones-right" style="border-top:1px solid var(--border);">
+          <!-- Phase 3 -->
+          <div class="vtl2-ph-label ph3">
+            <div class="vtl2-pnum">Phase 3</div>
+            <div class="vtl2-pname">Enterprise</div>
+            <div class="vtl2-pdates">Jul–Sep 2026</div>
+          </div>
+          <div class="vtl2-ph-cards">
+            <div class="vtl2-milestones">
               <div class="vtl2-m">
                 <div class="vtl2-m-dot dpl"></div>
                 <div class="vtl2-m-line"></div>
@@ -898,9 +869,16 @@
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Phase 4 milestones -->
-            <div class="vtl2-milestones-right" style="border-top:1px solid var(--border);">
+          <!-- Phase 4 -->
+          <div class="vtl2-ph-label ph4">
+            <div class="vtl2-pnum">Phase 4</div>
+            <div class="vtl2-pname">Mobile</div>
+            <div class="vtl2-pdates">Oct–Dec 2026</div>
+          </div>
+          <div class="vtl2-ph-cards">
+            <div class="vtl2-milestones">
               <div class="vtl2-m">
                 <div class="vtl2-m-dot dpl"></div>
                 <div class="vtl2-m-line"></div>
@@ -923,8 +901,8 @@
                 </div>
               </div>
             </div>
+          </div>
 
-          </div><!-- /vtl2-right -->
         </div><!-- /vtl2 -->
       </div>
     </div>
