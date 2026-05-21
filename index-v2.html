@@ -1,208 +1,925 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Variant Demo — Option 2: Floating Panel</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Variant Demo — Option 2: Floating Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
       :root {
-        --accent: #2563eb; --accent-bg: #eff6ff;
-        --fg: #111827; --fg-muted: #6b7280; --fg-faint: #9ca3af;
-        --border: #e5e7eb; --border-strong: #d1d5db;
-        --bg: #ffffff; --bg-subtle: #f9fafb; --bg-subtle-2: #f3f4f6;
-        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --font-sans:
+          'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
       }
       html.dark {
-        --accent: #58a6ff; --accent-bg: #0c2d6b;
-        --fg: #e6edf3; --fg-muted: #8b949e; --fg-faint: #6e7681;
-        --border: #30363d; --border-strong: #484f58;
-        --bg: #0d1117; --bg-subtle: #161b22; --bg-subtle-2: #21262d;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --border: #30363d;
+        --border-strong: #484f58;
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
       }
-      *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html { scroll-behavior: smooth; }
-      body { background: var(--bg); font-family: var(--font-sans); color: var(--fg); -webkit-font-smoothing: antialiased; line-height: 1.6; }
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { text-decoration: underline; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        font-family: var(--font-sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.6;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
 
       /* dark toggle */
-      .dm-sm { position: fixed; top: 14px; right: 16px; z-index: 300; cursor: pointer; background: none; color: var(--fg-faint); border: 0; padding: 0; width: 20px; height: 20px; }
-      .dm-sm:hover { color: var(--fg-muted); }
-      .dm-sm svg { width: 100%; height: 100%; }
-      html.dark .dm-sm svg:first-child { display: none; }
-      html:not(.dark) .dm-sm svg:last-child { display: none; }
+      .dm-sm {
+        position: fixed;
+        top: 14px;
+        right: 16px;
+        z-index: 300;
+        cursor: pointer;
+        background: none;
+        color: var(--fg-faint);
+        border: 0;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+      }
+      .dm-sm:hover {
+        color: var(--fg-muted);
+      }
+      .dm-sm svg {
+        width: 100%;
+        height: 100%;
+      }
+      html.dark .dm-sm svg:first-child {
+        display: none;
+      }
+      html:not(.dark) .dm-sm svg:last-child {
+        display: none;
+      }
 
       /* header */
-      .hdr-a { display: flex; align-items: center; justify-content: center; height: 52px; padding: 0 40px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); }
-      html.dark .hdr-a { background: rgba(13,17,23,0.95); }
-      .hdr-a .wm { font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--fg); }
+      .hdr-a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 52px;
+        padding: 0 40px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+      }
+      html.dark .hdr-a {
+        background: rgba(13, 17, 23, 0.95);
+      }
+      .hdr-a .wm {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--fg);
+      }
 
       /* mechanism banner */
-      .mech-banner { background: var(--bg-subtle); border-bottom: 1px solid var(--border); padding: 12px 40px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-      .mech-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; background: var(--fg); color: var(--bg); padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
-      .mech-desc { font-size: 13px; color: var(--fg-muted); flex: 1; min-width: 200px; }
-      .mech-links { display: flex; gap: 8px; flex-wrap: wrap; }
-      .mech-links a { font-size: 11px; font-family: var(--font-mono); background: var(--bg-subtle-2); color: var(--fg-muted); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); transition: border-color 0.12s, color 0.12s; }
-      .mech-links a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
-      .mech-url-box { font-size: 11px; font-family: var(--font-mono); color: var(--fg-faint); background: var(--bg); border: 1px dashed var(--border-strong); padding: 4px 10px; border-radius: 4px; max-width: 480px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .mech-banner {
+        background: var(--bg-subtle);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 40px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .mech-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        line-height: 2;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: var(--fg);
+        color: var(--bg);
+        padding: 3px 9px;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+      .mech-desc {
+        font-size: 13px;
+        color: var(--fg-muted);
+        flex: 1;
+        min-width: 200px;
+      }
+      .mech-links {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .mech-links a {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        transition:
+          border-color 0.12s,
+          color 0.12s;
+      }
+      .mech-links a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .mech-url-box {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        color: var(--fg-faint);
+        background: var(--bg);
+        border: 1px dashed var(--border-strong);
+        padding: 4px 10px;
+        border-radius: 4px;
+        max-width: 480px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
       /* hero v1 */
-      .hero-a { margin: 0 auto; max-width: 960px; text-align: center; padding: 72px 48px 64px; }
-      .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
-      .eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-      .hero-a h1 { font-size: 60px; font-weight: 300; letter-spacing: -0.03em; line-height: 1.08; color: var(--fg); max-width: 640px; margin: 0 auto 20px; }
-      .hero-a h1 .accent { color: var(--accent); }
-      .hero-a .lead { font-size: 18px; color: var(--fg-muted); line-height: 1.65; max-width: 500px; margin: 0 auto 28px; }
-      .hero-a .stats { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
-      .hero-a .stat { font-size: 13px; font-weight: 500; color: var(--fg-muted); padding: 0 16px; border-right: 1px solid var(--border); }
-      .hero-a .stat:first-child { padding-left: 0; }
-      .hero-a .stat:last-child { border-right: none; padding-right: 0; }
-      .hero-a .stat strong { color: var(--fg); }
-      .hero-a .ctas { display: flex; gap: 12px; align-items: center; justify-content: center; }
-      .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
-      .btn-primary:hover { background: #1d4ed8; text-decoration: none; }
-      .btn-secondary { background: none; color: var(--fg); border: 1.5px solid var(--border-strong); border-radius: 6px; padding: 9px 22px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block; }
-      .btn-secondary:hover { border-color: var(--fg-muted); text-decoration: none; }
+      .hero-a {
+        margin: 0 auto;
+        max-width: 960px;
+        text-align: center;
+        padding: 72px 48px 64px;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 20px;
+      }
+      .eyebrow-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .hero-a h1 {
+        font-size: 60px;
+        font-weight: 300;
+        letter-spacing: -0.03em;
+        line-height: 1.08;
+        color: var(--fg);
+        max-width: 640px;
+        margin: 0 auto 20px;
+      }
+      .hero-a h1 .accent {
+        color: var(--accent);
+      }
+      .hero-a .lead {
+        font-size: 18px;
+        color: var(--fg-muted);
+        line-height: 1.65;
+        max-width: 500px;
+        margin: 0 auto 28px;
+      }
+      .hero-a .stats {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        margin-bottom: 32px;
+      }
+      .hero-a .stat {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg-muted);
+        padding: 0 16px;
+        border-right: 1px solid var(--border);
+      }
+      .hero-a .stat:first-child {
+        padding-left: 0;
+      }
+      .hero-a .stat:last-child {
+        border-right: none;
+        padding-right: 0;
+      }
+      .hero-a .stat strong {
+        color: var(--fg);
+      }
+      .hero-a .ctas {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-primary:hover {
+        background: #1d4ed8;
+        text-decoration: none;
+      }
+      .btn-secondary {
+        background: none;
+        color: var(--fg);
+        border: 1.5px solid var(--border-strong);
+        border-radius: 6px;
+        padding: 9px 22px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-secondary:hover {
+        border-color: var(--fg-muted);
+        text-decoration: none;
+      }
 
       /* hero v2 */
-      .hero-b { max-width: 960px; margin: 0 auto; padding: 64px 48px; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; }
-      .hero-b-left h1 { font-size: 52px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 16px; }
-      .hero-b-left .accent { color: var(--accent); }
-      .hero-b-left .lead { font-size: 16px; color: var(--fg-muted); line-height: 1.65; max-width: 440px; margin-bottom: 28px; }
-      .hero-b-left .checks { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
-      .hero-b-left .checks li { font-size: 14px; color: var(--fg-muted); display: flex; align-items: center; gap: 8px; }
-      .hero-b-left .checks li::before { content: "✓"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
-      .hero-b-right { text-align: center; }
-      .hero-b-num { font-size: 88px; font-weight: 800; letter-spacing: -0.04em; color: var(--bg-subtle-2); line-height: 1; display: block; }
-      .hero-b-label { font-size: 13px; font-weight: 600; color: var(--fg-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+      .hero-b {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 64px 48px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 48px;
+        align-items: center;
+      }
+      .hero-b-left h1 {
+        font-size: 52px;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        margin-bottom: 16px;
+      }
+      .hero-b-left .accent {
+        color: var(--accent);
+      }
+      .hero-b-left .lead {
+        font-size: 16px;
+        color: var(--fg-muted);
+        line-height: 1.65;
+        max-width: 440px;
+        margin-bottom: 28px;
+      }
+      .hero-b-left .checks {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 32px;
+      }
+      .hero-b-left .checks li {
+        font-size: 14px;
+        color: var(--fg-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .hero-b-left .checks li::before {
+        content: '✓';
+        color: var(--accent);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .hero-b-right {
+        text-align: center;
+      }
+      .hero-b-num {
+        font-size: 88px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--bg-subtle-2);
+        line-height: 1;
+        display: block;
+      }
+      .hero-b-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg-faint);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
 
       /* examples section */
-      .sec-wide { max-width: 1100px; margin: 0 auto; padding: 56px 48px; border-top: 1px solid var(--border); }
-      .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin-bottom: 6px; }
-      .section-title { font-size: 26px; font-weight: 600; margin-bottom: 6px; }
-      .section-desc { font-size: 15px; color: var(--fg-muted); margin-bottom: 24px; }
+      .sec-wide {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 56px 48px;
+        border-top: 1px solid var(--border);
+      }
+      .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--fg-faint);
+        margin-bottom: 6px;
+      }
+      .section-title {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .section-desc {
+        font-size: 15px;
+        color: var(--fg-muted);
+        margin-bottom: 24px;
+      }
 
       /* view toggle */
-      .view-toggle { display: flex; gap: 2px; background: var(--bg-subtle-2); border-radius: 20px; padding: 3px; width: fit-content; margin-bottom: 28px; }
-      .view-toggle button { background: none; border: none; border-radius: 16px; padding: 5px 16px; font-size: 12px; font-weight: 500; color: var(--fg-muted); cursor: pointer; transition: all 0.12s; font-family: var(--font-sans); }
-      .view-toggle button.active { background: #fff; color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-      html.dark .view-toggle button.active { background: var(--bg-subtle); }
+      .view-toggle {
+        display: flex;
+        gap: 2px;
+        background: var(--bg-subtle-2);
+        border-radius: 20px;
+        padding: 3px;
+        width: fit-content;
+        margin-bottom: 28px;
+      }
+      .view-toggle button {
+        background: none;
+        border: none;
+        border-radius: 16px;
+        padding: 5px 16px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: all 0.12s;
+        font-family: var(--font-sans);
+      }
+      .view-toggle button.active {
+        background: #fff;
+        color: var(--fg);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+      html.dark .view-toggle button.active {
+        background: var(--bg-subtle);
+      }
 
       /* pattern visibility */
-      .pv { display: none; }
-      [data-view="a"] .pv-a,[data-view="b"] .pv-b,[data-view="c"] .pv-c,[data-view="d"] .pv-d { display: block; }
+      .pv {
+        display: none;
+      }
+      [data-view='a'] .pv-a,
+      [data-view='b'] .pv-b,
+      [data-view='c'] .pv-c,
+      [data-view='d'] .pv-d {
+        display: block;
+      }
 
       /* classic cards */
-      .group-heading { font-size: 12px; font-weight: 600; color: var(--fg-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; border-top: 1px solid var(--border); padding-top: 28px; }
-      .cat-group:first-child .group-heading { border-top: none; padding-top: 0; }
-      .cat-group:not(:last-child) { margin-bottom: 28px; }
-      .card-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-      .card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; display: block; text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
-      html.dark .card { background: var(--bg-subtle); }
-      .card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); text-decoration: none; }
-      .pattern-name { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); display: block; margin-bottom: 6px; }
-      .card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-      .card-desc { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
-      .card-cta { font-size: 11px; color: var(--accent); margin-top: 10px; font-weight: 500; }
+      .group-heading {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        border-top: 1px solid var(--border);
+        padding-top: 28px;
+      }
+      .cat-group:first-child .group-heading {
+        border-top: none;
+        padding-top: 0;
+      }
+      .cat-group:not(:last-child) {
+        margin-bottom: 28px;
+      }
+      .card-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+      .card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 18px;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      html.dark .card {
+        background: var(--bg-subtle);
+      }
+      .card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-bg);
+        text-decoration: none;
+      }
+      .pattern-name {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-faint);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .card-desc {
+        font-size: 12px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+      }
+      .card-cta {
+        font-size: 11px;
+        color: var(--accent);
+        margin-top: 10px;
+        font-weight: 500;
+      }
 
       /* list cards */
-      .list-compact { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-      .list-item { display: flex; align-items: center; gap: 16px; padding: 11px 18px; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; transition: background 0.12s; }
-      .list-item:last-child { border-bottom: none; }
-      .list-item:hover { background: var(--bg-subtle); text-decoration: none; }
-      .li-num { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); width: 24px; flex-shrink: 0; }
-      .li-name { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 500; width: 220px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .li-title { font-size: 13px; font-weight: 500; flex: 1; }
-      .li-cta { font-size: 12px; color: var(--accent); font-weight: 500; opacity: 0; transition: opacity 0.12s; flex-shrink: 0; }
-      .list-item:hover .li-cta { opacity: 1; }
+      .list-compact {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .list-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 11px 18px;
+        border-bottom: 1px solid var(--border);
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.12s;
+      }
+      .list-item:last-child {
+        border-bottom: none;
+      }
+      .list-item:hover {
+        background: var(--bg-subtle);
+        text-decoration: none;
+      }
+      .li-num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-faint);
+        width: 24px;
+        flex-shrink: 0;
+      }
+      .li-name {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--accent);
+        font-weight: 500;
+        width: 220px;
+        flex-shrink: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .li-title {
+        font-size: 13px;
+        font-weight: 500;
+        flex: 1;
+      }
+      .li-cta {
+        font-size: 12px;
+        color: var(--accent);
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.12s;
+        flex-shrink: 0;
+      }
+      .list-item:hover .li-cta {
+        opacity: 1;
+      }
 
       /* wide cards */
-      .grid-wide { display: flex; flex-direction: column; gap: 8px; }
-      .card-wide { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
-      html.dark .card-wide { background: var(--bg-subtle); }
-      .card-wide:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); text-decoration: none; }
-      .cw-badge { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 17px; }
-      .cw-info { flex: 1; min-width: 0; }
-      .cw-top { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
-      .cw-title { font-size: 14px; font-weight: 600; }
-      .cw-pn { font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); }
-      .cw-desc { font-size: 12px; color: var(--fg-muted); line-height: 1.4; }
-      .cw-cta { font-size: 12px; color: var(--accent); font-weight: 500; flex-shrink: 0; opacity: 0; transition: opacity 0.12s; }
-      .card-wide:hover .cw-cta { opacity: 1; }
-      .cw-b1{background:#eff6ff} .cw-b2{background:#f0fdf4} .cw-b3{background:#fffbeb}
-      .cw-b4{background:#fdf4ff} .cw-b5{background:#fff1f2} .cw-b6{background:#f0f9ff}
+      .grid-wide {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .card-wide {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        text-decoration: none;
+        color: inherit;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      html.dark .card-wide {
+        background: var(--bg-subtle);
+      }
+      .card-wide:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-bg);
+        text-decoration: none;
+      }
+      .cw-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 17px;
+      }
+      .cw-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .cw-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2px;
+      }
+      .cw-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .cw-pn {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-faint);
+      }
+      .cw-desc {
+        font-size: 12px;
+        color: var(--fg-muted);
+        line-height: 1.4;
+      }
+      .cw-cta {
+        font-size: 12px;
+        color: var(--accent);
+        font-weight: 500;
+        flex-shrink: 0;
+        opacity: 0;
+        transition: opacity 0.12s;
+      }
+      .card-wide:hover .cw-cta {
+        opacity: 1;
+      }
+      .cw-b1 {
+        background: #eff6ff;
+      }
+      .cw-b2 {
+        background: #f0fdf4;
+      }
+      .cw-b3 {
+        background: #fffbeb;
+      }
+      .cw-b4 {
+        background: #fdf4ff;
+      }
+      .cw-b5 {
+        background: #fff1f2;
+      }
+      .cw-b6 {
+        background: #f0f9ff;
+      }
 
       /* svg cards */
-      .grid-svg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-      .card-svg { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: block; text-decoration: none; color: inherit; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; }
-      html.dark .card-svg { background: var(--bg-subtle); }
-      .card-svg:hover { border-color: var(--accent); box-shadow: 0 6px 20px rgba(37,99,235,0.12); transform: translateY(-2px); text-decoration: none; }
-      .svg-cover { height: 90px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-      .cov-blue{background:linear-gradient(135deg,#eff6ff,#dbeafe)} .cov-green{background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
-      .cov-amber{background:linear-gradient(135deg,#fffbeb,#fef3c7)} .cov-violet{background:linear-gradient(135deg,#f5f3ff,#ede9fe)}
-      .cov-rose{background:linear-gradient(135deg,#fff1f2,#ffe4e6)} .cov-slate{background:linear-gradient(135deg,#f8fafc,#f1f5f9)}
-      .cov-teal{background:linear-gradient(135deg,#f0fdfa,#ccfbf1)} .cov-orange{background:linear-gradient(135deg,#fff7ed,#fed7aa)}
-      .card-svg .body { padding: 12px 14px 16px; }
-      .card-svg .pn { font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); margin-bottom: 4px; }
-      .card-svg .ttl { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-      .card-svg .dsc { font-size: 11px; color: var(--fg-muted); line-height: 1.5; }
+      .grid-svg {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .card-svg {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          transform 0.15s;
+      }
+      html.dark .card-svg {
+        background: var(--bg-subtle);
+      }
+      .card-svg:hover {
+        border-color: var(--accent);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.12);
+        transform: translateY(-2px);
+        text-decoration: none;
+      }
+      .svg-cover {
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+      .cov-blue {
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      }
+      .cov-green {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      }
+      .cov-amber {
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      }
+      .cov-violet {
+        background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+      }
+      .cov-rose {
+        background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+      }
+      .cov-slate {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      }
+      .cov-teal {
+        background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+      }
+      .cov-orange {
+        background: linear-gradient(135deg, #fff7ed, #fed7aa);
+      }
+      .card-svg .body {
+        padding: 12px 14px 16px;
+      }
+      .card-svg .pn {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-faint);
+        margin-bottom: 4px;
+      }
+      .card-svg .ttl {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .card-svg .dsc {
+        font-size: 11px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+      }
 
       /* v2: floating panel */
-      .vp-trigger { position: fixed; bottom: 24px; left: 24px; z-index: 200; background: var(--fg); color: var(--bg); border: none; border-radius: 20px; padding: 9px 16px; font-size: 12px; font-weight: 600; font-family: var(--font-sans); cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.18); transition: transform 0.15s, box-shadow 0.15s; letter-spacing: 0.01em; }
-      .vp-trigger:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(0,0,0,0.22); }
-      .vp-panel { display: none; position: fixed; bottom: 68px; left: 24px; z-index: 400; width: 300px; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); overflow: hidden; transform-origin: bottom left; transform: scale(0.96) translateY(8px); opacity: 0; transition: transform 0.18s ease, opacity 0.18s ease; }
-      .vp-panel.open { display: block; transform: scale(1) translateY(0); opacity: 1; }
-      .vp-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-      .vp-title { font-size: 13px; font-weight: 600; }
-      .vp-close { background: none; border: none; color: var(--fg-faint); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; }
-      .vp-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
-      .vp-body { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
-      .vp-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); margin-bottom: 6px; }
-      .vp-chips { display: flex; gap: 4px; flex-wrap: wrap; }
-      .vp-chip { font-size: 12px; padding: 4px 12px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; background: var(--bg); color: var(--fg-muted); transition: all 0.12s; font-family: var(--font-sans); }
-      .vp-chip:hover { border-color: var(--accent); color: var(--accent); }
-      .vp-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-      .vp-footer { font-size: 10px; color: var(--fg-faint); text-align: center; padding: 8px 16px; border-top: 1px solid var(--border); background: var(--bg-subtle); }
-      .vp-backdrop { display: none; position: fixed; inset: 0; z-index: 300; }
-      .vp-backdrop.open { display: block; }
-
-  </style>
-</head>
-<body>
+      .vp-trigger {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .vp-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      }
+      .vp-panel {
+        display: none;
+        position: fixed;
+        bottom: 68px;
+        left: 24px;
+        z-index: 400;
+        width: 300px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        transform-origin: bottom left;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease;
+      }
+      .vp-panel.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .vp-head {
+        padding: 14px 16px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .vp-title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .vp-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+      .vp-close:hover {
+        color: var(--fg);
+        background: var(--bg-subtle-2);
+      }
+      .vp-body {
+        padding: 12px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .vp-group-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--fg-faint);
+        margin-bottom: 6px;
+      }
+      .vp-chips {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .vp-chip {
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        background: var(--bg);
+        color: var(--fg-muted);
+        transition: all 0.12s;
+        font-family: var(--font-sans);
+      }
+      .vp-chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .vp-chip.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .vp-footer {
+        font-size: 10px;
+        color: var(--fg-faint);
+        text-align: center;
+        padding: 8px 16px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-subtle);
+      }
+      .vp-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+      }
+      .vp-backdrop.open {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
     <button class="dm-sm" id="dm-toggle" title="Toggle dark mode">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008"/></svg>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 19a1 1 0 0 1 1 1v2a1 1 0 0 1 -2 0v-2a1 1 0 0 1 1 -1m-4.95 -2.05a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1 -1.414 -1.414l1.414 -1.414a1 1 0 0 1 1.414 0m11.314 0l1.414 1.414a1 1 0 0 1 -1.414 1.414l-1.414 -1.414a1 1 0 0 1 1.414 -1.414m-5.049 -9.836a5 5 0 1 1 -2.532 9.674a5 5 0 0 1 2.532 -9.674m-9.315 3.886a1 1 0 0 1 0 2h-2a1 1 0 0 1 0 -2zm18 0a1 1 0 0 1 0 2h-2a1 1 0 0 1 0 -2zm-16.364 -6.778l1.414 1.414a1 1 0 0 1 -1.414 1.414l-1.414 -1.414a1 1 0 0 1 1.414 -1.414m14.142 0a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 0 1 -1.414 -1.414l1.414 -1.414a1 1 0 0 1 1.414 0m-7.778 -3.222a1 1 0 0 1 1 1v2a1 1 0 0 1 -2 0v-2a1 1 0 0 1 1 -1"/></svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008"
+        />
+      </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M12 19a1 1 0 0 1 1 1v2a1 1 0 0 1 -2 0v-2a1 1 0 0 1 1 -1m-4.95 -2.05a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1 -1.414 -1.414l1.414 -1.414a1 1 0 0 1 1.414 0m11.314 0l1.414 1.414a1 1 0 0 1 -1.414 1.414l-1.414 -1.414a1 1 0 0 1 1.414 -1.414m-5.049 -9.836a5 5 0 1 1 -2.532 9.674a5 5 0 0 1 2.532 -9.674m-9.315 3.886a1 1 0 0 1 0 2h-2a1 1 0 0 1 0 -2zm18 0a1 1 0 0 1 0 2h-2a1 1 0 0 1 0 -2zm-16.364 -6.778l1.414 1.414a1 1 0 0 1 -1.414 1.414l-1.414 -1.414a1 1 0 0 1 1.414 -1.414m14.142 0a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 0 1 -1.414 -1.414l1.414 -1.414a1 1 0 0 1 1.414 0m-7.778 -3.222a1 1 0 0 1 1 1v2a1 1 0 0 1 -2 0v-2a1 1 0 0 1 1 -1"
+        />
+      </svg>
     </button>
 
-  <!-- Floating variant panel trigger -->
-  <button class="vp-trigger" id="vp-trigger">◧ Variants</button>
-  <div class="vp-backdrop" id="vp-backdrop"></div>
-  <div class="vp-panel" id="vp-panel" role="dialog" aria-modal="true">
-    <div class="vp-head">
-      <span class="vp-title">Variants</span>
-      <button class="vp-close" id="vp-close">✕</button>
+    <!-- Floating variant panel trigger -->
+    <button class="vp-trigger" id="vp-trigger">◧ Variants</button>
+    <div class="vp-backdrop" id="vp-backdrop"></div>
+    <div class="vp-panel" id="vp-panel" role="dialog" aria-modal="true">
+      <div class="vp-head">
+        <span class="vp-title">Variants</span>
+        <button class="vp-close" id="vp-close">✕</button>
+      </div>
+      <div class="vp-body" id="vp-body"></div>
+      <div class="vp-footer">State saved to localStorage</div>
     </div>
-    <div class="vp-body" id="vp-body"></div>
-    <div class="vp-footer">State saved to localStorage</div>
-  </div>
 
-  <header class="hdr-a">
-    <span class="wm">html-artifacts</span>
-  </header>
+    <header class="hdr-a">
+      <span class="wm">html-artifacts</span>
+    </header>
 
-  <!-- Mechanism banner -->
-  <div class="mech-banner">
-    <span class="mech-tag">Option 2 — Floating panel</span>
-    <span class="mech-desc">◧ button (bottom-left) opens a panel that lists every variant group. State auto-persists to localStorage.</span>
-  </div>
+    <!-- Mechanism banner -->
+    <div class="mech-banner">
+      <span class="mech-tag">Option 2 — Floating panel</span>
+      <span class="mech-desc"
+        >◧ button (bottom-left) opens a panel that lists every variant group.
+        State auto-persists to localStorage.</span
+      >
+    </div>
 
     <section class="hero-variant" data-variant="v1">
       <div class="hero-a">
-        <div class="eyebrow"><span class="eyebrow-dot"></span>Agentic Skill · Variant v1 — Full</div>
-        <h1>Stop writing docs.<br>Start <span class="accent">shipping HTML.</span></h1>
-        <p class="lead">18 self-contained patterns — plans, diagrams, code reviews, reports — that open directly in your browser. No build step. No server. No Markdown walls.</p>
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>Agentic Skill · Variant v1 — Full
+        </div>
+        <h1>
+          Stop writing docs.<br />Start
+          <span class="accent">shipping HTML.</span>
+        </h1>
+        <p class="lead">
+          18 self-contained patterns — plans, diagrams, code reviews, reports —
+          that open directly in your browser. No build step. No server. No
+          Markdown walls.
+        </p>
         <div class="stats">
           <span class="stat"><strong>18</strong> patterns</span>
           <span class="stat"><strong>0</strong> dependencies</span>
@@ -218,10 +935,18 @@
     <section class="hero-variant" data-variant="v2">
       <div class="hero-b">
         <div class="hero-b-left">
-          <h1>Generate once.<br><span class="accent">Open anywhere.</span></h1>
-          <p class="lead">A Claude skill that turns codebase questions into shareable HTML artifacts — no build step, no framework, no server required.</p>
+          <h1>
+            Generate once.<br /><span class="accent">Open anywhere.</span>
+          </h1>
+          <p class="lead">
+            A Claude skill that turns codebase questions into shareable HTML
+            artifacts — no build step, no framework, no server required.
+          </p>
           <ul class="checks">
-            <li>Self-contained single files — open with <code>open report.html</code></li>
+            <li>
+              Self-contained single files — open with
+              <code>open report.html</code>
+            </li>
             <li>Commit to your repo or share as an attachment</li>
             <li>Works with any Claude model, any project</li>
           </ul>
@@ -236,233 +961,571 @@
       </div>
     </section>
 
-  <section class="sec-wide" id="examples">
-    <p class="section-label">Examples</p>
-    <h2 class="section-title">9 patterns</h2>
-    <p class="section-desc">Use the ◧ Variants panel to switch any dimension. State persists across refreshes.</p>
+    <section class="sec-wide" id="examples">
+      <p class="section-label">Examples</p>
+      <h2 class="section-title">9 patterns</h2>
+      <p class="section-desc">
+        Use the ◧ Variants panel to switch any dimension. State persists across
+        refreshes.
+      </p>
 
-    <div class="view-toggle" id="card-toggle">
-      <button class="active" data-view="d">Classic</button>
-      <button data-view="a">SVG Cards</button>
-      <button data-view="c">Wide Rows</button>
-      <button data-view="b">List</button>
-    </div>
+      <div class="view-toggle" id="card-toggle">
+        <button class="active" data-view="d">Classic</button>
+        <button data-view="a">SVG Cards</button>
+        <button data-view="c">Wide Rows</button>
+        <button data-view="b">List</button>
+      </div>
 
-    <div id="examples-inner" data-view="d">
-      <div class="pv pv-a"><div class="cat-group">
-  <div class="group-heading">Planning</div>
-  <div class="grid-svg">
-    <a class="card-svg" href="examples/product-brief.html"><div class="svg-cover cov-blue">📄</div><div class="body"><div class="pn">product-brief</div><div class="ttl">Product Brief</div><div class="dsc">Product overview, goals and competitive context</div></div></a>
-    <a class="card-svg" href="examples/feature-spec.html"><div class="svg-cover cov-violet">📋</div><div class="body"><div class="pn">feature-spec</div><div class="ttl">Feature Spec</div><div class="dsc">Requirements, user flows, and edge cases</div></div></a>
-    <a class="card-svg" href="examples/milestone-plan.html"><div class="svg-cover cov-slate">🗓️</div><div class="body"><div class="pn">milestone-plan</div><div class="ttl">Milestone Plan</div><div class="dsc">Quarterly roadmap with status and owners</div></div></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Code</div>
-  <div class="grid-svg">
-    <a class="card-svg" href="examples/code-review.html"><div class="svg-cover cov-green">🔍</div><div class="body"><div class="pn">code-review</div><div class="ttl">Code Review</div><div class="dsc">PR summary with issues grouped by severity</div></div></a>
-    <a class="card-svg" href="examples/architecture-diagram.html"><div class="svg-cover cov-teal">🏗️</div><div class="body"><div class="pn">architecture-diagram</div><div class="ttl">Architecture Diagram</div><div class="dsc">System components, services, and data flow</div></div></a>
-    <a class="card-svg" href="examples/flowchart-diagram.html"><div class="svg-cover cov-amber">🔀</div><div class="body"><div class="pn">flowchart-diagram</div><div class="ttl">Flowchart</div><div class="dsc">Process flows, decision trees, and state machines</div></div></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Reports</div>
-  <div class="grid-svg">
-    <a class="card-svg" href="examples/research-explainer.html"><div class="svg-cover cov-blue">📖</div><div class="body"><div class="pn">research-explainer</div><div class="ttl">Research Explainer</div><div class="dsc">Annotated deep-dive into how something works</div></div></a>
-    <a class="card-svg" href="examples/status-report.html"><div class="svg-cover cov-rose">📊</div><div class="body"><div class="pn">status-report</div><div class="ttl">Status Report</div><div class="dsc">Sprint summary with metrics and blockers</div></div></a>
-    <a class="card-svg" href="examples/slide-deck.html"><div class="svg-cover cov-orange">🎯</div><div class="body"><div class="pn">slide-deck</div><div class="ttl">Pitch Deck</div><div class="dsc">Investor-ready presentation for your project</div></div></a>
-  </div>
-</div></div>
-      <div class="pv pv-b"><div class="cat-group">
-  <div class="group-heading">Planning</div>
-  <div class="list-compact">
-    <a class="list-item" href="examples/product-brief.html"><span class="li-num">01</span><span class="li-name">product-brief</span><span class="li-title">Product Brief</span><span class="li-cta">Open →</span></a>
-    <a class="list-item" href="examples/feature-spec.html"><span class="li-num">02</span><span class="li-name">feature-spec</span><span class="li-title">Feature Spec</span><span class="li-cta">Open →</span></a>
-    <a class="list-item" href="examples/milestone-plan.html"><span class="li-num">03</span><span class="li-name">milestone-plan</span><span class="li-title">Milestone Plan</span><span class="li-cta">Open →</span></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Code</div>
-  <div class="list-compact">
-    <a class="list-item" href="examples/code-review.html"><span class="li-num">01</span><span class="li-name">code-review</span><span class="li-title">Code Review</span><span class="li-cta">Open →</span></a>
-    <a class="list-item" href="examples/architecture-diagram.html"><span class="li-num">02</span><span class="li-name">architecture-diagram</span><span class="li-title">Architecture Diagram</span><span class="li-cta">Open →</span></a>
-    <a class="list-item" href="examples/flowchart-diagram.html"><span class="li-num">03</span><span class="li-name">flowchart-diagram</span><span class="li-title">Flowchart</span><span class="li-cta">Open →</span></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Reports</div>
-  <div class="list-compact">
-    <a class="list-item" href="examples/research-explainer.html"><span class="li-num">01</span><span class="li-name">research-explainer</span><span class="li-title">Research Explainer</span><span class="li-cta">Open →</span></a>
-    <a class="list-item" href="examples/status-report.html"><span class="li-num">02</span><span class="li-name">status-report</span><span class="li-title">Status Report</span><span class="li-cta">Open →</span></a>
-    <a class="list-item" href="examples/slide-deck.html"><span class="li-num">03</span><span class="li-name">slide-deck</span><span class="li-title">Pitch Deck</span><span class="li-cta">Open →</span></a>
-  </div>
-</div></div>
-      <div class="pv pv-c"><div class="cat-group">
-  <div class="group-heading">Planning</div>
-  <div class="grid-wide">
-    <a class="card-wide" href="examples/product-brief.html"><div class="cw-badge cw-b1">📄</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Product Brief</span><span class="cw-pn">product-brief</span></div><div class="cw-desc">Product overview, goals and competitive context</div></div><span class="cw-cta">Open →</span></a>
-    <a class="card-wide" href="examples/feature-spec.html"><div class="cw-badge cw-b4">📋</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Feature Spec</span><span class="cw-pn">feature-spec</span></div><div class="cw-desc">Requirements, user flows, and edge cases</div></div><span class="cw-cta">Open →</span></a>
-    <a class="card-wide" href="examples/milestone-plan.html"><div class="cw-badge cw-b6">🗓️</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Milestone Plan</span><span class="cw-pn">milestone-plan</span></div><div class="cw-desc">Quarterly roadmap with status and owners</div></div><span class="cw-cta">Open →</span></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Code</div>
-  <div class="grid-wide">
-    <a class="card-wide" href="examples/code-review.html"><div class="cw-badge cw-b2">🔍</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Code Review</span><span class="cw-pn">code-review</span></div><div class="cw-desc">PR summary with issues grouped by severity</div></div><span class="cw-cta">Open →</span></a>
-    <a class="card-wide" href="examples/architecture-diagram.html"><div class="cw-badge cw-b6">🏗️</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Architecture Diagram</span><span class="cw-pn">architecture-diagram</span></div><div class="cw-desc">System components, services, and data flow</div></div><span class="cw-cta">Open →</span></a>
-    <a class="card-wide" href="examples/flowchart-diagram.html"><div class="cw-badge cw-b3">🔀</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Flowchart</span><span class="cw-pn">flowchart-diagram</span></div><div class="cw-desc">Process flows, decision trees, and state machines</div></div><span class="cw-cta">Open →</span></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Reports</div>
-  <div class="grid-wide">
-    <a class="card-wide" href="examples/research-explainer.html"><div class="cw-badge cw-b1">📖</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Research Explainer</span><span class="cw-pn">research-explainer</span></div><div class="cw-desc">Annotated deep-dive into how something works</div></div><span class="cw-cta">Open →</span></a>
-    <a class="card-wide" href="examples/status-report.html"><div class="cw-badge cw-b5">📊</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Status Report</span><span class="cw-pn">status-report</span></div><div class="cw-desc">Sprint summary with metrics and blockers</div></div><span class="cw-cta">Open →</span></a>
-    <a class="card-wide" href="examples/slide-deck.html"><div class="cw-badge cw-b3">🎯</div><div class="cw-info"><div class="cw-top"><span class="cw-title">Pitch Deck</span><span class="cw-pn">slide-deck</span></div><div class="cw-desc">Investor-ready presentation for your project</div></div><span class="cw-cta">Open →</span></a>
-  </div>
-</div></div>
-      <div class="pv pv-d"><div class="cat-group">
-  <div class="group-heading">Planning</div>
-  <div class="card-grid">
-    <a class="card" href="examples/product-brief.html"><span class="pattern-name">product-brief</span><div class="card-title">Product Brief</div><div class="card-desc">Product overview, goals and competitive context</div><div class="card-cta">Open example →</div></a>
-    <a class="card" href="examples/feature-spec.html"><span class="pattern-name">feature-spec</span><div class="card-title">Feature Spec</div><div class="card-desc">Requirements, user flows, and edge cases</div><div class="card-cta">Open example →</div></a>
-    <a class="card" href="examples/milestone-plan.html"><span class="pattern-name">milestone-plan</span><div class="card-title">Milestone Plan</div><div class="card-desc">Quarterly roadmap with status and owners</div><div class="card-cta">Open example →</div></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Code</div>
-  <div class="card-grid">
-    <a class="card" href="examples/code-review.html"><span class="pattern-name">code-review</span><div class="card-title">Code Review</div><div class="card-desc">PR summary with issues grouped by severity</div><div class="card-cta">Open example →</div></a>
-    <a class="card" href="examples/architecture-diagram.html"><span class="pattern-name">architecture-diagram</span><div class="card-title">Architecture Diagram</div><div class="card-desc">System components, services, and data flow</div><div class="card-cta">Open example →</div></a>
-    <a class="card" href="examples/flowchart-diagram.html"><span class="pattern-name">flowchart-diagram</span><div class="card-title">Flowchart</div><div class="card-desc">Process flows, decision trees, and state machines</div><div class="card-cta">Open example →</div></a>
-  </div>
-</div>
-<div class="cat-group">
-  <div class="group-heading">Reports</div>
-  <div class="card-grid">
-    <a class="card" href="examples/research-explainer.html"><span class="pattern-name">research-explainer</span><div class="card-title">Research Explainer</div><div class="card-desc">Annotated deep-dive into how something works</div><div class="card-cta">Open example →</div></a>
-    <a class="card" href="examples/status-report.html"><span class="pattern-name">status-report</span><div class="card-title">Status Report</div><div class="card-desc">Sprint summary with metrics and blockers</div><div class="card-cta">Open example →</div></a>
-    <a class="card" href="examples/slide-deck.html"><span class="pattern-name">slide-deck</span><div class="card-title">Pitch Deck</div><div class="card-desc">Investor-ready presentation for your project</div><div class="card-cta">Open example →</div></a>
-  </div>
-</div></div>
-    </div>
-  </section>
+      <div id="examples-inner" data-view="d">
+        <div class="pv pv-a">
+          <div class="cat-group">
+            <div class="group-heading">Planning</div>
+            <div class="grid-svg">
+              <a class="card-svg" href="examples/product-brief.html"
+                ><div class="svg-cover cov-blue">📄</div>
+                <div class="body">
+                  <div class="pn">product-brief</div>
+                  <div class="ttl">Product Brief</div>
+                  <div class="dsc">
+                    Product overview, goals and competitive context
+                  </div>
+                </div></a
+              >
+              <a class="card-svg" href="examples/feature-spec.html"
+                ><div class="svg-cover cov-violet">📋</div>
+                <div class="body">
+                  <div class="pn">feature-spec</div>
+                  <div class="ttl">Feature Spec</div>
+                  <div class="dsc">
+                    Requirements, user flows, and edge cases
+                  </div>
+                </div></a
+              >
+              <a class="card-svg" href="examples/milestone-plan.html"
+                ><div class="svg-cover cov-slate">🗓️</div>
+                <div class="body">
+                  <div class="pn">milestone-plan</div>
+                  <div class="ttl">Milestone Plan</div>
+                  <div class="dsc">
+                    Quarterly roadmap with status and owners
+                  </div>
+                </div></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Code</div>
+            <div class="grid-svg">
+              <a class="card-svg" href="examples/code-review.html"
+                ><div class="svg-cover cov-green">🔍</div>
+                <div class="body">
+                  <div class="pn">code-review</div>
+                  <div class="ttl">Code Review</div>
+                  <div class="dsc">
+                    PR summary with issues grouped by severity
+                  </div>
+                </div></a
+              >
+              <a class="card-svg" href="examples/architecture-diagram.html"
+                ><div class="svg-cover cov-teal">🏗️</div>
+                <div class="body">
+                  <div class="pn">architecture-diagram</div>
+                  <div class="ttl">Architecture Diagram</div>
+                  <div class="dsc">
+                    System components, services, and data flow
+                  </div>
+                </div></a
+              >
+              <a class="card-svg" href="examples/flowchart-diagram.html"
+                ><div class="svg-cover cov-amber">🔀</div>
+                <div class="body">
+                  <div class="pn">flowchart-diagram</div>
+                  <div class="ttl">Flowchart</div>
+                  <div class="dsc">
+                    Process flows, decision trees, and state machines
+                  </div>
+                </div></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Reports</div>
+            <div class="grid-svg">
+              <a class="card-svg" href="examples/research-explainer.html"
+                ><div class="svg-cover cov-blue">📖</div>
+                <div class="body">
+                  <div class="pn">research-explainer</div>
+                  <div class="ttl">Research Explainer</div>
+                  <div class="dsc">
+                    Annotated deep-dive into how something works
+                  </div>
+                </div></a
+              >
+              <a class="card-svg" href="examples/status-report.html"
+                ><div class="svg-cover cov-rose">📊</div>
+                <div class="body">
+                  <div class="pn">status-report</div>
+                  <div class="ttl">Status Report</div>
+                  <div class="dsc">
+                    Sprint summary with metrics and blockers
+                  </div>
+                </div></a
+              >
+              <a class="card-svg" href="examples/slide-deck.html"
+                ><div class="svg-cover cov-orange">🎯</div>
+                <div class="body">
+                  <div class="pn">slide-deck</div>
+                  <div class="ttl">Pitch Deck</div>
+                  <div class="dsc">
+                    Investor-ready presentation for your project
+                  </div>
+                </div></a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="pv pv-b">
+          <div class="cat-group">
+            <div class="group-heading">Planning</div>
+            <div class="list-compact">
+              <a class="list-item" href="examples/product-brief.html"
+                ><span class="li-num">01</span
+                ><span class="li-name">product-brief</span
+                ><span class="li-title">Product Brief</span
+                ><span class="li-cta">Open →</span></a
+              >
+              <a class="list-item" href="examples/feature-spec.html"
+                ><span class="li-num">02</span
+                ><span class="li-name">feature-spec</span
+                ><span class="li-title">Feature Spec</span
+                ><span class="li-cta">Open →</span></a
+              >
+              <a class="list-item" href="examples/milestone-plan.html"
+                ><span class="li-num">03</span
+                ><span class="li-name">milestone-plan</span
+                ><span class="li-title">Milestone Plan</span
+                ><span class="li-cta">Open →</span></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Code</div>
+            <div class="list-compact">
+              <a class="list-item" href="examples/code-review.html"
+                ><span class="li-num">01</span
+                ><span class="li-name">code-review</span
+                ><span class="li-title">Code Review</span
+                ><span class="li-cta">Open →</span></a
+              >
+              <a class="list-item" href="examples/architecture-diagram.html"
+                ><span class="li-num">02</span
+                ><span class="li-name">architecture-diagram</span
+                ><span class="li-title">Architecture Diagram</span
+                ><span class="li-cta">Open →</span></a
+              >
+              <a class="list-item" href="examples/flowchart-diagram.html"
+                ><span class="li-num">03</span
+                ><span class="li-name">flowchart-diagram</span
+                ><span class="li-title">Flowchart</span
+                ><span class="li-cta">Open →</span></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Reports</div>
+            <div class="list-compact">
+              <a class="list-item" href="examples/research-explainer.html"
+                ><span class="li-num">01</span
+                ><span class="li-name">research-explainer</span
+                ><span class="li-title">Research Explainer</span
+                ><span class="li-cta">Open →</span></a
+              >
+              <a class="list-item" href="examples/status-report.html"
+                ><span class="li-num">02</span
+                ><span class="li-name">status-report</span
+                ><span class="li-title">Status Report</span
+                ><span class="li-cta">Open →</span></a
+              >
+              <a class="list-item" href="examples/slide-deck.html"
+                ><span class="li-num">03</span
+                ><span class="li-name">slide-deck</span
+                ><span class="li-title">Pitch Deck</span
+                ><span class="li-cta">Open →</span></a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="pv pv-c">
+          <div class="cat-group">
+            <div class="group-heading">Planning</div>
+            <div class="grid-wide">
+              <a class="card-wide" href="examples/product-brief.html"
+                ><div class="cw-badge cw-b1">📄</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Product Brief</span
+                    ><span class="cw-pn">product-brief</span>
+                  </div>
+                  <div class="cw-desc">
+                    Product overview, goals and competitive context
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+              <a class="card-wide" href="examples/feature-spec.html"
+                ><div class="cw-badge cw-b4">📋</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Feature Spec</span
+                    ><span class="cw-pn">feature-spec</span>
+                  </div>
+                  <div class="cw-desc">
+                    Requirements, user flows, and edge cases
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+              <a class="card-wide" href="examples/milestone-plan.html"
+                ><div class="cw-badge cw-b6">🗓️</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Milestone Plan</span
+                    ><span class="cw-pn">milestone-plan</span>
+                  </div>
+                  <div class="cw-desc">
+                    Quarterly roadmap with status and owners
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Code</div>
+            <div class="grid-wide">
+              <a class="card-wide" href="examples/code-review.html"
+                ><div class="cw-badge cw-b2">🔍</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Code Review</span
+                    ><span class="cw-pn">code-review</span>
+                  </div>
+                  <div class="cw-desc">
+                    PR summary with issues grouped by severity
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+              <a class="card-wide" href="examples/architecture-diagram.html"
+                ><div class="cw-badge cw-b6">🏗️</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Architecture Diagram</span
+                    ><span class="cw-pn">architecture-diagram</span>
+                  </div>
+                  <div class="cw-desc">
+                    System components, services, and data flow
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+              <a class="card-wide" href="examples/flowchart-diagram.html"
+                ><div class="cw-badge cw-b3">🔀</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Flowchart</span
+                    ><span class="cw-pn">flowchart-diagram</span>
+                  </div>
+                  <div class="cw-desc">
+                    Process flows, decision trees, and state machines
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Reports</div>
+            <div class="grid-wide">
+              <a class="card-wide" href="examples/research-explainer.html"
+                ><div class="cw-badge cw-b1">📖</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Research Explainer</span
+                    ><span class="cw-pn">research-explainer</span>
+                  </div>
+                  <div class="cw-desc">
+                    Annotated deep-dive into how something works
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+              <a class="card-wide" href="examples/status-report.html"
+                ><div class="cw-badge cw-b5">📊</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Status Report</span
+                    ><span class="cw-pn">status-report</span>
+                  </div>
+                  <div class="cw-desc">
+                    Sprint summary with metrics and blockers
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+              <a class="card-wide" href="examples/slide-deck.html"
+                ><div class="cw-badge cw-b3">🎯</div>
+                <div class="cw-info">
+                  <div class="cw-top">
+                    <span class="cw-title">Pitch Deck</span
+                    ><span class="cw-pn">slide-deck</span>
+                  </div>
+                  <div class="cw-desc">
+                    Investor-ready presentation for your project
+                  </div>
+                </div>
+                <span class="cw-cta">Open →</span></a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="pv pv-d">
+          <div class="cat-group">
+            <div class="group-heading">Planning</div>
+            <div class="card-grid">
+              <a class="card" href="examples/product-brief.html"
+                ><span class="pattern-name">product-brief</span>
+                <div class="card-title">Product Brief</div>
+                <div class="card-desc">
+                  Product overview, goals and competitive context
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+              <a class="card" href="examples/feature-spec.html"
+                ><span class="pattern-name">feature-spec</span>
+                <div class="card-title">Feature Spec</div>
+                <div class="card-desc">
+                  Requirements, user flows, and edge cases
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+              <a class="card" href="examples/milestone-plan.html"
+                ><span class="pattern-name">milestone-plan</span>
+                <div class="card-title">Milestone Plan</div>
+                <div class="card-desc">
+                  Quarterly roadmap with status and owners
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Code</div>
+            <div class="card-grid">
+              <a class="card" href="examples/code-review.html"
+                ><span class="pattern-name">code-review</span>
+                <div class="card-title">Code Review</div>
+                <div class="card-desc">
+                  PR summary with issues grouped by severity
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+              <a class="card" href="examples/architecture-diagram.html"
+                ><span class="pattern-name">architecture-diagram</span>
+                <div class="card-title">Architecture Diagram</div>
+                <div class="card-desc">
+                  System components, services, and data flow
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+              <a class="card" href="examples/flowchart-diagram.html"
+                ><span class="pattern-name">flowchart-diagram</span>
+                <div class="card-title">Flowchart</div>
+                <div class="card-desc">
+                  Process flows, decision trees, and state machines
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="group-heading">Reports</div>
+            <div class="card-grid">
+              <a class="card" href="examples/research-explainer.html"
+                ><span class="pattern-name">research-explainer</span>
+                <div class="card-title">Research Explainer</div>
+                <div class="card-desc">
+                  Annotated deep-dive into how something works
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+              <a class="card" href="examples/status-report.html"
+                ><span class="pattern-name">status-report</span>
+                <div class="card-title">Status Report</div>
+                <div class="card-desc">
+                  Sprint summary with metrics and blockers
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+              <a class="card" href="examples/slide-deck.html"
+                ><span class="pattern-name">slide-deck</span>
+                <div class="card-title">Pitch Deck</div>
+                <div class="card-desc">
+                  Investor-ready presentation for your project
+                </div>
+                <div class="card-cta">Open example →</div></a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <script>
-      ;(function() {
-        var t = localStorage.getItem('ha-theme') || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-        if (t === 'dark') document.documentElement.classList.add('dark');
-        document.getElementById('dm-toggle').addEventListener('click', function() {
-          var d = document.documentElement.classList.toggle('dark');
-          localStorage.setItem('ha-theme', d ? 'dark' : 'light');
-        });
-      })();
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
       // Floating variant panel
-      (function() {
+      ;(function () {
         var GROUPS = [
-          { key: 'hero', label: 'Hero', options: [
-            { value: 'v1', label: 'v1 Full' },
-            { value: 'v2', label: 'v2 Minimal' }
-          ]},
-          { key: 'layout', label: 'Layout', options: [
-            { value: 'd', label: 'Classic' },
-            { value: 'a', label: 'SVG Cards' },
-            { value: 'c', label: 'Wide Rows' },
-            { value: 'b', label: 'List' }
-          ]}
-        ];
+          {
+            key: 'hero',
+            label: 'Hero',
+            options: [
+              { value: 'v1', label: 'v1 Full' },
+              { value: 'v2', label: 'v2 Minimal' },
+            ],
+          },
+          {
+            key: 'layout',
+            label: 'Layout',
+            options: [
+              { value: 'd', label: 'Classic' },
+              { value: 'a', label: 'SVG Cards' },
+              { value: 'c', label: 'Wide Rows' },
+              { value: 'b', label: 'List' },
+            ],
+          },
+        ]
 
         // Load saved or defaults
-        var saved = {};
-        try { saved = JSON.parse(localStorage.getItem('ha-variants') || '{}'); } catch(e){}
-        var state = { hero: saved.hero || 'v1', layout: saved.layout || 'd' };
+        var saved = {}
+        try {
+          saved = JSON.parse(localStorage.getItem('ha-variants') || '{}')
+        } catch (e) {}
+        var state = { hero: saved.hero || 'v1', layout: saved.layout || 'd' }
 
         function applyState() {
           // Hero
-          document.querySelectorAll('.hero-variant').forEach(function(el) {
-            el.hidden = el.dataset.variant !== state.hero;
-          });
+          document.querySelectorAll('.hero-variant').forEach(function (el) {
+            el.hidden = el.dataset.variant !== state.hero
+          })
           // Layout
-          var inner = document.getElementById('examples-inner');
-          if (inner) inner.dataset.view = state.layout;
+          var inner = document.getElementById('examples-inner')
+          if (inner) inner.dataset.view = state.layout
           // Sync card-toggle buttons
-          document.querySelectorAll('#card-toggle button').forEach(function(btn) {
-            btn.classList.toggle('active', btn.dataset.view === state.layout);
-          });
+          document
+            .querySelectorAll('#card-toggle button')
+            .forEach(function (btn) {
+              btn.classList.toggle('active', btn.dataset.view === state.layout)
+            })
           // Mark chips active
-          document.querySelectorAll('.vp-chip').forEach(function(chip) {
-            var groupKey = chip.dataset.group;
-            chip.classList.toggle('active', chip.dataset.value === state[groupKey]);
-          });
+          document.querySelectorAll('.vp-chip').forEach(function (chip) {
+            var groupKey = chip.dataset.group
+            chip.classList.toggle(
+              'active',
+              chip.dataset.value === state[groupKey],
+            )
+          })
           // Persist
-          localStorage.setItem('ha-variants', JSON.stringify(state));
+          localStorage.setItem('ha-variants', JSON.stringify(state))
         }
 
         // Build panel body
-        var bodyEl = document.getElementById('vp-body');
-        GROUPS.forEach(function(group) {
-          var groupDiv = document.createElement('div');
-          var label = document.createElement('div');
-          label.className = 'vp-group-label';
-          label.textContent = group.label;
-          groupDiv.appendChild(label);
-          var chips = document.createElement('div');
-          chips.className = 'vp-chips';
-          group.options.forEach(function(opt) {
-            var chip = document.createElement('button');
-            chip.className = 'vp-chip';
-            chip.dataset.group = group.key;
-            chip.dataset.value = opt.value;
-            chip.textContent = opt.label;
-            chip.addEventListener('click', function() {
-              state[group.key] = opt.value;
-              applyState();
-            });
-            chips.appendChild(chip);
-          });
-          groupDiv.appendChild(chips);
-          bodyEl.appendChild(groupDiv);
-        });
+        var bodyEl = document.getElementById('vp-body')
+        GROUPS.forEach(function (group) {
+          var groupDiv = document.createElement('div')
+          var label = document.createElement('div')
+          label.className = 'vp-group-label'
+          label.textContent = group.label
+          groupDiv.appendChild(label)
+          var chips = document.createElement('div')
+          chips.className = 'vp-chips'
+          group.options.forEach(function (opt) {
+            var chip = document.createElement('button')
+            chip.className = 'vp-chip'
+            chip.dataset.group = group.key
+            chip.dataset.value = opt.value
+            chip.textContent = opt.label
+            chip.addEventListener('click', function () {
+              state[group.key] = opt.value
+              applyState()
+            })
+            chips.appendChild(chip)
+          })
+          groupDiv.appendChild(chips)
+          bodyEl.appendChild(groupDiv)
+        })
 
-        applyState();
+        applyState()
 
         // Panel open/close
-        var trigger = document.getElementById('vp-trigger');
-        var panel = document.getElementById('vp-panel');
-        var closeBtn = document.getElementById('vp-close');
-        var backdrop = document.getElementById('vp-backdrop');
+        var trigger = document.getElementById('vp-trigger')
+        var panel = document.getElementById('vp-panel')
+        var closeBtn = document.getElementById('vp-close')
+        var backdrop = document.getElementById('vp-backdrop')
 
         function openPanel() {
-          backdrop.classList.add('open');
-          panel.style.display = 'block';
-          requestAnimationFrame(function() {
-            requestAnimationFrame(function() { panel.classList.add('open'); });
-          });
+          backdrop.classList.add('open')
+          panel.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              panel.classList.add('open')
+            })
+          })
         }
         function closePanel() {
-          panel.classList.remove('open');
-          backdrop.classList.remove('open');
-          panel.addEventListener('transitionend', function h() {
-            panel.style.display = 'none';
-            panel.removeEventListener('transitionend', h);
-          }, {once:true});
+          panel.classList.remove('open')
+          backdrop.classList.remove('open')
+          panel.addEventListener(
+            'transitionend',
+            function h() {
+              panel.style.display = 'none'
+              panel.removeEventListener('transitionend', h)
+            },
+            { once: true },
+          )
         }
 
-        trigger.addEventListener('click', openPanel);
-        closeBtn.addEventListener('click', closePanel);
-        backdrop.addEventListener('click', closePanel);
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
-        });
+        trigger.addEventListener('click', openPanel)
+        closeBtn.addEventListener('click', closePanel)
+        backdrop.addEventListener('click', closePanel)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && panel.classList.contains('open'))
+            closePanel()
+        })
 
         // Also wire up the card-toggle buttons to update panel state
-        document.querySelectorAll('#card-toggle button').forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            state.layout = btn.dataset.view;
-            applyState();
-          });
-        });
-      })();
-  </script>
-</body>
+        document
+          .querySelectorAll('#card-toggle button')
+          .forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              state.layout = btn.dataset.view
+              applyState()
+            })
+          })
+      })()
+    </script>
+  </body>
 </html>
