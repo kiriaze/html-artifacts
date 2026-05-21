@@ -1,361 +1,989 @@
-<!-- html-artifacts: approach-explorer example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: approach-explorer example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/approach-explorer.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File Change Detection — Approach Explorer · Acme Sync</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Nav */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg); border-bottom: 1px solid var(--border);
-      padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 48px;
-    }
-    .back {
-      font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0;
-    }
-    .back:hover { color: var(--fg); }
-    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); white-space: nowrap; flex-shrink: 0; }
-    .dm-toggle {
-      background: none; border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 4px 8px;
-      font-size: 13px; cursor: pointer; color: var(--fg-muted); line-height: 1; flex-shrink: 0;
-    }
-    .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
-
-    /* Layout */
-    main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
-
-    /* Header */
-    .page-header { margin-bottom: 32px; }
-    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; }
-    .page-header p { color: var(--fg-muted); max-width: 680px; font-size: 14px; }
-    .date-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 12px;
-      background: var(--warning-bg); color: var(--warning);
-      border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
-      border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 500;
-    }
-
-    /* Grid wrapper */
-    .grid-wrapper { overflow-x: auto; margin-bottom: 32px; }
-
-    /* Criteria grid */
-    table.criteria-grid {
-      width: 100%; border-collapse: collapse; min-width: 680px;
-    }
-    .criteria-grid th {
-      background: var(--bg-subtle); font-size: 13px; font-weight: 600;
-      padding: 10px 16px; text-align: left; border: 1px solid var(--border);
-      color: var(--fg-muted); white-space: nowrap;
-    }
-    .criteria-grid th.option-col {
-      text-align: center; color: var(--fg); font-size: 14px;
-    }
-    .criteria-grid th.option-col .opt-label { display: block; font-weight: 700; }
-    .criteria-grid th.option-col .opt-sub { font-size: 11px; font-weight: 400; color: var(--fg-muted); }
-
-    .criteria-grid td {
-      padding: 0; border: 1px solid var(--border); vertical-align: top;
-    }
-    .criteria-grid td.criteria-label {
-      padding: 12px 16px; font-size: 13px; font-weight: 600;
-      background: var(--bg-subtle); white-space: nowrap;
-    }
-
-    /* Cell button */
-    .cell-btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      width: 100%; min-height: 64px; padding: 10px 12px; gap: 4px;
-      background: none; border: none; cursor: pointer; font-family: inherit;
-      transition: filter 0.15s;
-    }
-    .cell-btn:hover { filter: brightness(0.96); }
-    .cell-icon { font-size: 18px; line-height: 1; }
-    .cell-label { font-size: 11px; font-weight: 500; line-height: 1.3; text-align: center; }
-
-    td.cell-success .cell-btn { background: var(--success-bg); color: var(--success); }
-    td.cell-warning .cell-btn { background: var(--warning-bg); color: var(--warning); }
-    td.cell-danger  .cell-btn { background: var(--danger-bg);  color: var(--danger);  }
-
-    /* Rationale drawer */
-    .rationale {
-      display: none; font-size: 12px; line-height: 1.5;
-      padding: 8px 12px 10px; border-top: 1px solid var(--border);
-      color: var(--fg-muted); background: var(--bg); text-align: left;
-    }
-    .rationale.open { display: block; }
-
-    /* Summary row */
-    tr.summary-row td {
-      padding: 12px 16px; background: var(--bg-subtle-2);
-      font-size: 13px; font-weight: 600; text-align: center; border: 1px solid var(--border);
-    }
-    tr.summary-row td.summary-label { text-align: left; color: var(--fg-muted); }
-    .traffic-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      border-radius: 99px; padding: 3px 12px; font-size: 12px; font-weight: 600;
-    }
-    .traffic-green { background: var(--success-bg); color: var(--success); }
-    .traffic-yellow { background: var(--warning-bg); color: var(--warning); }
-    .traffic-red { background: var(--danger-bg); color: var(--danger); }
-
-    /* Recommendation */
-    .recommendation {
-      border-left: 3px solid var(--accent); background: var(--accent-bg);
-      border-radius: 0 var(--radius-md) var(--radius-md) 0;
-      padding: 20px 24px;
-    }
-    .recommendation .rec-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px;
-    }
-    .recommendation h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .recommendation p { font-size: 14px; color: var(--fg-muted); line-height: 1.65; }
-
-    .hint {
-      font-size: 12px; color: var(--fg-faint); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .hint::before { content: '↓'; font-size: 14px; }
-
-    section h2.section-title {
-      font-size: 13px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--fg-faint); margin-bottom: 12px;
-    }
-  </style>
-</head>
-<body>
-  <nav>
-    <a href="../index.html" class="back">← Acme Sync</a>
-    <span class="nav-sep">|</span>
-    <span class="nav-brand">Approach Explorer</span>
-    <div style="flex:1"></div>
-    <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-  </nav>
-
-  <main>
-    <div class="page-header">
-      <h1>How should Acme Sync detect file changes?</h1>
-      <p>We need to detect when files change on disk so we can trigger sync. The approach affects battery life, CPU usage, sync latency, and cross-platform complexity.</p>
-      <span class="date-chip">⏱ Decision needed by 2026-05-22</span>
-    </div>
-
-    <p class="hint">Click any cell to expand its rationale</p>
-
-    <div class="grid-wrapper">
-      <table class="criteria-grid" id="criteria-grid">
-        <thead>
-          <tr>
-            <th style="width:160px">Criteria</th>
-            <th class="option-col">
-              <span class="opt-label">A: FS Watchers</span>
-              <span class="opt-sub">FSEvents / inotify / ReadDirectoryChangesW</span>
-            </th>
-            <th class="option-col">
-              <span class="opt-label">B: Polling</span>
-              <span class="opt-sub">Directory hash scan every 30s</span>
-            </th>
-            <th class="option-col">
-              <span class="opt-label">C: Write Intercept</span>
-              <span class="opt-sub">Hook OS file write syscalls</span>
-            </th>
-            <th class="option-col">
-              <span class="opt-label">D: Hybrid</span>
-              <span class="opt-sub">FS watchers + hash verification</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="grid-body">
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <section style="margin-bottom:32px">
-      <h2 class="section-title">Recommendation</h2>
-      <div class="recommendation">
-        <div class="rec-label">Recommended · Option D</div>
-        <h2>Hybrid: FS Watchers + Hash Reconciliation</h2>
-        <p>Use <code style="font-family:var(--font-mono);font-size:13px">chokidar</code> (wraps all three native watcher APIs — FSEvents, inotify, ReadDirectoryChangesW) for near-instant event delivery, with a lightweight hash-based reconciliation pass every 5 minutes to catch any missed events. This is the only option that is both low-latency AND correct for large directories with burst writes. The implementation complexity is manageable: chokidar's abstraction layer handles most platform differences, and the reconciliation loop is a straightforward directory hash comparison already prototyped. Battery and CPU impact is acceptable — hashing runs only on detected change events rather than on a fixed timer.</p>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    (function(){
-      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-      if(t==='dark')document.documentElement.classList.add('dark');
-      document.getElementById('dm-toggle').addEventListener('click',function(){
-        var d=document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ha-theme',d?'dark':'light');
-      });
-    })();
-
-    var CRITERIA = [
-      {
-        label: 'Sync latency',
-        cells: [
-          { type: 'success', icon: '✓', label: 'Sub-second', rationale: 'OS pushes events immediately; no polling delay.' },
-          { type: 'danger',  icon: '✗', label: 'Up to 30s',  rationale: 'Polling interval sets the floor; annoying for collaborative editing.' },
-          { type: 'success', icon: '✓', label: 'Sub-second', rationale: 'Intercepts at write time.' },
-          { type: 'success', icon: '✓', label: 'Sub-second', rationale: 'Watcher fires event; hash confirms before upload.' }
-        ]
-      },
-      {
-        label: 'CPU / battery',
-        cells: [
-          { type: 'success', icon: '✓', label: 'Near zero idle',   rationale: 'Kernel-driven; Electron wrapper adds ~0.1% CPU in practice.' },
-          { type: 'warning', icon: '~', label: 'Moderate',         rationale: 'Hash scan scales with directory size; ~50MB dir takes ~80ms per scan.' },
-          { type: 'danger',  icon: '✗', label: 'High',             rationale: 'Syscall hook adds overhead on every write, not just synced files.' },
-          { type: 'warning', icon: '~', label: 'Slightly above A', rationale: 'Hash computation on change; amortized cost is low for typical workloads.' }
-        ]
-      },
-      {
-        label: 'Cross-platform',
-        cells: [
-          { type: 'warning', icon: '~', label: 'Three APIs',    rationale: 'FSEvents (mac), inotify (linux), ReadDirectoryChangesW (win) — different edge cases, especially on network drives.' },
-          { type: 'success', icon: '✓', label: 'Identical',     rationale: 'Pure Node.js fs.stat calls; no platform differences.' },
-          { type: 'danger',  icon: '✗', label: 'Very hard',     rationale: 'Platform-specific kernel modules; not feasible for Electron app distribution.' },
-          { type: 'warning', icon: '~', label: 'Inherits A',    rationale: 'Same three APIs but complexity is manageable with an abstraction layer like chokidar.' }
-        ]
-      },
-      {
-        label: 'Missed events',
-        cells: [
-          { type: 'warning', icon: '~', label: 'Rare but possible', rationale: 'Kernel buffers can overflow on large bursts; documented in FSEvents; mitigated with periodic reconciliation.' },
-          { type: 'success', icon: '✓', label: 'None',             rationale: 'Full scan always catches everything.' },
-          { type: 'success', icon: '✓', label: 'None',             rationale: 'Every write is intercepted.' },
-          { type: 'success', icon: '✓', label: 'Hash catches all', rationale: 'Watcher for low latency; periodic hash reconciliation for correctness.' }
-        ]
-      },
-      {
-        label: 'Implementation effort',
-        cells: [
-          { type: 'warning', icon: '~', label: 'Medium (~2wks)',    rationale: 'chokidar handles abstraction; ~2 weeks to production quality.' },
-          { type: 'success', icon: '✓', label: 'Low (~200 lines)',  rationale: '~200 lines of Node.js; already have prototype.' },
-          { type: 'danger',  icon: '✗', label: 'Very high (3–6mo)', rationale: 'Kernel module per platform; 3–6 months minimum.' },
-          { type: 'warning', icon: '~', label: 'Medium-high (~3wks)', rationale: 'Combines A + reconciliation loop; ~3 weeks; but most robust option.' }
-        ]
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Change Detection — Approach Explorer · Acme Sync</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
       }
-    ];
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    var SUMMARIES = [
-      { type: 'green',  label: 'Viable ✓' },
-      { type: 'yellow', label: 'Caution ~' },
-      { type: 'red',    label: 'Not viable ✗' },
-      { type: 'green',  label: 'Recommended ✓' }
-    ];
+      /* Nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 48px;
+      }
+      .back {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      .back:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
 
-    var tbody = document.getElementById('grid-body');
+      /* Layout */
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 24px 80px;
+      }
 
-    CRITERIA.forEach(function(row, ri) {
-      var tr = document.createElement('tr');
+      /* Header */
+      .page-header {
+        margin-bottom: 32px;
+      }
+      .page-header h1 {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        line-height: 1.3;
+      }
+      .page-header p {
+        color: var(--fg-muted);
+        max-width: 680px;
+        font-size: 14px;
+      }
+      .date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        background: var(--warning-bg);
+        color: var(--warning);
+        border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+        border-radius: 99px;
+        padding: 3px 10px;
+        font-size: 12px;
+        font-weight: 500;
+      }
 
-      var labelTd = document.createElement('td');
-      labelTd.className = 'criteria-label';
-      labelTd.textContent = row.label;
-      tr.appendChild(labelTd);
+      /* Grid wrapper */
+      .grid-wrapper {
+        overflow-x: auto;
+        margin-bottom: 32px;
+      }
 
-      row.cells.forEach(function(cell, ci) {
-        var td = document.createElement('td');
-        td.className = 'cell-' + cell.type;
+      /* Criteria grid */
+      table.criteria-grid {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 680px;
+      }
+      .criteria-grid th {
+        background: var(--bg-subtle);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 10px 16px;
+        text-align: left;
+        border: 1px solid var(--border);
+        color: var(--fg-muted);
+        white-space: nowrap;
+      }
+      .criteria-grid th.option-col {
+        text-align: center;
+        color: var(--fg);
+        font-size: 14px;
+      }
+      .criteria-grid th.option-col .opt-label {
+        display: block;
+        font-weight: 700;
+      }
+      .criteria-grid th.option-col .opt-sub {
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--fg-muted);
+      }
 
-        var btn = document.createElement('button');
-        btn.className = 'cell-btn';
-        btn.type = 'button';
-        btn.setAttribute('aria-expanded', 'false');
-        btn.setAttribute('aria-label', 'Expand rationale for ' + row.label + ', option ' + ['A','B','C','D'][ci]);
+      .criteria-grid td {
+        padding: 0;
+        border: 1px solid var(--border);
+        vertical-align: top;
+      }
+      .criteria-grid td.criteria-label {
+        padding: 12px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        background: var(--bg-subtle);
+        white-space: nowrap;
+      }
 
-        var icon = document.createElement('span');
-        icon.className = 'cell-icon';
-        icon.textContent = cell.icon;
+      /* Cell button */
+      .cell-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 64px;
+        padding: 10px 12px;
+        gap: 4px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        transition: filter 0.15s;
+      }
+      .cell-btn:hover {
+        filter: brightness(0.96);
+      }
+      .cell-icon {
+        font-size: 18px;
+        line-height: 1;
+      }
+      .cell-label {
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.3;
+        text-align: center;
+      }
 
-        var lbl = document.createElement('span');
-        lbl.className = 'cell-label';
-        lbl.textContent = cell.label;
+      td.cell-success .cell-btn {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      td.cell-warning .cell-btn {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      td.cell-danger .cell-btn {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
 
-        btn.appendChild(icon);
-        btn.appendChild(lbl);
+      /* Rationale drawer */
+      .rationale {
+        display: none;
+        font-size: 12px;
+        line-height: 1.5;
+        padding: 8px 12px 10px;
+        border-top: 1px solid var(--border);
+        color: var(--fg-muted);
+        background: var(--bg);
+        text-align: left;
+      }
+      .rationale.open {
+        display: block;
+      }
 
-        var rat = document.createElement('div');
-        rat.className = 'rationale';
-        rat.textContent = cell.rationale;
+      /* Summary row */
+      tr.summary-row td {
+        padding: 12px 16px;
+        background: var(--bg-subtle-2);
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        border: 1px solid var(--border);
+      }
+      tr.summary-row td.summary-label {
+        text-align: left;
+        color: var(--fg-muted);
+      }
+      .traffic-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 99px;
+        padding: 3px 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .traffic-green {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .traffic-yellow {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      .traffic-red {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
 
-        btn.addEventListener('click', function() {
-          var isOpen = rat.classList.contains('open');
-          rat.classList.toggle('open', !isOpen);
-          btn.setAttribute('aria-expanded', String(!isOpen));
-        });
+      /* Recommendation */
+      .recommendation {
+        border-left: 3px solid var(--accent);
+        background: var(--accent-bg);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding: 20px 24px;
+      }
+      .recommendation .rec-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      .recommendation h2 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .recommendation p {
+        font-size: 14px;
+        color: var(--fg-muted);
+        line-height: 1.65;
+      }
 
-        td.appendChild(btn);
-        td.appendChild(rat);
-        tr.appendChild(td);
-      });
+      .hint {
+        font-size: 12px;
+        color: var(--fg-faint);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hint::before {
+        content: '↓';
+        font-size: 14px;
+      }
 
-      tbody.appendChild(tr);
-    });
+      section h2.section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--fg-faint);
+        margin-bottom: 12px;
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
 
-    // Summary row
-    var sumTr = document.createElement('tr');
-    sumTr.className = 'summary-row';
-    var sumLabel = document.createElement('td');
-    sumLabel.className = 'summary-label';
-    sumLabel.textContent = 'Overall';
-    sumTr.appendChild(sumLabel);
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
 
-    SUMMARIES.forEach(function(s) {
-      var td = document.createElement('td');
-      var pill = document.createElement('span');
-      pill.className = 'traffic-pill traffic-' + s.type;
-      pill.textContent = s.label;
-      td.appendChild(pill);
-      sumTr.appendChild(td);
-    });
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
 
-    tbody.appendChild(sumTr);
-  </script>
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Approach Explorer · May 2026
-</footer>
-</body>
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="back">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Approach Explorer</span>
+      <div style="flex: 1"></div>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">We keep going in circles about how Acme Sync should detect file changes — inotify, polling, or hash comparison. Read through the relevant code and generate an HTML approach explorer: lay out each option with its tradeoffs, constraints, and a clear recommendation based on our current architecture.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate an approach explorer for file change detection strategies — compare inotify, polling, and hash-based options with tradeoffs and a recommendation</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate an approach explorer comparing file change detection strategies for our sync daemon — include tradeoffs, constraints, and a recommended path forward</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <main>
+      <div class="page-header">
+        <h1>How should Acme Sync detect file changes?</h1>
+        <p>
+          We need to detect when files change on disk so we can trigger sync.
+          The approach affects battery life, CPU usage, sync latency, and
+          cross-platform complexity.
+        </p>
+        <span class="date-chip">⏱ Decision needed by 2026-05-22</span>
+      </div>
+
+      <p class="hint">Click any cell to expand its rationale</p>
+
+      <div class="grid-wrapper">
+        <table class="criteria-grid" id="criteria-grid">
+          <thead>
+            <tr>
+              <th style="width: 160px">Criteria</th>
+              <th class="option-col">
+                <span class="opt-label">A: FS Watchers</span>
+                <span class="opt-sub"
+                  >FSEvents / inotify / ReadDirectoryChangesW</span
+                >
+              </th>
+              <th class="option-col">
+                <span class="opt-label">B: Polling</span>
+                <span class="opt-sub">Directory hash scan every 30s</span>
+              </th>
+              <th class="option-col">
+                <span class="opt-label">C: Write Intercept</span>
+                <span class="opt-sub">Hook OS file write syscalls</span>
+              </th>
+              <th class="option-col">
+                <span class="opt-label">D: Hybrid</span>
+                <span class="opt-sub">FS watchers + hash verification</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="grid-body">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <section style="margin-bottom: 32px">
+        <h2 class="section-title">Recommendation</h2>
+        <div class="recommendation">
+          <div class="rec-label">Recommended · Option D</div>
+          <h2>Hybrid: FS Watchers + Hash Reconciliation</h2>
+          <p>
+            Use
+            <code style="font-family: var(--font-mono); font-size: 13px"
+              >chokidar</code
+            >
+            (wraps all three native watcher APIs — FSEvents, inotify,
+            ReadDirectoryChangesW) for near-instant event delivery, with a
+            lightweight hash-based reconciliation pass every 5 minutes to catch
+            any missed events. This is the only option that is both low-latency
+            AND correct for large directories with burst writes. The
+            implementation complexity is manageable: chokidar's abstraction
+            layer handles most platform differences, and the reconciliation loop
+            is a straightforward directory hash comparison already prototyped.
+            Battery and CPU impact is acceptable — hashing runs only on detected
+            change events rather than on a fixed timer.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+
+      var CRITERIA = [
+        {
+          label: 'Sync latency',
+          cells: [
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Sub-second',
+              rationale: 'OS pushes events immediately; no polling delay.',
+            },
+            {
+              type: 'danger',
+              icon: '✗',
+              label: 'Up to 30s',
+              rationale:
+                'Polling interval sets the floor; annoying for collaborative editing.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Sub-second',
+              rationale: 'Intercepts at write time.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Sub-second',
+              rationale: 'Watcher fires event; hash confirms before upload.',
+            },
+          ],
+        },
+        {
+          label: 'CPU / battery',
+          cells: [
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Near zero idle',
+              rationale:
+                'Kernel-driven; Electron wrapper adds ~0.1% CPU in practice.',
+            },
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Moderate',
+              rationale:
+                'Hash scan scales with directory size; ~50MB dir takes ~80ms per scan.',
+            },
+            {
+              type: 'danger',
+              icon: '✗',
+              label: 'High',
+              rationale:
+                'Syscall hook adds overhead on every write, not just synced files.',
+            },
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Slightly above A',
+              rationale:
+                'Hash computation on change; amortized cost is low for typical workloads.',
+            },
+          ],
+        },
+        {
+          label: 'Cross-platform',
+          cells: [
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Three APIs',
+              rationale:
+                'FSEvents (mac), inotify (linux), ReadDirectoryChangesW (win) — different edge cases, especially on network drives.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Identical',
+              rationale: 'Pure Node.js fs.stat calls; no platform differences.',
+            },
+            {
+              type: 'danger',
+              icon: '✗',
+              label: 'Very hard',
+              rationale:
+                'Platform-specific kernel modules; not feasible for Electron app distribution.',
+            },
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Inherits A',
+              rationale:
+                'Same three APIs but complexity is manageable with an abstraction layer like chokidar.',
+            },
+          ],
+        },
+        {
+          label: 'Missed events',
+          cells: [
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Rare but possible',
+              rationale:
+                'Kernel buffers can overflow on large bursts; documented in FSEvents; mitigated with periodic reconciliation.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'None',
+              rationale: 'Full scan always catches everything.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'None',
+              rationale: 'Every write is intercepted.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Hash catches all',
+              rationale:
+                'Watcher for low latency; periodic hash reconciliation for correctness.',
+            },
+          ],
+        },
+        {
+          label: 'Implementation effort',
+          cells: [
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Medium (~2wks)',
+              rationale:
+                'chokidar handles abstraction; ~2 weeks to production quality.',
+            },
+            {
+              type: 'success',
+              icon: '✓',
+              label: 'Low (~200 lines)',
+              rationale: '~200 lines of Node.js; already have prototype.',
+            },
+            {
+              type: 'danger',
+              icon: '✗',
+              label: 'Very high (3–6mo)',
+              rationale: 'Kernel module per platform; 3–6 months minimum.',
+            },
+            {
+              type: 'warning',
+              icon: '~',
+              label: 'Medium-high (~3wks)',
+              rationale:
+                'Combines A + reconciliation loop; ~3 weeks; but most robust option.',
+            },
+          ],
+        },
+      ]
+
+      var SUMMARIES = [
+        { type: 'green', label: 'Viable ✓' },
+        { type: 'yellow', label: 'Caution ~' },
+        { type: 'red', label: 'Not viable ✗' },
+        { type: 'green', label: 'Recommended ✓' },
+      ]
+
+      var tbody = document.getElementById('grid-body')
+
+      CRITERIA.forEach(function (row, ri) {
+        var tr = document.createElement('tr')
+
+        var labelTd = document.createElement('td')
+        labelTd.className = 'criteria-label'
+        labelTd.textContent = row.label
+        tr.appendChild(labelTd)
+
+        row.cells.forEach(function (cell, ci) {
+          var td = document.createElement('td')
+          td.className = 'cell-' + cell.type
+
+          var btn = document.createElement('button')
+          btn.className = 'cell-btn'
+          btn.type = 'button'
+          btn.setAttribute('aria-expanded', 'false')
+          btn.setAttribute(
+            'aria-label',
+            'Expand rationale for ' +
+              row.label +
+              ', option ' +
+              ['A', 'B', 'C', 'D'][ci],
+          )
+
+          var icon = document.createElement('span')
+          icon.className = 'cell-icon'
+          icon.textContent = cell.icon
+
+          var lbl = document.createElement('span')
+          lbl.className = 'cell-label'
+          lbl.textContent = cell.label
+
+          btn.appendChild(icon)
+          btn.appendChild(lbl)
+
+          var rat = document.createElement('div')
+          rat.className = 'rationale'
+          rat.textContent = cell.rationale
+
+          btn.addEventListener('click', function () {
+            var isOpen = rat.classList.contains('open')
+            rat.classList.toggle('open', !isOpen)
+            btn.setAttribute('aria-expanded', String(!isOpen))
+          })
+
+          td.appendChild(btn)
+          td.appendChild(rat)
+          tr.appendChild(td)
+        })
+
+        tbody.appendChild(tr)
+      })
+
+      // Summary row
+      var sumTr = document.createElement('tr')
+      sumTr.className = 'summary-row'
+      var sumLabel = document.createElement('td')
+      sumLabel.className = 'summary-label'
+      sumLabel.textContent = 'Overall'
+      sumTr.appendChild(sumLabel)
+
+      SUMMARIES.forEach(function (s) {
+        var td = document.createElement('td')
+        var pill = document.createElement('span')
+        pill.className = 'traffic-pill traffic-' + s.type
+        pill.textContent = s.label
+        td.appendChild(pill)
+        sumTr.appendChild(td)
+      })
+
+      tbody.appendChild(sumTr)
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Approach Explorer · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

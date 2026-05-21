@@ -1,487 +1,1312 @@
-<!-- html-artifacts: prototype-animation example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: prototype-animation example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/prototype-animation.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acme Sync — Animation Explorer</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acme Sync — Animation Explorer</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    /* Nav */
-    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 16px; height: 48px; padding: 0 24px; background: var(--bg); border-bottom: 1px solid var(--border); }
-    .back { font-size: 13px; color: var(--fg-muted); text-decoration: none; }
-    .back:hover { color: var(--fg); }
-    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    .dm-toggle { margin-left: auto; background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 8px; font-size: 13px; cursor: pointer; color: var(--fg-muted); line-height: 1; flex-shrink: 0; }
-    .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
+      /* Nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 48px;
+        padding: 0 24px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+      }
+      .back {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+      }
+      .back:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      .dm-toggle {
+        margin-left: auto;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
 
-    /* Layout */
-    main { display: grid; grid-template-columns: 1fr; gap: 0; }
-    @media (min-width: 768px) { main { grid-template-columns: 60% 40%; min-height: calc(100vh - 48px); } }
+      /* Layout */
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      @media (min-width: 768px) {
+        main {
+          grid-template-columns: 60% 40%;
+          min-height: calc(100vh - 48px);
+        }
+      }
 
-    /* Left panel */
-    .preview-panel { padding: 32px 24px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 24px; }
-    .panel-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px; }
+      /* Left panel */
+      .preview-panel {
+        padding: 32px 24px;
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .panel-title {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-faint);
+        margin-bottom: 4px;
+      }
 
-    /* File card */
-    .file-card { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); }
-    .file-icon { width: 40px; height: 48px; background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .file-info { flex: 1; min-width: 0; }
-    .file-name { font-size: 14px; font-weight: 600; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .file-meta { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
-    .sync-indicator { width: 56px; height: 56px; flex-shrink: 0; position: relative; }
-    .sync-indicator svg { width: 56px; height: 56px; transform: rotate(-90deg); }
-    .ring-track { fill: none; stroke: var(--border); stroke-width: 4; }
-    .ring-fill { fill: none; stroke: var(--accent); stroke-width: 4; stroke-dasharray: 283; stroke-dashoffset: 283; stroke-linecap: round; }
-    .checkmark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; font-size: 22px; }
+      /* File card */
+      .file-card {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: var(--shadow-sm);
+      }
+      .file-icon {
+        width: 40px;
+        height: 48px;
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+      .file-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .file-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .file-meta {
+        font-size: 12px;
+        color: var(--fg-muted);
+        margin-top: 2px;
+      }
+      .sync-indicator {
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        position: relative;
+      }
+      .sync-indicator svg {
+        width: 56px;
+        height: 56px;
+        transform: rotate(-90deg);
+      }
+      .ring-track {
+        fill: none;
+        stroke: var(--border);
+        stroke-width: 4;
+      }
+      .ring-fill {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 4;
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        stroke-linecap: round;
+      }
+      .checkmark {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        font-size: 22px;
+      }
 
-    @keyframes sync-complete {
-      0%   { stroke-dashoffset: 283; }
-      80%  { stroke-dashoffset: 0; }
-      100% { stroke-dashoffset: 0; }
-    }
-    @keyframes ring-fade {
-      0%, 80% { opacity: 1; }
-      100%     { opacity: 0; }
-    }
-    @keyframes check-appear {
-      0%, 75% { opacity: 0; transform: scale(0.6); }
-      100%    { opacity: 1; transform: scale(1); }
-    }
+      @keyframes sync-complete {
+        0% {
+          stroke-dashoffset: 283;
+        }
+        80% {
+          stroke-dashoffset: 0;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+      @keyframes ring-fade {
+        0%,
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes check-appear {
+        0%,
+        75% {
+          opacity: 0;
+          transform: scale(0.6);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
 
-    .sync-indicator.playing .ring-fill {
-      animation: sync-complete var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards,
-                 ring-fade var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards;
-    }
-    .sync-indicator.playing .checkmark {
-      animation: check-appear var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards;
-    }
-    .sync-indicator.scrubbing .ring-fill {
-      animation: sync-complete var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards,
-                 ring-fade var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards;
-      animation-play-state: paused;
-    }
-    .sync-indicator.scrubbing .checkmark {
-      animation: check-appear var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards;
-      animation-play-state: paused;
-    }
+      .sync-indicator.playing .ring-fill {
+        animation:
+          sync-complete var(--anim-duration, 1.2s) var(--anim-easing, ease)
+            forwards,
+          ring-fade var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards;
+      }
+      .sync-indicator.playing .checkmark {
+        animation: check-appear var(--anim-duration, 1.2s)
+          var(--anim-easing, ease) forwards;
+      }
+      .sync-indicator.scrubbing .ring-fill {
+        animation:
+          sync-complete var(--anim-duration, 1.2s) var(--anim-easing, ease)
+            forwards,
+          ring-fade var(--anim-duration, 1.2s) var(--anim-easing, ease) forwards;
+        animation-play-state: paused;
+      }
+      .sync-indicator.scrubbing .checkmark {
+        animation: check-appear var(--anim-duration, 1.2s)
+          var(--anim-easing, ease) forwards;
+        animation-play-state: paused;
+      }
 
-    /* Play controls */
-    .play-controls { display: flex; gap: 8px; }
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background 0.15s; }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-ghost { background: var(--bg-subtle-2); color: var(--fg); }
-    .btn-ghost:hover { background: var(--border); }
-    .btn-success { background: var(--success); color: #fff; }
+      /* Play controls */
+      .play-controls {
+        display: flex;
+        gap: 8px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: background 0.15s;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+      }
+      .btn-ghost {
+        background: var(--bg-subtle-2);
+        color: var(--fg);
+      }
+      .btn-ghost:hover {
+        background: var(--border);
+      }
+      .btn-success {
+        background: var(--success);
+        color: #fff;
+      }
 
-    /* Scrubber */
-    .scrubber-row { display: flex; flex-direction: column; gap: 8px; }
-    .scrubber-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--fg-muted); }
-    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+      /* Scrubber */
+      .scrubber-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .scrubber-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--fg-muted);
+      }
+      input[type='range'] {
+        width: 100%;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
 
-    /* Right panel */
-    .controls-panel { padding: 24px; background: var(--bg-subtle); display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
-    .control-group { display: flex; flex-direction: column; gap: 10px; }
-    .control-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .control-row label { font-size: 13px; color: var(--fg-muted); white-space: nowrap; }
-    .value-display { font-size: 12px; font-family: var(--font-mono); color: var(--accent); min-width: 40px; text-align: right; }
-    select, input[type="number"] { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 8px; font-size: 13px; color: var(--fg); width: 100%; }
-    select:focus, input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-    .bezier-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .bezier-input-group { display: flex; flex-direction: column; gap: 4px; }
-    .bezier-input-group label { font-size: 11px; color: var(--fg-faint); }
-    .bezier-inputs-wrap { display: none; }
-    .bezier-inputs-wrap.visible { display: block; }
+      /* Right panel */
+      .controls-panel {
+        padding: 24px;
+        background: var(--bg-subtle);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        overflow-y: auto;
+      }
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .control-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .control-row label {
+        font-size: 13px;
+        color: var(--fg-muted);
+        white-space: nowrap;
+      }
+      .value-display {
+        font-size: 12px;
+        font-family: var(--font-mono);
+        color: var(--accent);
+        min-width: 40px;
+        text-align: right;
+      }
+      select,
+      input[type='number'] {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 5px 8px;
+        font-size: 13px;
+        color: var(--fg);
+        width: 100%;
+      }
+      select:focus,
+      input[type='number']:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      .bezier-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .bezier-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .bezier-input-group label {
+        font-size: 11px;
+        color: var(--fg-faint);
+      }
+      .bezier-inputs-wrap {
+        display: none;
+      }
+      .bezier-inputs-wrap.visible {
+        display: block;
+      }
 
-    /* Easing visualizer */
-    .viz-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .viz-label { font-size: 11px; color: var(--fg-faint); text-align: center; }
-    .easing-svg { width: 160px; height: 160px; }
-    .bez-axis { stroke: var(--border-strong); stroke-width: 1; }
-    .bez-curve { fill: none; stroke: var(--accent); stroke-width: 2; }
-    .bez-handle-line { stroke: var(--fg-faint); stroke-width: 1; stroke-dasharray: 3 2; }
-    .bez-handle { fill: var(--accent); cursor: grab; r: 5; }
-    .bez-endpoint { fill: var(--fg-muted); r: 4; }
+      /* Easing visualizer */
+      .viz-wrap {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .viz-label {
+        font-size: 11px;
+        color: var(--fg-faint);
+        text-align: center;
+      }
+      .easing-svg {
+        width: 160px;
+        height: 160px;
+      }
+      .bez-axis {
+        stroke: var(--border-strong);
+        stroke-width: 1;
+      }
+      .bez-curve {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 2;
+      }
+      .bez-handle-line {
+        stroke: var(--fg-faint);
+        stroke-width: 1;
+        stroke-dasharray: 3 2;
+      }
+      .bez-handle {
+        fill: var(--accent);
+        cursor: grab;
+        r: 5;
+      }
+      .bez-endpoint {
+        fill: var(--fg-muted);
+        r: 4;
+      }
 
-    /* Keyframe table */
-    .kf-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .kf-table th { text-align: left; padding: 6px 8px; color: var(--fg-faint); font-weight: 500; border-bottom: 1px solid var(--border); }
-    .kf-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--fg-muted); vertical-align: top; }
-    .kf-table td:last-child { font-family: var(--font-mono); font-size: 11px; color: var(--fg); }
-    [contenteditable] { outline: none; cursor: text; border-radius: 2px; padding: 1px 3px; }
-    [contenteditable]:focus { background: var(--accent-bg); outline: 1px solid var(--accent-border); }
-    .ref-note { font-size: 11px; color: var(--fg-faint); font-style: italic; margin-top: 4px; }
+      /* Keyframe table */
+      .kf-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .kf-table th {
+        text-align: left;
+        padding: 6px 8px;
+        color: var(--fg-faint);
+        font-weight: 500;
+        border-bottom: 1px solid var(--border);
+      }
+      .kf-table td {
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--border);
+        color: var(--fg-muted);
+        vertical-align: top;
+      }
+      .kf-table td:last-child {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg);
+      }
+      [contenteditable] {
+        outline: none;
+        cursor: text;
+        border-radius: 2px;
+        padding: 1px 3px;
+      }
+      [contenteditable]:focus {
+        background: var(--accent-bg);
+        outline: 1px solid var(--accent-border);
+      }
+      .ref-note {
+        font-size: 11px;
+        color: var(--fg-faint);
+        font-style: italic;
+        margin-top: 4px;
+      }
 
-    /* Copy button */
-    .copy-btn-wrap { display: flex; justify-content: flex-end; }
+      /* Copy button */
+      .copy-btn-wrap {
+        display: flex;
+        justify-content: flex-end;
+      }
 
-    /* Section divider */
-    .section-divider { border: none; border-top: 1px solid var(--border); }
-  </style>
-</head>
-<body>
-  <nav>
-    <a href="../index.html" class="back">← Acme Sync</a>
-    <span class="nav-sep">|</span>
-    <span class="nav-brand">Animation Explorer</span>
-    <div style="flex:1"></div>
-    <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-  </nav>
+      /* Section divider */
+      .section-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
 
-  <main>
-    <!-- LEFT: Preview -->
-    <section class="preview-panel">
-      <div>
-        <div class="panel-title">Animation Preview</div>
-        <p style="font-size:13px;color:var(--fg-muted);margin-top:4px;">Sync progress ring animating to completion. Adjust controls on the right, then hit Play.</p>
-      </div>
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
 
-      <div class="file-card" id="file-card">
-        <div class="file-icon">📄</div>
-        <div class="file-info">
-          <div class="file-name">quarterly-report.pdf</div>
-          <div class="file-meta" id="file-status-text">Syncing…</div>
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="back">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Animation Explorer</span>
+      <div style="flex: 1"></div>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
         </div>
-        <div class="sync-indicator" id="sync-indicator">
-          <svg viewBox="0 0 100 100">
-            <circle class="ring-track" cx="50" cy="50" r="45"/>
-            <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="45"/>
-          </svg>
-          <div class="checkmark" id="checkmark">✅</div>
-        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
       </div>
+      <div class="gen-body">
 
-      <div class="play-controls">
-        <button class="btn btn-primary" id="btn-play" type="button">▶ Play</button>
-        <button class="btn btn-ghost" id="btn-reset" type="button">↺ Reset</button>
-      </div>
-
-      <hr class="section-divider">
-
-      <div class="scrubber-row">
-        <div class="panel-title">Scrubber — pause &amp; drag</div>
-        <div class="scrubber-label"><span>0%</span><span id="scrub-pct-label">0%</span><span>100%</span></div>
-        <input type="range" id="scrubber" min="0" max="100" value="0">
-        <p style="font-size:12px;color:var(--fg-faint);">Drag to inspect any point in the animation.</p>
-      </div>
-    </section>
-
-    <!-- RIGHT: Controls -->
-    <section class="controls-panel">
-      <div>
-        <div class="panel-title">Timing Controls</div>
-      </div>
-
-      <div class="control-group">
-        <div class="control-row">
-          <label for="duration-range">Duration</label>
-          <span class="value-display" id="duration-display">1.20s</span>
-        </div>
-        <input type="range" id="duration-range" min="0.2" max="3" step="0.05" value="1.2">
-      </div>
-
-      <div class="control-group">
-        <div class="control-row">
-          <label for="easing-select">Easing</label>
-        </div>
-        <select id="easing-select">
-          <option value="ease" selected>ease</option>
-          <option value="ease-in">ease-in</option>
-          <option value="ease-out">ease-out</option>
-          <option value="ease-in-out">ease-in-out</option>
-          <option value="linear">linear</option>
-          <option value="cubic-bezier">cubic-bezier (custom)</option>
-        </select>
-        <div class="bezier-inputs-wrap" id="bezier-inputs-wrap">
-          <div class="bezier-inputs" style="margin-top:8px;">
-            <div class="bezier-input-group"><label>P1 x</label><input type="number" id="bz-p1x" min="0" max="1" step="0.01" value="0.4"></div>
-            <div class="bezier-input-group"><label>P1 y</label><input type="number" id="bz-p1y" min="-1" max="2" step="0.01" value="0"></div>
-            <div class="bezier-input-group"><label>P2 x</label><input type="number" id="bz-p2x" min="0" max="1" step="0.01" value="0.2"></div>
-            <div class="bezier-input-group"><label>P2 y</label><input type="number" id="bz-p2y" min="-1" max="2" step="0.01" value="1"></div>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">I want to feel out what the Acme Sync UI could be like with different animation personalities before we commit. Generate an HTML animation explorer showing the same conflict resolution interaction with fast/snappy, smooth/calm, and minimal motion variants.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
           </div>
         </div>
-      </div>
 
-      <hr class="section-divider">
-
-      <div class="control-group">
-        <div class="panel-title">Easing Curve</div>
-        <div class="viz-wrap">
-          <svg class="easing-svg" id="easing-svg" viewBox="0 0 200 200">
-            <!-- Axes -->
-            <line class="bez-axis" x1="0" y1="200" x2="200" y2="200"/>
-            <line class="bez-axis" x1="0" y1="0" x2="0" y2="200"/>
-            <!-- Handle lines (dynamic) -->
-            <line class="bez-handle-line" id="handle-line-1" x1="0" y1="200" x2="80" y2="200"/>
-            <line class="bez-handle-line" id="handle-line-2" x1="200" y1="0" x2="40" y2="0"/>
-            <!-- Curve -->
-            <path class="bez-curve" id="bez-curve" d="M 0,200 C 80,200 40,0 200,0"/>
-            <!-- Endpoints -->
-            <circle class="bez-endpoint" cx="0" cy="200"/>
-            <circle class="bez-endpoint" cx="200" cy="0"/>
-            <!-- Handles (draggable) -->
-            <circle class="bez-handle" id="handle-p1" cx="80" cy="200" r="6"/>
-            <circle class="bez-handle" id="handle-p2" cx="40" cy="0" r="6"/>
-          </svg>
-          <div class="viz-label" id="bez-label">cubic-bezier(0.40, 0.00, 0.20, 1.00)</div>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate an animation explorer for Acme Sync's conflict resolution interaction with fast/snappy, smooth/calm, and minimal motion style variants</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
         </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate an animation explorer for Acme Sync — show the conflict resolution interaction rendered in fast/snappy, smooth/calm, and minimal motion styles for comparison</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
       </div>
+    </div>
 
-      <hr class="section-divider">
 
-      <div class="control-group">
-        <div class="panel-title">Keyframe Reference</div>
-        <p class="ref-note">For reference — edit values here; preview uses the controls above.</p>
-        <table class="kf-table" style="margin-top:8px;">
-          <thead><tr><th>Stop</th><th>Property</th><th>Value</th></tr></thead>
-          <tbody>
-            <tr><td>0%</td><td>stroke-dashoffset</td><td contenteditable="true">283</td></tr>
-            <tr><td>80%</td><td>stroke-dashoffset</td><td contenteditable="true">0</td></tr>
-            <tr><td>85%</td><td>opacity (ring)</td><td contenteditable="true">1</td></tr>
-            <tr><td>100%</td><td>opacity (ring)</td><td contenteditable="true">0</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <main>
+      <!-- LEFT: Preview -->
+      <section class="preview-panel">
+        <div>
+          <div class="panel-title">Animation Preview</div>
+          <p style="font-size: 13px; color: var(--fg-muted); margin-top: 4px">
+            Sync progress ring animating to completion. Adjust controls on the
+            right, then hit Play.
+          </p>
+        </div>
 
-      <hr class="section-divider">
+        <div class="file-card" id="file-card">
+          <div class="file-icon">📄</div>
+          <div class="file-info">
+            <div class="file-name">quarterly-report.pdf</div>
+            <div class="file-meta" id="file-status-text">Syncing…</div>
+          </div>
+          <div class="sync-indicator" id="sync-indicator">
+            <svg viewBox="0 0 100 100">
+              <circle class="ring-track" cx="50" cy="50" r="45" />
+              <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="45" />
+            </svg>
+            <div class="checkmark" id="checkmark">✅</div>
+          </div>
+        </div>
 
-      <div class="copy-btn-wrap">
-        <button class="btn btn-ghost" id="copy-css-btn" type="button">Copy CSS</button>
-      </div>
-    </section>
-  </main>
+        <div class="play-controls">
+          <button class="btn btn-primary" id="btn-play" type="button">
+            ▶ Play
+          </button>
+          <button class="btn btn-ghost" id="btn-reset" type="button">
+            ↺ Reset
+          </button>
+        </div>
 
-  <script>
-    (function(){
-      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-      if(t==='dark')document.documentElement.classList.add('dark');
-      document.getElementById('dm-toggle').addEventListener('click',function(){
-        var d=document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ha-theme',d?'dark':'light');
-      });
-    })();
+        <hr class="section-divider" />
 
-    // State
-    var duration = 1.2;
-    var easingPreset = 'ease';
-    var bezier = { p1x: 0.4, p1y: 0.0, p2x: 0.2, p2y: 1.0 };
-    var animState = 'idle'; // idle | playing | scrubbing
+        <div class="scrubber-row">
+          <div class="panel-title">Scrubber — pause &amp; drag</div>
+          <div class="scrubber-label">
+            <span>0%</span><span id="scrub-pct-label">0%</span><span>100%</span>
+          </div>
+          <input type="range" id="scrubber" min="0" max="100" value="0" />
+          <p style="font-size: 12px; color: var(--fg-faint)">
+            Drag to inspect any point in the animation.
+          </p>
+        </div>
+      </section>
 
-    var indicator = document.getElementById('sync-indicator');
-    var ringFill = document.getElementById('ring-fill');
-    var checkmark = document.getElementById('checkmark');
-    var fileStatusText = document.getElementById('file-status-text');
-    var btnPlay = document.getElementById('btn-play');
-    var btnReset = document.getElementById('btn-reset');
-    var scrubber = document.getElementById('scrubber');
-    var scrubPctLabel = document.getElementById('scrub-pct-label');
-    var durationRange = document.getElementById('duration-range');
-    var durationDisplay = document.getElementById('duration-display');
-    var easingSelect = document.getElementById('easing-select');
-    var bezierWrap = document.getElementById('bezier-inputs-wrap');
-    var copyCssBtn = document.getElementById('copy-css-btn');
+      <!-- RIGHT: Controls -->
+      <section class="controls-panel">
+        <div>
+          <div class="panel-title">Timing Controls</div>
+        </div>
 
-    function getEasingString() {
-      if (easingPreset === 'cubic-bezier') {
-        return 'cubic-bezier(' + bezier.p1x.toFixed(2) + ',' + bezier.p1y.toFixed(2) + ',' + bezier.p2x.toFixed(2) + ',' + bezier.p2y.toFixed(2) + ')';
+        <div class="control-group">
+          <div class="control-row">
+            <label for="duration-range">Duration</label>
+            <span class="value-display" id="duration-display">1.20s</span>
+          </div>
+          <input
+            type="range"
+            id="duration-range"
+            min="0.2"
+            max="3"
+            step="0.05"
+            value="1.2"
+          />
+        </div>
+
+        <div class="control-group">
+          <div class="control-row">
+            <label for="easing-select">Easing</label>
+          </div>
+          <select id="easing-select">
+            <option value="ease" selected>ease</option>
+            <option value="ease-in">ease-in</option>
+            <option value="ease-out">ease-out</option>
+            <option value="ease-in-out">ease-in-out</option>
+            <option value="linear">linear</option>
+            <option value="cubic-bezier">cubic-bezier (custom)</option>
+          </select>
+          <div class="bezier-inputs-wrap" id="bezier-inputs-wrap">
+            <div class="bezier-inputs" style="margin-top: 8px">
+              <div class="bezier-input-group">
+                <label>P1 x</label
+                ><input
+                  type="number"
+                  id="bz-p1x"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.4"
+                />
+              </div>
+              <div class="bezier-input-group">
+                <label>P1 y</label
+                ><input
+                  type="number"
+                  id="bz-p1y"
+                  min="-1"
+                  max="2"
+                  step="0.01"
+                  value="0"
+                />
+              </div>
+              <div class="bezier-input-group">
+                <label>P2 x</label
+                ><input
+                  type="number"
+                  id="bz-p2x"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.2"
+                />
+              </div>
+              <div class="bezier-input-group">
+                <label>P2 y</label
+                ><input
+                  type="number"
+                  id="bz-p2y"
+                  min="-1"
+                  max="2"
+                  step="0.01"
+                  value="1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <div class="control-group">
+          <div class="panel-title">Easing Curve</div>
+          <div class="viz-wrap">
+            <svg class="easing-svg" id="easing-svg" viewBox="0 0 200 200">
+              <!-- Axes -->
+              <line class="bez-axis" x1="0" y1="200" x2="200" y2="200" />
+              <line class="bez-axis" x1="0" y1="0" x2="0" y2="200" />
+              <!-- Handle lines (dynamic) -->
+              <line
+                class="bez-handle-line"
+                id="handle-line-1"
+                x1="0"
+                y1="200"
+                x2="80"
+                y2="200"
+              />
+              <line
+                class="bez-handle-line"
+                id="handle-line-2"
+                x1="200"
+                y1="0"
+                x2="40"
+                y2="0"
+              />
+              <!-- Curve -->
+              <path
+                class="bez-curve"
+                id="bez-curve"
+                d="M 0,200 C 80,200 40,0 200,0"
+              />
+              <!-- Endpoints -->
+              <circle class="bez-endpoint" cx="0" cy="200" />
+              <circle class="bez-endpoint" cx="200" cy="0" />
+              <!-- Handles (draggable) -->
+              <circle
+                class="bez-handle"
+                id="handle-p1"
+                cx="80"
+                cy="200"
+                r="6"
+              />
+              <circle class="bez-handle" id="handle-p2" cx="40" cy="0" r="6" />
+            </svg>
+            <div class="viz-label" id="bez-label">
+              cubic-bezier(0.40, 0.00, 0.20, 1.00)
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <div class="control-group">
+          <div class="panel-title">Keyframe Reference</div>
+          <p class="ref-note">
+            For reference — edit values here; preview uses the controls above.
+          </p>
+          <table class="kf-table" style="margin-top: 8px">
+            <thead>
+              <tr>
+                <th>Stop</th>
+                <th>Property</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0%</td>
+                <td>stroke-dashoffset</td>
+                <td contenteditable="true">283</td>
+              </tr>
+              <tr>
+                <td>80%</td>
+                <td>stroke-dashoffset</td>
+                <td contenteditable="true">0</td>
+              </tr>
+              <tr>
+                <td>85%</td>
+                <td>opacity (ring)</td>
+                <td contenteditable="true">1</td>
+              </tr>
+              <tr>
+                <td>100%</td>
+                <td>opacity (ring)</td>
+                <td contenteditable="true">0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="section-divider" />
+
+        <div class="copy-btn-wrap">
+          <button class="btn btn-ghost" id="copy-css-btn" type="button">
+            Copy CSS
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+
+      // State
+      var duration = 1.2
+      var easingPreset = 'ease'
+      var bezier = { p1x: 0.4, p1y: 0.0, p2x: 0.2, p2y: 1.0 }
+      var animState = 'idle' // idle | playing | scrubbing
+
+      var indicator = document.getElementById('sync-indicator')
+      var ringFill = document.getElementById('ring-fill')
+      var checkmark = document.getElementById('checkmark')
+      var fileStatusText = document.getElementById('file-status-text')
+      var btnPlay = document.getElementById('btn-play')
+      var btnReset = document.getElementById('btn-reset')
+      var scrubber = document.getElementById('scrubber')
+      var scrubPctLabel = document.getElementById('scrub-pct-label')
+      var durationRange = document.getElementById('duration-range')
+      var durationDisplay = document.getElementById('duration-display')
+      var easingSelect = document.getElementById('easing-select')
+      var bezierWrap = document.getElementById('bezier-inputs-wrap')
+      var copyCssBtn = document.getElementById('copy-css-btn')
+
+      function getEasingString() {
+        if (easingPreset === 'cubic-bezier') {
+          return (
+            'cubic-bezier(' +
+            bezier.p1x.toFixed(2) +
+            ',' +
+            bezier.p1y.toFixed(2) +
+            ',' +
+            bezier.p2x.toFixed(2) +
+            ',' +
+            bezier.p2y.toFixed(2) +
+            ')'
+          )
+        }
+        return easingPreset
       }
-      return easingPreset;
-    }
 
-    function applyCustomProps() {
-      document.documentElement.style.setProperty('--anim-duration', duration.toFixed(2) + 's');
-      document.documentElement.style.setProperty('--anim-easing', getEasingString());
-    }
-
-    function resetAnimation() {
-      indicator.classList.remove('playing', 'scrubbing');
-      ringFill.style.animationDelay = '';
-      checkmark.style.animationDelay = '';
-      scrubber.value = 0;
-      scrubPctLabel.textContent = '0%';
-      fileStatusText.textContent = 'Syncing…';
-      animState = 'idle';
-    }
-
-    function playAnimation() {
-      resetAnimation();
-      applyCustomProps();
-      // Force reflow so animation restarts cleanly
-      void indicator.offsetWidth;
-      indicator.classList.add('playing');
-      fileStatusText.textContent = 'Syncing…';
-      animState = 'playing';
-      setTimeout(function() {
-        fileStatusText.textContent = 'Synced';
-      }, duration * 800);
-    }
-
-    btnPlay.addEventListener('click', playAnimation);
-    btnReset.addEventListener('click', resetAnimation);
-
-    durationRange.addEventListener('input', function() {
-      duration = parseFloat(this.value);
-      durationDisplay.textContent = duration.toFixed(2) + 's';
-      applyCustomProps();
-    });
-
-    easingSelect.addEventListener('change', function() {
-      easingPreset = this.value;
-      bezierWrap.classList.toggle('visible', easingPreset === 'cubic-bezier');
-      if (easingPreset !== 'cubic-bezier') {
-        // Map preset to equivalent bezier for visualizer
-        var presets = {
-          'ease': [0.25,0.1,0.25,1], 'ease-in': [0.42,0,1,1],
-          'ease-out': [0,0,0.58,1], 'ease-in-out': [0.42,0,0.58,1], 'linear': [0,0,1,1]
-        };
-        var p = presets[easingPreset] || [0.25,0.1,0.25,1];
-        bezier = { p1x: p[0], p1y: p[1], p2x: p[2], p2y: p[3] };
-        syncBezierInputs();
+      function applyCustomProps() {
+        document.documentElement.style.setProperty(
+          '--anim-duration',
+          duration.toFixed(2) + 's',
+        )
+        document.documentElement.style.setProperty(
+          '--anim-easing',
+          getEasingString(),
+        )
       }
-      updateEasingViz();
-      applyCustomProps();
-    });
 
-    function syncBezierInputs() {
-      document.getElementById('bz-p1x').value = bezier.p1x;
-      document.getElementById('bz-p1y').value = bezier.p1y;
-      document.getElementById('bz-p2x').value = bezier.p2x;
-      document.getElementById('bz-p2y').value = bezier.p2y;
-    }
+      function resetAnimation() {
+        indicator.classList.remove('playing', 'scrubbing')
+        ringFill.style.animationDelay = ''
+        checkmark.style.animationDelay = ''
+        scrubber.value = 0
+        scrubPctLabel.textContent = '0%'
+        fileStatusText.textContent = 'Syncing…'
+        animState = 'idle'
+      }
 
-    ['bz-p1x','bz-p1y','bz-p2x','bz-p2y'].forEach(function(id) {
-      document.getElementById(id).addEventListener('input', function() {
-        bezier.p1x = parseFloat(document.getElementById('bz-p1x').value) || 0;
-        bezier.p1y = parseFloat(document.getElementById('bz-p1y').value) || 0;
-        bezier.p2x = parseFloat(document.getElementById('bz-p2x').value) || 0;
-        bezier.p2y = parseFloat(document.getElementById('bz-p2y').value) || 0;
-        updateEasingViz();
-        applyCustomProps();
-      });
-    });
+      function playAnimation() {
+        resetAnimation()
+        applyCustomProps()
+        // Force reflow so animation restarts cleanly
+        void indicator.offsetWidth
+        indicator.classList.add('playing')
+        fileStatusText.textContent = 'Syncing…'
+        animState = 'playing'
+        setTimeout(function () {
+          fileStatusText.textContent = 'Synced'
+        }, duration * 800)
+      }
 
-    // Scrubber
-    scrubber.addEventListener('input', function() {
-      var pct = parseInt(this.value, 10);
-      scrubPctLabel.textContent = pct + '%';
-      applyCustomProps();
-      indicator.classList.remove('playing');
-      void indicator.offsetWidth;
-      indicator.classList.add('scrubbing');
-      var delay = -(pct / 100) * duration;
-      ringFill.style.animationDelay = delay.toFixed(3) + 's';
-      checkmark.style.animationDelay = delay.toFixed(3) + 's';
-      fileStatusText.textContent = pct >= 90 ? 'Synced' : 'Syncing…';
-      animState = 'scrubbing';
-    });
+      btnPlay.addEventListener('click', playAnimation)
+      btnReset.addEventListener('click', resetAnimation)
 
-    // Easing visualizer
-    function toSvgX(t) { return t * 200; }
-    function toSvgY(t) { return 200 - t * 200; }
+      durationRange.addEventListener('input', function () {
+        duration = parseFloat(this.value)
+        durationDisplay.textContent = duration.toFixed(2) + 's'
+        applyCustomProps()
+      })
 
-    function updateEasingViz() {
-      var p1sx = toSvgX(bezier.p1x), p1sy = toSvgY(bezier.p1y);
-      var p2sx = toSvgX(bezier.p2x), p2sy = toSvgY(bezier.p2y);
-      document.getElementById('bez-curve').setAttribute('d',
-        'M 0,200 C ' + p1sx + ',' + p1sy + ' ' + p2sx + ',' + p2sy + ' 200,0'
-      );
-      document.getElementById('handle-p1').setAttribute('cx', p1sx);
-      document.getElementById('handle-p1').setAttribute('cy', p1sy);
-      document.getElementById('handle-p2').setAttribute('cx', p2sx);
-      document.getElementById('handle-p2').setAttribute('cy', p2sy);
-      document.getElementById('handle-line-1').setAttribute('x2', p1sx);
-      document.getElementById('handle-line-1').setAttribute('y2', p1sy);
-      document.getElementById('handle-line-2').setAttribute('x2', p2sx);
-      document.getElementById('handle-line-2').setAttribute('y2', p2sy);
-      document.getElementById('bez-label').textContent =
-        'cubic-bezier(' + bezier.p1x.toFixed(2) + ', ' + bezier.p1y.toFixed(2) +
-        ', ' + bezier.p2x.toFixed(2) + ', ' + bezier.p2y.toFixed(2) + ')';
-    }
+      easingSelect.addEventListener('change', function () {
+        easingPreset = this.value
+        bezierWrap.classList.toggle('visible', easingPreset === 'cubic-bezier')
+        if (easingPreset !== 'cubic-bezier') {
+          // Map preset to equivalent bezier for visualizer
+          var presets = {
+            ease: [0.25, 0.1, 0.25, 1],
+            'ease-in': [0.42, 0, 1, 1],
+            'ease-out': [0, 0, 0.58, 1],
+            'ease-in-out': [0.42, 0, 0.58, 1],
+            linear: [0, 0, 1, 1],
+          }
+          var p = presets[easingPreset] || [0.25, 0.1, 0.25, 1]
+          bezier = { p1x: p[0], p1y: p[1], p2x: p[2], p2y: p[3] }
+          syncBezierInputs()
+        }
+        updateEasingViz()
+        applyCustomProps()
+      })
 
-    // Draggable handles
-    function makeDraggable(handleId, which) {
-      var el = document.getElementById(handleId);
-      var svg = document.getElementById('easing-svg');
-      var dragging = false;
+      function syncBezierInputs() {
+        document.getElementById('bz-p1x').value = bezier.p1x
+        document.getElementById('bz-p1y').value = bezier.p1y
+        document.getElementById('bz-p2x').value = bezier.p2x
+        document.getElementById('bz-p2y').value = bezier.p2y
+      }
 
-      el.addEventListener('mousedown', function(e) { dragging = true; e.preventDefault(); });
-      document.addEventListener('mousemove', function(e) {
-        if (!dragging) return;
-        var rect = svg.getBoundingClientRect();
-        var x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        var y = Math.max(-1, Math.min(2, 1 - (e.clientY - rect.top) / rect.height));
-        if (which === 'p1') { bezier.p1x = +x.toFixed(2); bezier.p1y = +y.toFixed(2); }
-        else               { bezier.p2x = +x.toFixed(2); bezier.p2y = +y.toFixed(2); }
-        syncBezierInputs();
-        updateEasingViz();
-        applyCustomProps();
-      });
-      document.addEventListener('mouseup', function() { dragging = false; });
-    }
-    makeDraggable('handle-p1', 'p1');
-    makeDraggable('handle-p2', 'p2');
+      ;['bz-p1x', 'bz-p1y', 'bz-p2x', 'bz-p2y'].forEach(function (id) {
+        document.getElementById(id).addEventListener('input', function () {
+          bezier.p1x = parseFloat(document.getElementById('bz-p1x').value) || 0
+          bezier.p1y = parseFloat(document.getElementById('bz-p1y').value) || 0
+          bezier.p2x = parseFloat(document.getElementById('bz-p2x').value) || 0
+          bezier.p2y = parseFloat(document.getElementById('bz-p2y').value) || 0
+          updateEasingViz()
+          applyCustomProps()
+        })
+      })
 
-    // Copy CSS
-    copyCssBtn.addEventListener('click', function() {
-      var easing = getEasingString();
-      var css = '@keyframes sync-complete {\n' +
-        '  0%   { stroke-dashoffset: 283; }\n' +
-        '  80%  { stroke-dashoffset: 0; }\n' +
-        '  85%  { opacity: 1; }\n' +
-        '  100% { opacity: 0; }\n' +
-        '}\n' +
-        '.sync-ring {\n' +
-        '  animation: sync-complete ' + duration.toFixed(2) + 's ' + easing + ' forwards;\n' +
-        '}';
-      navigator.clipboard.writeText(css).then(function() {
-        var orig = copyCssBtn.textContent;
-        copyCssBtn.textContent = 'Copied!';
-        copyCssBtn.classList.add('btn-success');
-        copyCssBtn.classList.remove('btn-ghost');
-        setTimeout(function() {
-          copyCssBtn.textContent = orig;
-          copyCssBtn.classList.remove('btn-success');
-          copyCssBtn.classList.add('btn-ghost');
-        }, 2000);
-      });
-    });
+      // Scrubber
+      scrubber.addEventListener('input', function () {
+        var pct = parseInt(this.value, 10)
+        scrubPctLabel.textContent = pct + '%'
+        applyCustomProps()
+        indicator.classList.remove('playing')
+        void indicator.offsetWidth
+        indicator.classList.add('scrubbing')
+        var delay = -(pct / 100) * duration
+        ringFill.style.animationDelay = delay.toFixed(3) + 's'
+        checkmark.style.animationDelay = delay.toFixed(3) + 's'
+        fileStatusText.textContent = pct >= 90 ? 'Synced' : 'Syncing…'
+        animState = 'scrubbing'
+      })
 
-    // Init
-    applyCustomProps();
-    updateEasingViz();
-  </script>
+      // Easing visualizer
+      function toSvgX(t) {
+        return t * 200
+      }
+      function toSvgY(t) {
+        return 200 - t * 200
+      }
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Prototype Animation · May 2026
-</footer>
-</body>
+      function updateEasingViz() {
+        var p1sx = toSvgX(bezier.p1x),
+          p1sy = toSvgY(bezier.p1y)
+        var p2sx = toSvgX(bezier.p2x),
+          p2sy = toSvgY(bezier.p2y)
+        document
+          .getElementById('bez-curve')
+          .setAttribute(
+            'd',
+            'M 0,200 C ' +
+              p1sx +
+              ',' +
+              p1sy +
+              ' ' +
+              p2sx +
+              ',' +
+              p2sy +
+              ' 200,0',
+          )
+        document.getElementById('handle-p1').setAttribute('cx', p1sx)
+        document.getElementById('handle-p1').setAttribute('cy', p1sy)
+        document.getElementById('handle-p2').setAttribute('cx', p2sx)
+        document.getElementById('handle-p2').setAttribute('cy', p2sy)
+        document.getElementById('handle-line-1').setAttribute('x2', p1sx)
+        document.getElementById('handle-line-1').setAttribute('y2', p1sy)
+        document.getElementById('handle-line-2').setAttribute('x2', p2sx)
+        document.getElementById('handle-line-2').setAttribute('y2', p2sy)
+        document.getElementById('bez-label').textContent =
+          'cubic-bezier(' +
+          bezier.p1x.toFixed(2) +
+          ', ' +
+          bezier.p1y.toFixed(2) +
+          ', ' +
+          bezier.p2x.toFixed(2) +
+          ', ' +
+          bezier.p2y.toFixed(2) +
+          ')'
+      }
+
+      // Draggable handles
+      function makeDraggable(handleId, which) {
+        var el = document.getElementById(handleId)
+        var svg = document.getElementById('easing-svg')
+        var dragging = false
+
+        el.addEventListener('mousedown', function (e) {
+          dragging = true
+          e.preventDefault()
+        })
+        document.addEventListener('mousemove', function (e) {
+          if (!dragging) return
+          var rect = svg.getBoundingClientRect()
+          var x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+          var y = Math.max(
+            -1,
+            Math.min(2, 1 - (e.clientY - rect.top) / rect.height),
+          )
+          if (which === 'p1') {
+            bezier.p1x = +x.toFixed(2)
+            bezier.p1y = +y.toFixed(2)
+          } else {
+            bezier.p2x = +x.toFixed(2)
+            bezier.p2y = +y.toFixed(2)
+          }
+          syncBezierInputs()
+          updateEasingViz()
+          applyCustomProps()
+        })
+        document.addEventListener('mouseup', function () {
+          dragging = false
+        })
+      }
+      makeDraggable('handle-p1', 'p1')
+      makeDraggable('handle-p2', 'p2')
+
+      // Copy CSS
+      copyCssBtn.addEventListener('click', function () {
+        var easing = getEasingString()
+        var css =
+          '@keyframes sync-complete {\n' +
+          '  0%   { stroke-dashoffset: 283; }\n' +
+          '  80%  { stroke-dashoffset: 0; }\n' +
+          '  85%  { opacity: 1; }\n' +
+          '  100% { opacity: 0; }\n' +
+          '}\n' +
+          '.sync-ring {\n' +
+          '  animation: sync-complete ' +
+          duration.toFixed(2) +
+          's ' +
+          easing +
+          ' forwards;\n' +
+          '}'
+        navigator.clipboard.writeText(css).then(function () {
+          var orig = copyCssBtn.textContent
+          copyCssBtn.textContent = 'Copied!'
+          copyCssBtn.classList.add('btn-success')
+          copyCssBtn.classList.remove('btn-ghost')
+          setTimeout(function () {
+            copyCssBtn.textContent = orig
+            copyCssBtn.classList.remove('btn-success')
+            copyCssBtn.classList.add('btn-ghost')
+          }, 2000)
+        })
+      })
+
+      // Init
+      applyCustomProps()
+      updateEasingViz()
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Prototype Animation · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

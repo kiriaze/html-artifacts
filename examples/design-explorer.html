@@ -1,625 +1,1055 @@
-<!-- html-artifacts: design-explorer example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: design-explorer example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-16T00:00:00Z | source: examples/design-explorer.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Design Explorer — Acme Sync</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Design Explorer — Acme Sync</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    /* ── Nav ── */
-    nav {
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      height: 48px;
-      z-index: 10;
-    }
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 32px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 48px;
+        z-index: 10;
+      }
 
-    nav .back-link { font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0; }
-    nav .back-link:hover { color: var(--fg); }
-    nav .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    nav .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    nav .nav-spacer { flex: 1; }
+      nav .back-link {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      nav .back-link:hover {
+        color: var(--fg);
+      }
+      nav .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      nav .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      nav .nav-spacer {
+        flex: 1;
+      }
 
-    nav a.nav-link {
-      color: var(--fg-muted);
-      text-decoration: none;
-      font-size: 13px;
-    }
-    nav a.nav-link:hover { color: var(--fg); }
+      nav a.nav-link {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      nav a.nav-link:hover {
+        color: var(--fg);
+      }
 
-    /* ── Page shell ── */
-    main {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 24px 96px;
-    }
+      /* ── Page shell ── */
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
 
-    /* ── Page title ── */
-    .page-title { margin-bottom: 64px; }
+      /* ── Page title ── */
+      .page-title {
+        margin-bottom: 64px;
+      }
 
-    .page-label {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 8px;
-    }
+      .page-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 8px;
+      }
 
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      color: var(--fg);
-      line-height: 1.25;
-    }
+      h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--fg);
+        line-height: 1.25;
+      }
 
-    /* ── Section ── */
-    section { margin-bottom: 64px; }
+      /* ── Section ── */
+      section {
+        margin-bottom: 64px;
+      }
 
-    h2 {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 24px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
+      h2 {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 24px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    .section-hint {
-      font-size: 13px;
-      color: var(--fg-faint);
-      margin-bottom: 20px;
-      margin-top: -16px;
-    }
+      .section-hint {
+        font-size: 13px;
+        color: var(--fg-faint);
+        margin-bottom: 20px;
+        margin-top: -16px;
+      }
 
-    /* ── Color swatches ── */
-    .swatch-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-    }
+      /* ── Color swatches ── */
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+      }
 
-    .swatch-card {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 4px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.1s;
-      user-select: none;
-    }
+      .swatch-card {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition:
+          transform 0.1s,
+          box-shadow 0.1s;
+        user-select: none;
+      }
 
-    .swatch-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
+      .swatch-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
 
-    .swatch-color {
-      height: 56px;
-      position: relative;
-      flex-shrink: 0;
-    }
+      .swatch-color {
+        height: 56px;
+        position: relative;
+        flex-shrink: 0;
+      }
 
-    .swatch-copied {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-family: var(--font-mono);
-      background: rgba(0,0,0,0.55);
-      color: #fff;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
+      .swatch-copied {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
 
-    .swatch-card.flash .swatch-copied { opacity: 1; }
+      .swatch-card.flash .swatch-copied {
+        opacity: 1;
+      }
 
-    .swatch-info {
-      padding: 10px 12px;
-      background: var(--bg-subtle);
-    }
+      .swatch-info {
+        padding: 10px 12px;
+        background: var(--bg-subtle);
+      }
 
-    .swatch-name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--fg);
-      display: block;
-    }
+      .swatch-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        display: block;
+      }
 
-    .swatch-hex {
-      font-size: 12px;
-      font-family: var(--font-mono);
-      color: var(--fg-muted);
-      display: block;
-      margin-top: 2px;
-    }
+      .swatch-hex {
+        font-size: 12px;
+        font-family: var(--font-mono);
+        color: var(--fg-muted);
+        display: block;
+        margin-top: 2px;
+      }
 
-    .swatch-var {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--fg-faint);
-      display: block;
-      margin-top: 2px;
-    }
+      .swatch-var {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        color: var(--fg-faint);
+        display: block;
+        margin-top: 2px;
+      }
 
-    /* ── Typography specimens ── */
-    .type-scale {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+      /* ── Typography specimens ── */
+      .type-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-    .type-row {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      transition: background 0.1s;
-    }
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        transition: background 0.1s;
+      }
 
-    .type-row:hover { background: var(--bg-subtle); }
+      .type-row:hover {
+        background: var(--bg-subtle);
+      }
 
-    .type-meta {
-      width: 100px;
-      flex-shrink: 0;
-    }
+      .type-meta {
+        width: 100px;
+        flex-shrink: 0;
+      }
 
-    .type-size-label {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--fg-muted);
-      display: block;
-    }
+      .type-size-label {
+        font-size: 11px;
+        font-family: var(--font-mono);
+        color: var(--fg-muted);
+        display: block;
+      }
 
-    .type-role {
-      font-size: 11px;
-      color: var(--fg-faint);
-      display: block;
-      margin-top: 2px;
-    }
+      .type-role {
+        font-size: 11px;
+        color: var(--fg-faint);
+        display: block;
+        margin-top: 2px;
+      }
 
-    .type-specimen {
-      flex: 1;
-      outline: none;
-    }
+      .type-specimen {
+        flex: 1;
+        outline: none;
+      }
 
-    .type-specimen:focus {
-      border-bottom: 1px dashed var(--border-strong);
-    }
+      .type-specimen:focus {
+        border-bottom: 1px dashed var(--border-strong);
+      }
 
-    .type-specimen.mono {
-      font-family: var(--font-mono);
-      background: var(--bg-subtle);
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      color: var(--fg);
-    }
+      .type-specimen.mono {
+        font-family: var(--font-mono);
+        background: var(--bg-subtle);
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        color: var(--fg);
+      }
 
-    .type-specimen.mono:focus {
-      border-bottom: none;
-      outline: 1px dashed var(--border-strong);
-      outline-offset: 2px;
-    }
+      .type-specimen.mono:focus {
+        border-bottom: none;
+        outline: 1px dashed var(--border-strong);
+        outline-offset: 2px;
+      }
 
-    /* ── CLI states ── */
-    .cli-states {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+      /* ── CLI states ── */
+      .cli-states {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-    .cli-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #1e293b;
-      color: #e2e8f0;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-    }
+      .cli-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #1e293b;
+        color: #e2e8f0;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+      }
 
-    .cli-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+      .cli-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
 
-    .cli-dot.idle     { background: var(--fg-faint); }
-    .cli-dot.syncing  { background: var(--warning); }
-    .cli-dot.done     { background: var(--success); }
-    .cli-dot.conflict { background: var(--danger); }
+      .cli-dot.idle {
+        background: var(--fg-faint);
+      }
+      .cli-dot.syncing {
+        background: var(--warning);
+      }
+      .cli-dot.done {
+        background: var(--success);
+      }
+      .cli-dot.conflict {
+        background: var(--danger);
+      }
 
-    .cli-text { flex: 1; }
+      .cli-text {
+        flex: 1;
+      }
 
-    .cli-state-label {
-      font-size: 11px;
-      color: #64748b;
-      margin-left: 4px;
-    }
+      .cli-state-label {
+        font-size: 11px;
+        color: #64748b;
+        margin-left: 4px;
+      }
 
-    .copy-btn {
-      background: transparent;
-      border: 1px solid #475569;
-      color: #94a3b8;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: border-color 0.1s, color 0.1s;
-      flex-shrink: 0;
-    }
+      .copy-btn {
+        background: transparent;
+        border: 1px solid #475569;
+        color: #94a3b8;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition:
+          border-color 0.1s,
+          color 0.1s;
+        flex-shrink: 0;
+      }
 
-    .copy-btn:hover {
-      border-color: #e2e8f0;
-      color: #e2e8f0;
-    }
+      .copy-btn:hover {
+        border-color: #e2e8f0;
+        color: #e2e8f0;
+      }
 
-    .copy-btn.copied {
-      border-color: var(--success);
-      color: var(--success);
-    }
+      .copy-btn.copied {
+        border-color: var(--success);
+        color: var(--success);
+      }
 
-    /* ── Spacing scale ── */
-    .spacing-scale {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+      /* ── Spacing scale ── */
+      .spacing-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
 
-    .space-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+      .space-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-    .space-label {
-      width: 80px;
-      flex-shrink: 0;
-      font-size: 13px;
-      color: var(--fg-muted);
-    }
+      .space-label {
+        width: 80px;
+        flex-shrink: 0;
+        font-size: 13px;
+        color: var(--fg-muted);
+      }
 
-    .space-bar {
-      background: var(--accent-bg);
-      border: 1px solid var(--accent-border);
-      height: 20px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
+      .space-bar {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        height: 20px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
 
-    .space-var {
-      font-size: 13px;
-      font-family: var(--font-mono);
-      color: var(--fg-muted);
-      flex-shrink: 0;
-    }
+      .space-var {
+        font-size: 13px;
+        font-family: var(--font-mono);
+        color: var(--fg-muted);
+        flex-shrink: 0;
+      }
 
-    /* ── Footer ── */
-    footer {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 24px;
-      border-top: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--fg-faint);
-      font-family: var(--font-mono);
-    }
-    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-  </style>
-</head>
-<body>
+      /* ── Footer ── */
+      footer {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 24px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--fg-faint);
+        font-family: var(--font-mono);
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
 
-<nav>
-  <a class="back-link" href="../index.html">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Design Token Explorer</span>
-  <span class="nav-spacer"></span>
-  <a class="nav-link" href="#colors">Colors</a>
-  <a class="nav-link" href="#type">Typography</a>
-  <a class="nav-link" href="#cli-states">CLI States</a>
-  <a class="nav-link" href="#spacing">Spacing</a>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
 
-<main>
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
 
-  <div class="page-title">
-    <p class="page-label">Design System</p>
-    <h1>Design Explorer</h1>
-  </div>
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
 
-  <!-- Color swatches -->
-  <section id="colors">
-    <h2>Color Palette — click to copy hex</h2>
-    <div class="swatch-grid" id="swatchGrid"></div>
-  </section>
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
 
-  <!-- Typography -->
-  <section id="type">
-    <h2>Typography Scale</h2>
-    <p class="section-hint">Click any specimen to edit it</p>
-    <div class="type-scale">
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">28px</span>
-          <span class="type-role">heading</span>
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="back-link" href="../index.html">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Design Token Explorer</span>
+      <span class="nav-spacer"></span>
+      <a class="nav-link" href="#colors">Colors</a>
+      <a class="nav-link" href="#type">Typography</a>
+      <a class="nav-link" href="#cli-states">CLI States</a>
+      <a class="nav-link" href="#spacing">Spacing</a>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
         </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:28px;font-weight:600;">Page heading — large, clear, confident</span>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
       </div>
+      <div class="gen-body">
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">20px</span>
-          <span class="type-role">heading-sm</span>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">Before we commit to a direction for the Acme Sync conflict resolution UI, I want to see a few design approaches laid out. Generate an HTML design explorer with 3–4 distinct directions, each showing the core interaction pattern and its tradeoffs.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
         </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:20px;font-weight:500;">Section heading or card title with moderate weight</span>
-      </div>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">16px</span>
-          <span class="type-role">body</span>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a design explorer for Acme Sync's conflict resolution UI with multiple design directions and tradeoffs</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
         </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:16px;">Primary body text. Clear, readable prose at default size with sufficient line height.</span>
-      </div>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">14px</span>
-          <span class="type-role">body-sm</span>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a design explorer for the Acme Sync conflict resolution UI — show 3–4 distinct design directions with interaction patterns and tradeoffs for each</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
         </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:14px;color:var(--fg-muted);">Secondary body text for captions, descriptions, and supporting detail.</span>
-      </div>
 
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">12px</span>
-          <span class="type-role">caption</span>
-        </div>
-        <span class="type-specimen" contenteditable="true" style="font-size:12px;color:var(--fg-faint);">Timestamp · category tag · metadata label</span>
       </div>
-
-      <div class="type-row">
-        <div class="type-meta">
-          <span class="type-size-label">14px mono</span>
-          <span class="type-role">code</span>
-        </div>
-        <span class="type-specimen mono" contenteditable="true">$ acmesync push --dry-run --verbose</span>
-      </div>
-
     </div>
-  </section>
 
-  <!-- CLI states -->
-  <section id="cli-states">
-    <h2>CLI Status Component — 4 States</h2>
-    <div class="cli-states" id="cliStates"></div>
-  </section>
 
-  <!-- Spacing scale -->
-  <section id="spacing">
-    <h2>Spacing Scale — 4pt base</h2>
-    <div class="spacing-scale" id="spacingScale"></div>
-  </section>
+    <main>
+      <div class="page-title">
+        <p class="page-label">Design System</p>
+        <h1>Design Explorer</h1>
+      </div>
 
-</main>
+      <!-- Color swatches -->
+      <section id="colors">
+        <h2>Color Palette — click to copy hex</h2>
+        <div class="swatch-grid" id="swatchGrid"></div>
+      </section>
 
-<footer>generated 2026-05-16 · Acme Sync · Design Explorer</footer>
+      <!-- Typography -->
+      <section id="type">
+        <h2>Typography Scale</h2>
+        <p class="section-hint">Click any specimen to edit it</p>
+        <div class="type-scale">
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">28px</span>
+              <span class="type-role">heading</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 28px; font-weight: 600"
+              >Page heading — large, clear, confident</span
+            >
+          </div>
 
-<script>
-(function(){
-  var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  if(t==='dark')document.documentElement.classList.add('dark');
-  document.getElementById('dm-toggle').addEventListener('click',function(){
-    var d=document.documentElement.classList.toggle('dark');
-    localStorage.setItem('ha-theme',d?'dark':'light');
-  });
-})();
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">20px</span>
+              <span class="type-role">heading-sm</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 20px; font-weight: 500"
+              >Section heading or card title with moderate weight</span
+            >
+          </div>
 
-  /* ── Color swatches ── */
-  (function () {
-    var swatches = [
-      { name: 'Background',     hex: '#ffffff', varName: '--bg' },
-      { name: 'Bg Subtle',      hex: '#f9fafb', varName: '--bg-subtle' },
-      { name: 'Bg Subtle 2',    hex: '#f3f4f6', varName: '--bg-subtle-2' },
-      { name: 'Foreground',     hex: '#111827', varName: '--fg' },
-      { name: 'Fg Muted',       hex: '#6b7280', varName: '--fg-muted' },
-      { name: 'Fg Faint',       hex: '#9ca3af', varName: '--fg-faint' },
-      { name: 'Accent',         hex: '#2563eb', varName: '--accent' },
-      { name: 'Accent Bg',      hex: '#eff6ff', varName: '--accent-bg' },
-      { name: 'Accent Border',  hex: '#bfdbfe', varName: '--accent-border' },
-      { name: 'Success',        hex: '#16a34a', varName: '--success' },
-      { name: 'Success Bg',     hex: '#f0fdf4', varName: '--success-bg' },
-      { name: 'Warning',        hex: '#d97706', varName: '--warning' },
-      { name: 'Warning Bg',     hex: '#fffbeb', varName: '--warning-bg' },
-      { name: 'Danger',         hex: '#dc2626', varName: '--danger' },
-      { name: 'Danger Bg',      hex: '#fef2f2', varName: '--danger-bg' },
-      { name: 'Border',         hex: '#e5e7eb', varName: '--border' },
-      { name: 'Border Strong',  hex: '#d1d5db', varName: '--border-strong' },
-    ];
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">16px</span>
+              <span class="type-role">body</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 16px"
+              >Primary body text. Clear, readable prose at default size with
+              sufficient line height.</span
+            >
+          </div>
 
-    var grid = document.getElementById('swatchGrid');
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">14px</span>
+              <span class="type-role">body-sm</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 14px; color: var(--fg-muted)"
+              >Secondary body text for captions, descriptions, and supporting
+              detail.</span
+            >
+          </div>
 
-    swatches.forEach(function (s) {
-      var card = document.createElement('div');
-      card.className = 'swatch-card';
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">12px</span>
+              <span class="type-role">caption</span>
+            </div>
+            <span
+              class="type-specimen"
+              contenteditable="true"
+              style="font-size: 12px; color: var(--fg-faint)"
+              >Timestamp · category tag · metadata label</span
+            >
+          </div>
 
-      var colorDiv = document.createElement('div');
-      colorDiv.className = 'swatch-color';
-      colorDiv.style.background = s.hex;
+          <div class="type-row">
+            <div class="type-meta">
+              <span class="type-size-label">14px mono</span>
+              <span class="type-role">code</span>
+            </div>
+            <span class="type-specimen mono" contenteditable="true"
+              >$ acmesync push --dry-run --verbose</span
+            >
+          </div>
+        </div>
+      </section>
 
-      var copiedDiv = document.createElement('div');
-      copiedDiv.className = 'swatch-copied';
-      copiedDiv.textContent = 'Copied!';
-      colorDiv.appendChild(copiedDiv);
+      <!-- CLI states -->
+      <section id="cli-states">
+        <h2>CLI Status Component — 4 States</h2>
+        <div class="cli-states" id="cliStates"></div>
+      </section>
 
-      var info = document.createElement('div');
-      info.className = 'swatch-info';
+      <!-- Spacing scale -->
+      <section id="spacing">
+        <h2>Spacing Scale — 4pt base</h2>
+        <div class="spacing-scale" id="spacingScale"></div>
+      </section>
+    </main>
 
-      var nameEl = document.createElement('span');
-      nameEl.className = 'swatch-name';
-      nameEl.textContent = s.name;
+    <footer>generated 2026-05-16 · Acme Sync · Design Explorer</footer>
 
-      var hexEl = document.createElement('span');
-      hexEl.className = 'swatch-hex';
-      hexEl.textContent = s.hex;
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
 
-      var varEl = document.createElement('span');
-      varEl.className = 'swatch-var';
-      varEl.textContent = s.varName;
+      /* ── Color swatches ── */
+      ;(function () {
+        var swatches = [
+          { name: 'Background', hex: '#ffffff', varName: '--bg' },
+          { name: 'Bg Subtle', hex: '#f9fafb', varName: '--bg-subtle' },
+          { name: 'Bg Subtle 2', hex: '#f3f4f6', varName: '--bg-subtle-2' },
+          { name: 'Foreground', hex: '#111827', varName: '--fg' },
+          { name: 'Fg Muted', hex: '#6b7280', varName: '--fg-muted' },
+          { name: 'Fg Faint', hex: '#9ca3af', varName: '--fg-faint' },
+          { name: 'Accent', hex: '#2563eb', varName: '--accent' },
+          { name: 'Accent Bg', hex: '#eff6ff', varName: '--accent-bg' },
+          { name: 'Accent Border', hex: '#bfdbfe', varName: '--accent-border' },
+          { name: 'Success', hex: '#16a34a', varName: '--success' },
+          { name: 'Success Bg', hex: '#f0fdf4', varName: '--success-bg' },
+          { name: 'Warning', hex: '#d97706', varName: '--warning' },
+          { name: 'Warning Bg', hex: '#fffbeb', varName: '--warning-bg' },
+          { name: 'Danger', hex: '#dc2626', varName: '--danger' },
+          { name: 'Danger Bg', hex: '#fef2f2', varName: '--danger-bg' },
+          { name: 'Border', hex: '#e5e7eb', varName: '--border' },
+          { name: 'Border Strong', hex: '#d1d5db', varName: '--border-strong' },
+        ]
 
-      info.appendChild(nameEl);
-      info.appendChild(hexEl);
-      info.appendChild(varEl);
-      card.appendChild(colorDiv);
-      card.appendChild(info);
-      grid.appendChild(card);
+        var grid = document.getElementById('swatchGrid')
 
-      card.addEventListener('click', function () {
-        navigator.clipboard.writeText(s.hex).then(function () {
-          card.classList.add('flash');
-          setTimeout(function () { card.classList.remove('flash'); }, 900);
-        });
-      });
-    });
-  }());
+        swatches.forEach(function (s) {
+          var card = document.createElement('div')
+          card.className = 'swatch-card'
 
-  /* ── CLI states ── */
-  (function () {
-    var states = [
-      { dotClass: 'idle',     label: 'Idle',     text: 'Watching...',                 stateText: 'IDLE' },
-      { dotClass: 'syncing',  label: 'Syncing',  text: 'Syncing 3 files...',          stateText: 'SYNC' },
-      { dotClass: 'done',     label: 'Complete', text: 'All files synced',            stateText: 'OK' },
-      { dotClass: 'conflict', label: 'Conflict', text: '1 conflict needs resolution', stateText: 'ERR' },
-    ];
+          var colorDiv = document.createElement('div')
+          colorDiv.className = 'swatch-color'
+          colorDiv.style.background = s.hex
 
-    var container = document.getElementById('cliStates');
+          var copiedDiv = document.createElement('div')
+          copiedDiv.className = 'swatch-copied'
+          copiedDiv.textContent = 'Copied!'
+          colorDiv.appendChild(copiedDiv)
 
-    states.forEach(function (s) {
-      var row = document.createElement('div');
-      row.className = 'cli-row';
+          var info = document.createElement('div')
+          info.className = 'swatch-info'
 
-      var dot = document.createElement('span');
-      dot.className = 'cli-dot ' + s.dotClass;
+          var nameEl = document.createElement('span')
+          nameEl.className = 'swatch-name'
+          nameEl.textContent = s.name
 
-      var textEl = document.createElement('span');
-      textEl.className = 'cli-text';
-      textEl.textContent = s.text;
+          var hexEl = document.createElement('span')
+          hexEl.className = 'swatch-hex'
+          hexEl.textContent = s.hex
 
-      var stateLabel = document.createElement('span');
-      stateLabel.className = 'cli-state-label';
-      stateLabel.textContent = '[' + s.stateText + ']';
+          var varEl = document.createElement('span')
+          varEl.className = 'swatch-var'
+          varEl.textContent = s.varName
 
-      var btn = document.createElement('button');
-      btn.className = 'copy-btn';
-      btn.textContent = 'Copy';
-      btn.type = 'button';
+          info.appendChild(nameEl)
+          info.appendChild(hexEl)
+          info.appendChild(varEl)
+          card.appendChild(colorDiv)
+          card.appendChild(info)
+          grid.appendChild(card)
 
-      btn.addEventListener('click', function () {
-        navigator.clipboard.writeText(s.text).then(function () {
-          btn.textContent = 'Copied!';
-          btn.classList.add('copied');
-          setTimeout(function () {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-          }, 1200);
-        });
-      });
+          card.addEventListener('click', function () {
+            navigator.clipboard.writeText(s.hex).then(function () {
+              card.classList.add('flash')
+              setTimeout(function () {
+                card.classList.remove('flash')
+              }, 900)
+            })
+          })
+        })
+      })()
 
-      row.appendChild(dot);
-      row.appendChild(textEl);
-      row.appendChild(stateLabel);
-      row.appendChild(btn);
-      container.appendChild(row);
-    });
-  }());
+      /* ── CLI states ── */
+      ;(function () {
+        var states = [
+          {
+            dotClass: 'idle',
+            label: 'Idle',
+            text: 'Watching...',
+            stateText: 'IDLE',
+          },
+          {
+            dotClass: 'syncing',
+            label: 'Syncing',
+            text: 'Syncing 3 files...',
+            stateText: 'SYNC',
+          },
+          {
+            dotClass: 'done',
+            label: 'Complete',
+            text: 'All files synced',
+            stateText: 'OK',
+          },
+          {
+            dotClass: 'conflict',
+            label: 'Conflict',
+            text: '1 conflict needs resolution',
+            stateText: 'ERR',
+          },
+        ]
 
-  /* ── Spacing scale ── */
-  (function () {
-    var steps = [
-      { px: 4,  varName: '--space-1' },
-      { px: 8,  varName: '--space-2' },
-      { px: 12, varName: '--space-3' },
-      { px: 16, varName: '--space-4' },
-      { px: 24, varName: '--space-6' },
-      { px: 32, varName: '--space-8' },
-      { px: 48, varName: '--space-12' },
-      { px: 64, varName: '--space-16' },
-    ];
+        var container = document.getElementById('cliStates')
 
-    var maxPx = 64;
-    var container = document.getElementById('spacingScale');
+        states.forEach(function (s) {
+          var row = document.createElement('div')
+          row.className = 'cli-row'
 
-    steps.forEach(function (s) {
-      var row = document.createElement('div');
-      row.className = 'space-row';
+          var dot = document.createElement('span')
+          dot.className = 'cli-dot ' + s.dotClass
 
-      var label = document.createElement('span');
-      label.className = 'space-label';
-      label.textContent = s.px + 'px';
+          var textEl = document.createElement('span')
+          textEl.className = 'cli-text'
+          textEl.textContent = s.text
 
-      var bar = document.createElement('div');
-      bar.className = 'space-bar';
-      bar.style.width = Math.round((s.px / maxPx) * 400) + 'px';
+          var stateLabel = document.createElement('span')
+          stateLabel.className = 'cli-state-label'
+          stateLabel.textContent = '[' + s.stateText + ']'
 
-      var varLabel = document.createElement('span');
-      varLabel.className = 'space-var';
-      varLabel.textContent = s.varName;
+          var btn = document.createElement('button')
+          btn.className = 'copy-btn'
+          btn.textContent = 'Copy'
+          btn.type = 'button'
 
-      row.appendChild(label);
-      row.appendChild(bar);
-      row.appendChild(varLabel);
-      container.appendChild(row);
-    });
-  }());
-</script>
+          btn.addEventListener('click', function () {
+            navigator.clipboard.writeText(s.text).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 1200)
+            })
+          })
 
-</body>
+          row.appendChild(dot)
+          row.appendChild(textEl)
+          row.appendChild(stateLabel)
+          row.appendChild(btn)
+          container.appendChild(row)
+        })
+      })()
+
+      /* ── Spacing scale ── */
+      ;(function () {
+        var steps = [
+          { px: 4, varName: '--space-1' },
+          { px: 8, varName: '--space-2' },
+          { px: 12, varName: '--space-3' },
+          { px: 16, varName: '--space-4' },
+          { px: 24, varName: '--space-6' },
+          { px: 32, varName: '--space-8' },
+          { px: 48, varName: '--space-12' },
+          { px: 64, varName: '--space-16' },
+        ]
+
+        var maxPx = 64
+        var container = document.getElementById('spacingScale')
+
+        steps.forEach(function (s) {
+          var row = document.createElement('div')
+          row.className = 'space-row'
+
+          var label = document.createElement('span')
+          label.className = 'space-label'
+          label.textContent = s.px + 'px'
+
+          var bar = document.createElement('div')
+          bar.className = 'space-bar'
+          bar.style.width = Math.round((s.px / maxPx) * 400) + 'px'
+
+          var varLabel = document.createElement('span')
+          varLabel.className = 'space-var'
+          varLabel.textContent = s.varName
+
+          row.appendChild(label)
+          row.appendChild(bar)
+          row.appendChild(varLabel)
+          container.appendChild(row)
+        })
+      })()
+    </script>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

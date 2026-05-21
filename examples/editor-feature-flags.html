@@ -1,588 +1,1660 @@
-<!-- html-artifacts: editor-feature-flags example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: editor-feature-flags example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/editor-feature-flags.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acme Sync — Feature Flags</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-
-    /* Nav */
-    nav { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; gap: 16px; height: 48px; padding: 0 24px; background: var(--bg); border-bottom: 1px solid var(--border); }
-    .back { font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0; }
-    .back:hover { color: var(--fg); }
-    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    .dm-toggle { background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 8px; font-size: 13px; cursor: pointer; color: var(--fg-muted); line-height: 1; flex-shrink: 0; }
-    .dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
-
-    /* Header row */
-    .page-header { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
-    .env-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-    .env-tab { padding: 6px 16px; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--bg); color: var(--fg-muted); border: none; border-right: 1px solid var(--border); transition: background 0.12s, color 0.12s; }
-    .env-tab:last-child { border-right: none; }
-    .env-tab.active { background: var(--accent); color: #fff; }
-    .env-tab:hover:not(.active) { background: var(--bg-subtle-2); color: var(--fg); }
-    .header-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-    .meta-chip { font-size: 12px; color: var(--fg-muted); background: var(--bg-subtle-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 10px; }
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background 0.15s, color 0.15s; }
-    .btn-accent { background: var(--accent); color: #fff; }
-    .btn-accent:hover { filter: brightness(1.1); }
-    .btn-ghost { background: var(--bg-subtle-2); color: var(--fg); border: 1px solid var(--border); }
-    .btn-ghost:hover { background: var(--border); }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-danger { background: var(--danger); color: #fff; }
-
-    /* Flag list */
-    main { padding: 24px; display: flex; flex-direction: column; gap: 12px; max-width: 960px; margin: 0 auto; }
-
-    /* Flag card */
-    .flag-card { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); box-shadow: var(--shadow-sm); overflow: hidden; transition: border-color 0.2s, background 0.2s; }
-    .flag-card.kill-active { background: var(--danger-bg); border-color: var(--danger); }
-    .flag-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; padding: 16px 20px; }
-    .flag-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .flag-name { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--fg); }
-    .flag-desc { font-size: 13px; color: var(--fg-muted); }
-    .flag-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-    .flag-controls { display: flex; align-items: center; gap: 12px; }
-
-    /* Status badge */
-    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; }
-    .badge-active   { background: var(--success-bg); color: var(--success); }
-    .badge-staged   { background: var(--accent-bg); color: var(--accent); }
-    .badge-deprecated { background: var(--bg-subtle-2); color: var(--fg-faint); }
-    .badge-danger   { background: var(--danger-bg); color: var(--danger); }
-    .badge-off      { background: var(--bg-subtle-2); color: var(--fg-muted); }
-    .badge-warning  { background: var(--warning-bg); color: var(--warning); }
-
-    /* Toggle */
-    .toggle-wrap { display: flex; align-items: center; gap: 8px; }
-    .toggle-label { font-size: 12px; color: var(--fg-muted); }
-    .toggle { appearance: none; width: 36px; height: 20px; border-radius: 10px; background: var(--border-strong); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
-    .toggle:checked { background: var(--success); }
-    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
-    .toggle:checked::after { transform: translateX(16px); }
-    .toggle:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* Rollout */
-    .rollout-wrap { display: flex; align-items: center; gap: 8px; }
-    .rollout-label { font-size: 12px; color: var(--fg-muted); white-space: nowrap; }
-    .rollout-pct { font-size: 12px; font-family: var(--font-mono); color: var(--fg); min-width: 36px; text-align: right; }
-    input[type="range"] { width: 100px; accent-color: var(--accent); cursor: pointer; }
-
-    /* Details section */
-    .flag-details { border-top: 1px solid var(--border); padding: 16px 20px; background: var(--bg-subtle); display: flex; flex-direction: column; gap: 12px; }
-    details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--fg-muted); padding: 0 20px 12px; }
-    details > summary::after { content: '›'; margin-left: auto; transition: transform 0.2s; font-size: 16px; }
-    details[open] > summary::after { transform: rotate(90deg); }
-    details > summary::-webkit-details-marker { display: none; }
-
-    /* Segments */
-    .segments-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-    .seg-label { font-size: 12px; color: var(--fg-muted); }
-    .seg-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-bg); border: 1px solid var(--accent-border); color: var(--accent); border-radius: var(--radius-sm); padding: 2px 8px; font-size: 12px; font-family: var(--font-mono); }
-    .seg-chip.danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
-    .seg-remove { cursor: pointer; font-size: 10px; opacity: 0.7; background: none; border: none; color: inherit; padding: 0; line-height: 1; }
-    .seg-remove:hover { opacity: 1; }
-    .seg-input { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px 8px; font-size: 12px; font-family: var(--font-mono); background: var(--bg); color: var(--fg); width: 120px; }
-    .seg-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-
-    /* Kill switch */
-    .kill-wrap { display: flex; align-items: center; gap: 8px; }
-    .kill-cb { width: 15px; height: 15px; accent-color: var(--danger); cursor: pointer; }
-    .kill-label { font-size: 13px; font-weight: 600; color: var(--danger); }
-    .kill-note { font-size: 12px; color: var(--danger); }
-
-    /* Notes */
-    .details-note { font-size: 12px; color: var(--fg-muted); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; line-height: 1.5; }
-    .details-note.danger { color: var(--danger); background: var(--danger-bg); border-color: var(--danger); }
-
-    /* Rollout warning */
-    .rollout-warn { font-size: 12px; color: var(--warning); display: none; }
-    .rollout-warn.visible { display: block; }
-
-    /* Modal */
-    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500; align-items: center; justify-content: center; }
-    .modal-backdrop.open { display: flex; }
-    .modal { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); width: 90%; max-width: 560px; max-height: 80vh; display: flex; flex-direction: column; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
-    .modal-title { font-size: 15px; font-weight: 600; }
-    .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--fg-muted); line-height: 1; padding: 2px 6px; border-radius: var(--radius-sm); }
-    .modal-close:hover { background: var(--bg-subtle-2); color: var(--fg); }
-    .modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
-    .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
-    pre.json-block { font-family: var(--font-mono); font-size: 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; white-space: pre; overflow-x: auto; color: var(--fg); line-height: 1.6; }
-  </style>
-</head>
-<body>
-  <nav>
-    <a href="../index.html" class="back">← Acme Sync</a>
-    <span class="nav-sep">|</span>
-    <span class="nav-brand">Feature Flags</span>
-    <div style="flex:1"></div>
-    <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-  </nav>
-
-  <div class="page-header">
-    <div class="env-tabs" id="env-tabs">
-      <button class="env-tab" type="button" data-env="dev">Dev</button>
-      <button class="env-tab" type="button" data-env="staging">Staging</button>
-      <button class="env-tab active" type="button" data-env="prod">Prod</button>
-    </div>
-    <div class="header-right">
-      <span class="meta-chip">Last updated: 2026-05-15 14:32 UTC</span>
-      <button class="btn btn-accent" id="copy-json-btn" type="button">Copy as JSON</button>
-    </div>
-  </div>
-
-  <main id="flags-main">
-
-    <!-- Flag 1: three_way_merge -->
-    <div class="flag-card" id="card-three_way_merge">
-      <div class="flag-row">
-        <div class="flag-left">
-          <div class="flag-name">three_way_merge</div>
-          <div class="flag-desc">Automatic text file conflict resolution using ancestor snapshot</div>
-        </div>
-        <div class="flag-right">
-          <div class="flag-controls">
-            <span class="badge badge-active" id="badge-three_way_merge">Active</span>
-            <div class="toggle-wrap">
-              <input type="checkbox" class="toggle flag-toggle" id="toggle-three_way_merge" data-flag="three_way_merge" checked>
-              <span class="toggle-label" id="toggle-lbl-three_way_merge">ON</span>
-            </div>
-          </div>
-          <div class="rollout-wrap">
-            <span class="rollout-label">Rollout</span>
-            <input type="range" class="rollout-slider" id="rollout-three_way_merge" data-flag="three_way_merge" min="0" max="100" value="100">
-            <span class="rollout-pct" id="pct-three_way_merge">100%</span>
-          </div>
-          <span class="rollout-warn" id="warn-three_way_merge">Warning: flag is ON but rollout is 0%</span>
-        </div>
-      </div>
-      <details>
-        <summary>Targeting &amp; Rules</summary>
-        <div class="flag-details">
-          <div class="segments-row" id="segs-three_way_merge">
-            <span class="seg-label">Segments:</span>
-            <span class="seg-chip">all <button class="seg-remove" type="button" data-flag="three_way_merge" data-seg="all">×</button></span>
-            <input class="seg-input" type="text" placeholder="add segment…" data-flag="three_way_merge">
-          </div>
-          <div class="kill-wrap">
-            <input type="checkbox" class="kill-cb" id="kill-three_way_merge" data-flag="three_way_merge">
-            <label class="kill-label" for="kill-three_way_merge">Kill switch</label>
-          </div>
-          <div class="details-note">Stable since v2.1. Monitor P99 latency on merge operations.</div>
-        </div>
-      </details>
-    </div>
-
-    <!-- Flag 2: real_time_collab -->
-    <div class="flag-card" id="card-real_time_collab">
-      <div class="flag-row">
-        <div class="flag-left">
-          <div class="flag-name">real_time_collab</div>
-          <div class="flag-desc">Live cursor presence and real-time co-editing (experimental)</div>
-        </div>
-        <div class="flag-right">
-          <div class="flag-controls">
-            <span class="badge badge-staged" id="badge-real_time_collab">Staged</span>
-            <div class="toggle-wrap">
-              <input type="checkbox" class="toggle flag-toggle" id="toggle-real_time_collab" data-flag="real_time_collab">
-              <span class="toggle-label" id="toggle-lbl-real_time_collab">OFF</span>
-            </div>
-          </div>
-          <div class="rollout-wrap">
-            <span class="rollout-label">Rollout</span>
-            <input type="range" class="rollout-slider" id="rollout-real_time_collab" data-flag="real_time_collab" min="0" max="100" value="0">
-            <span class="rollout-pct" id="pct-real_time_collab">0%</span>
-          </div>
-          <span class="rollout-warn" id="warn-real_time_collab"></span>
-        </div>
-      </div>
-      <details>
-        <summary>Targeting &amp; Rules</summary>
-        <div class="flag-details">
-          <div class="segments-row" id="segs-real_time_collab">
-            <span class="seg-label">Segments:</span>
-            <span class="seg-chip">internal <button class="seg-remove" type="button" data-flag="real_time_collab" data-seg="internal">×</button></span>
-            <input class="seg-input" type="text" placeholder="add segment…" data-flag="real_time_collab">
-          </div>
-          <div class="kill-wrap">
-            <input type="checkbox" class="kill-cb" id="kill-real_time_collab" data-flag="real_time_collab">
-            <label class="kill-label" for="kill-real_time_collab">Kill switch</label>
-          </div>
-          <div class="details-note">WebSocket infrastructure not yet provisioned for prod. Enable only in staging.</div>
-        </div>
-      </details>
-    </div>
-
-    <!-- Flag 3: ai_conflict_summary -->
-    <div class="flag-card" id="card-ai_conflict_summary">
-      <div class="flag-row">
-        <div class="flag-left">
-          <div class="flag-name">ai_conflict_summary</div>
-          <div class="flag-desc">AI-generated plain-language summary of what changed in a conflict</div>
-        </div>
-        <div class="flag-right">
-          <div class="flag-controls">
-            <span class="badge badge-active" id="badge-ai_conflict_summary">Active</span>
-            <div class="toggle-wrap">
-              <input type="checkbox" class="toggle flag-toggle" id="toggle-ai_conflict_summary" data-flag="ai_conflict_summary" checked>
-              <span class="toggle-label" id="toggle-lbl-ai_conflict_summary">ON</span>
-            </div>
-          </div>
-          <div class="rollout-wrap">
-            <span class="rollout-label">Rollout</span>
-            <input type="range" class="rollout-slider" id="rollout-ai_conflict_summary" data-flag="ai_conflict_summary" min="0" max="100" value="25">
-            <span class="rollout-pct" id="pct-ai_conflict_summary">25%</span>
-          </div>
-          <span class="rollout-warn" id="warn-ai_conflict_summary"></span>
-        </div>
-      </div>
-      <details>
-        <summary>Targeting &amp; Rules</summary>
-        <div class="flag-details">
-          <div class="segments-row" id="segs-ai_conflict_summary">
-            <span class="seg-label">Segments:</span>
-            <span class="seg-chip">beta <button class="seg-remove" type="button" data-flag="ai_conflict_summary" data-seg="beta">×</button></span>
-            <span class="seg-chip">pro <button class="seg-remove" type="button" data-flag="ai_conflict_summary" data-seg="pro">×</button></span>
-            <input class="seg-input" type="text" placeholder="add segment…" data-flag="ai_conflict_summary">
-          </div>
-          <div class="kill-wrap">
-            <input type="checkbox" class="kill-cb" id="kill-ai_conflict_summary" data-flag="ai_conflict_summary">
-            <label class="kill-label" for="kill-ai_conflict_summary">Kill switch</label>
-          </div>
-          <div class="details-note">Monitor OpenAI API costs. Cap at $0.02/request. Roll back if P95 latency &gt; 3s.</div>
-        </div>
-      </details>
-    </div>
-
-    <!-- Flag 4: offline_mode_v2 -->
-    <div class="flag-card" id="card-offline_mode_v2">
-      <div class="flag-row">
-        <div class="flag-left">
-          <div class="flag-name">offline_mode_v2</div>
-          <div class="flag-desc">Full offline support with conflict queue, replaces offline_mode_v1</div>
-        </div>
-        <div class="flag-right">
-          <div class="flag-controls">
-            <span class="badge badge-staged" id="badge-offline_mode_v2">Staged</span>
-            <div class="toggle-wrap">
-              <input type="checkbox" class="toggle flag-toggle" id="toggle-offline_mode_v2" data-flag="offline_mode_v2" checked>
-              <span class="toggle-label" id="toggle-lbl-offline_mode_v2">ON</span>
-            </div>
-          </div>
-          <div class="rollout-wrap">
-            <span class="rollout-label">Rollout</span>
-            <input type="range" class="rollout-slider" id="rollout-offline_mode_v2" data-flag="offline_mode_v2" min="0" max="100" value="50">
-            <span class="rollout-pct" id="pct-offline_mode_v2">50%</span>
-          </div>
-          <span class="rollout-warn" id="warn-offline_mode_v2"></span>
-        </div>
-      </div>
-      <details>
-        <summary>Targeting &amp; Rules</summary>
-        <div class="flag-details">
-          <div class="segments-row" id="segs-offline_mode_v2">
-            <span class="seg-label">Segments:</span>
-            <span class="seg-chip">beta <button class="seg-remove" type="button" data-flag="offline_mode_v2" data-seg="beta">×</button></span>
-            <span class="seg-chip">pro <button class="seg-remove" type="button" data-flag="offline_mode_v2" data-seg="pro">×</button></span>
-            <input class="seg-input" type="text" placeholder="add segment…" data-flag="offline_mode_v2">
-          </div>
-          <div class="kill-wrap">
-            <input type="checkbox" class="kill-cb" id="kill-offline_mode_v2" data-flag="offline_mode_v2">
-            <label class="kill-label" for="kill-offline_mode_v2">Kill switch</label>
-          </div>
-          <div class="details-note" id="note-offline_mode_v2">A/B testing against v1. Currently 50/50 split on eligible users.</div>
-        </div>
-      </details>
-    </div>
-
-    <!-- Flag 5: enterprise_sso -->
-    <div class="flag-card kill-active" id="card-enterprise_sso">
-      <div class="flag-row">
-        <div class="flag-left">
-          <div class="flag-name">enterprise_sso</div>
-          <div class="flag-desc">SAML 2.0 SSO login for enterprise accounts</div>
-        </div>
-        <div class="flag-right">
-          <div class="flag-controls">
-            <span class="badge badge-danger" id="badge-enterprise_sso">KILL SWITCH ACTIVE</span>
-            <div class="toggle-wrap">
-              <input type="checkbox" class="toggle flag-toggle" id="toggle-enterprise_sso" data-flag="enterprise_sso" disabled>
-              <span class="toggle-label" id="toggle-lbl-enterprise_sso">OFF</span>
-            </div>
-          </div>
-          <div class="rollout-wrap">
-            <span class="rollout-label">Rollout</span>
-            <input type="range" class="rollout-slider" id="rollout-enterprise_sso" data-flag="enterprise_sso" min="0" max="100" value="0" disabled>
-            <span class="rollout-pct" id="pct-enterprise_sso">0%</span>
-          </div>
-          <span class="rollout-warn" id="warn-enterprise_sso"></span>
-        </div>
-      </div>
-      <details open>
-        <summary>Targeting &amp; Rules</summary>
-        <div class="flag-details">
-          <div class="segments-row" id="segs-enterprise_sso">
-            <span class="seg-label">Segments:</span>
-            <span class="seg-chip danger">enterprise <button class="seg-remove" type="button" data-flag="enterprise_sso" data-seg="enterprise">×</button></span>
-            <input class="seg-input" type="text" placeholder="add segment…" data-flag="enterprise_sso">
-          </div>
-          <div class="kill-wrap">
-            <input type="checkbox" class="kill-cb" id="kill-enterprise_sso" data-flag="enterprise_sso" checked>
-            <label class="kill-label" for="kill-enterprise_sso">Kill switch — ACTIVE</label>
-          </div>
-          <div class="details-note danger">Replaced by enterprise_sso_v2 (SYNC-301). Do not re-enable — deactivate in next release.</div>
-        </div>
-      </details>
-    </div>
-
-  </main>
-
-  <!-- JSON Modal -->
-  <div class="modal-backdrop" id="json-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title">Export as JSON</span>
-        <button class="modal-close" id="modal-close" type="button">×</button>
-      </div>
-      <div class="modal-body">
-        <pre class="json-block" id="json-output"></pre>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" id="modal-close-2" type="button">Close</button>
-        <button class="btn btn-accent" id="modal-copy-btn" type="button">Copy JSON</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function(){
-      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-      if(t==='dark')document.documentElement.classList.add('dark');
-      document.getElementById('dm-toggle').addEventListener('click',function(){
-        var d=document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ha-theme',d?'dark':'light');
-      });
-    })();
-
-    // Flag state
-    var flags = {
-      three_way_merge:    { enabled: true,  rollout: 100, segments: ['all'],       killSwitch: false, status: 'active',     desc: 'Automatic text file conflict resolution using ancestor snapshot' },
-      real_time_collab:   { enabled: false, rollout: 0,   segments: ['internal'],  killSwitch: false, status: 'staged',     desc: 'Live cursor presence and real-time co-editing (experimental)' },
-      ai_conflict_summary:{ enabled: true,  rollout: 25,  segments: ['beta','pro'],killSwitch: false, status: 'active',     desc: 'AI-generated plain-language summary of what changed in a conflict' },
-      offline_mode_v2:    { enabled: true,  rollout: 50,  segments: ['beta','pro'],killSwitch: false, status: 'staged',     desc: 'Full offline support with conflict queue, replaces offline_mode_v1' },
-      enterprise_sso:     { enabled: false, rollout: 0,   segments: ['enterprise'],killSwitch: true,  status: 'deprecated', desc: 'SAML 2.0 SSO login for enterprise accounts' }
-    };
-
-    var currentEnv = 'prod';
-
-    function computeStatus(flagId) {
-      var f = flags[flagId];
-      if (f.killSwitch) return 'kill';
-      if (flagId === 'enterprise_sso') return 'deprecated';
-      if (!f.enabled) return 'off';
-      if (f.rollout === 0) return 'staged';
-      if (f.enabled && f.rollout > 0) return 'active';
-      return 'staged';
-    }
-
-    function applyBadge(flagId) {
-      var badge = document.getElementById('badge-' + flagId);
-      var status = computeStatus(flagId);
-      badge.className = 'badge';
-      if (status === 'kill')       { badge.classList.add('badge-danger');      badge.textContent = 'KILL SWITCH ACTIVE'; }
-      else if (status === 'active')     { badge.classList.add('badge-active');     badge.textContent = 'Active'; }
-      else if (status === 'staged')     { badge.classList.add('badge-staged');     badge.textContent = 'Staged'; }
-      else if (status === 'deprecated') { badge.classList.add('badge-deprecated'); badge.textContent = 'Deprecated'; }
-      else if (status === 'off')        { badge.classList.add('badge-off');        badge.textContent = 'Off'; }
-    }
-
-    function applyKillState(flagId) {
-      var f = flags[flagId];
-      var card = document.getElementById('card-' + flagId);
-      var toggle = document.getElementById('toggle-' + flagId);
-      var slider = document.getElementById('rollout-' + flagId);
-      card.classList.toggle('kill-active', f.killSwitch);
-      toggle.disabled = f.killSwitch;
-      slider.disabled = f.killSwitch;
-      applyBadge(flagId);
-    }
-
-    // Toggles
-    document.querySelectorAll('.flag-toggle').forEach(function(cb) {
-      cb.addEventListener('change', function() {
-        var id = this.dataset.flag;
-        flags[id].enabled = this.checked;
-        document.getElementById('toggle-lbl-' + id).textContent = this.checked ? 'ON' : 'OFF';
-        checkRolloutWarn(id);
-        applyBadge(id);
-      });
-    });
-
-    // Rollout sliders
-    document.querySelectorAll('.rollout-slider').forEach(function(slider) {
-      slider.addEventListener('input', function() {
-        var id = this.dataset.flag;
-        var val = parseInt(this.value, 10);
-        flags[id].rollout = val;
-        document.getElementById('pct-' + id).textContent = val + '%';
-        checkRolloutWarn(id);
-        applyBadge(id);
-      });
-    });
-
-    function checkRolloutWarn(id) {
-      var warn = document.getElementById('warn-' + id);
-      var f = flags[id];
-      if (f.enabled && f.rollout === 0) {
-        warn.textContent = 'Warning: flag is ON but rollout is 0%';
-        warn.classList.add('visible');
-      } else {
-        warn.classList.remove('visible');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acme Sync — Feature Flags</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
       }
-    }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    // Kill switches
-    document.querySelectorAll('.kill-cb').forEach(function(cb) {
-      cb.addEventListener('change', function() {
-        var id = this.dataset.flag;
-        flags[id].killSwitch = this.checked;
-        applyKillState(id);
-      });
-    });
+      /* Nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 48px;
+        padding: 0 24px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+      }
+      .back {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      .back:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
 
-    // Segments: remove
-    document.addEventListener('click', function(e) {
-      var btn = e.target.closest('.seg-remove');
-      if (!btn) return;
-      var flagId = btn.dataset.flag;
-      var seg = btn.dataset.seg;
-      flags[flagId].segments = flags[flagId].segments.filter(function(s){ return s !== seg; });
-      btn.parentElement.remove();
-    });
+      /* Header row */
+      .page-header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-subtle);
+      }
+      .env-tabs {
+        display: flex;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      .env-tab {
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        background: var(--bg);
+        color: var(--fg-muted);
+        border: none;
+        border-right: 1px solid var(--border);
+        transition:
+          background 0.12s,
+          color 0.12s;
+      }
+      .env-tab:last-child {
+        border-right: none;
+      }
+      .env-tab.active {
+        background: var(--accent);
+        color: #fff;
+      }
+      .env-tab:hover:not(.active) {
+        background: var(--bg-subtle-2);
+        color: var(--fg);
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+      }
+      .meta-chip {
+        font-size: 12px;
+        color: var(--fg-muted);
+        background: var(--bg-subtle-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 10px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .btn-accent {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-accent:hover {
+        filter: brightness(1.1);
+      }
+      .btn-ghost {
+        background: var(--bg-subtle-2);
+        color: var(--fg);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--border);
+      }
+      .btn-success {
+        background: var(--success);
+        color: #fff;
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
 
-    // Segments: add
-    document.querySelectorAll('.seg-input').forEach(function(input) {
-      input.addEventListener('keydown', function(e) {
-        if (e.key !== 'Enter' && e.key !== ',') return;
-        e.preventDefault();
-        var val = this.value.trim().replace(/,/g, '');
-        if (!val) return;
-        var id = this.dataset.flag;
-        if (flags[id].segments.indexOf(val) !== -1) { this.value = ''; return; }
-        flags[id].segments.push(val);
-        var chip = document.createElement('span');
-        chip.className = 'seg-chip';
-        chip.innerHTML = val + ' ';
-        var removeBtn = document.createElement('button');
-        removeBtn.className = 'seg-remove';
-        removeBtn.type = 'button';
-        removeBtn.dataset.flag = id;
-        removeBtn.dataset.seg = val;
-        removeBtn.textContent = '×';
-        chip.appendChild(removeBtn);
-        this.parentElement.insertBefore(chip, this);
-        this.value = '';
-      });
-    });
+      /* Flag list */
+      main {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 960px;
+        margin: 0 auto;
+      }
 
-    // Environment tabs
-    document.querySelectorAll('.env-tab').forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        document.querySelectorAll('.env-tab').forEach(function(t){ t.classList.remove('active'); });
-        this.classList.add('active');
-        currentEnv = this.dataset.env;
-      });
-    });
+      /* Flag card */
+      .flag-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--bg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      .flag-card.kill-active {
+        background: var(--danger-bg);
+        border-color: var(--danger);
+      }
+      .flag-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: start;
+        padding: 16px 20px;
+      }
+      .flag-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      .flag-name {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+      }
+      .flag-desc {
+        font-size: 13px;
+        color: var(--fg-muted);
+      }
+      .flag-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+      }
+      .flag-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-    // JSON export
-    function buildJSON() {
-      var flagArr = Object.keys(flags).map(function(id) {
-        var f = flags[id];
-        return {
-          name: id,
-          enabled: f.enabled,
-          rollout_pct: f.rollout,
-          segments: f.segments.slice(),
-          kill_switch: f.killSwitch,
-          status: computeStatus(id).replace('kill', 'kill_switch_active')
-        };
-      });
-      return JSON.stringify({
-        environment: currentEnv,
-        exported_at: '2026-05-15T14:32:00Z',
-        flags: flagArr
-      }, null, 2);
-    }
+      /* Status badge */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+      .badge-active {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .badge-staged {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .badge-deprecated {
+        background: var(--bg-subtle-2);
+        color: var(--fg-faint);
+      }
+      .badge-danger {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+      .badge-off {
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+      }
+      .badge-warning {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
 
-    document.getElementById('copy-json-btn').addEventListener('click', function() {
-      var json = buildJSON();
-      document.getElementById('json-output').textContent = json;
-      document.getElementById('json-modal').classList.add('open');
-    });
+      /* Toggle */
+      .toggle-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .toggle-label {
+        font-size: 12px;
+        color: var(--fg-muted);
+      }
+      .toggle {
+        appearance: none;
+        width: 36px;
+        height: 20px;
+        border-radius: 10px;
+        background: var(--border-strong);
+        cursor: pointer;
+        position: relative;
+        transition: background 0.2s;
+        flex-shrink: 0;
+      }
+      .toggle:checked {
+        background: var(--success);
+      }
+      .toggle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 0.2s;
+      }
+      .toggle:checked::after {
+        transform: translateX(16px);
+      }
+      .toggle:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
 
-    document.getElementById('modal-close').addEventListener('click', function() {
-      document.getElementById('json-modal').classList.remove('open');
-    });
-    document.getElementById('modal-close-2').addEventListener('click', function() {
-      document.getElementById('json-modal').classList.remove('open');
-    });
-    document.getElementById('json-modal').addEventListener('click', function(e) {
-      if (e.target === this) this.classList.remove('open');
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') document.getElementById('json-modal').classList.remove('open');
-    });
+      /* Rollout */
+      .rollout-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .rollout-label {
+        font-size: 12px;
+        color: var(--fg-muted);
+        white-space: nowrap;
+      }
+      .rollout-pct {
+        font-size: 12px;
+        font-family: var(--font-mono);
+        color: var(--fg);
+        min-width: 36px;
+        text-align: right;
+      }
+      input[type='range'] {
+        width: 100px;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
 
-    document.getElementById('modal-copy-btn').addEventListener('click', function() {
-      var json = document.getElementById('json-output').textContent;
-      navigator.clipboard.writeText(json).then(function() {
-        var btn = document.getElementById('modal-copy-btn');
-        var orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.classList.add('btn-success');
-        btn.classList.remove('btn-accent');
-        setTimeout(function() {
-          btn.textContent = orig;
-          btn.classList.remove('btn-success');
-          btn.classList.add('btn-accent');
-        }, 2000);
-      });
-    });
-  </script>
+      /* Details section */
+      .flag-details {
+        border-top: 1px solid var(--border);
+        padding: 16px 20px;
+        background: var(--bg-subtle);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      details > summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--fg-muted);
+        padding: 0 20px 12px;
+      }
+      details > summary::after {
+        content: '›';
+        margin-left: auto;
+        transition: transform 0.2s;
+        font-size: 16px;
+      }
+      details[open] > summary::after {
+        transform: rotate(90deg);
+      }
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Editor Feature Flags · May 2026
-</footer>
-</body>
+      /* Segments */
+      .segments-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .seg-label {
+        font-size: 12px;
+        color: var(--fg-muted);
+      }
+      .seg-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        color: var(--accent);
+        border-radius: var(--radius-sm);
+        padding: 2px 8px;
+        font-size: 12px;
+        font-family: var(--font-mono);
+      }
+      .seg-chip.danger {
+        background: var(--danger-bg);
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .seg-remove {
+        cursor: pointer;
+        font-size: 10px;
+        opacity: 0.7;
+        background: none;
+        border: none;
+        color: inherit;
+        padding: 0;
+        line-height: 1;
+      }
+      .seg-remove:hover {
+        opacity: 1;
+      }
+      .seg-input {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 3px 8px;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        background: var(--bg);
+        color: var(--fg);
+        width: 120px;
+      }
+      .seg-input:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+
+      /* Kill switch */
+      .kill-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .kill-cb {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--danger);
+        cursor: pointer;
+      }
+      .kill-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--danger);
+      }
+      .kill-note {
+        font-size: 12px;
+        color: var(--danger);
+      }
+
+      /* Notes */
+      .details-note {
+        font-size: 12px;
+        color: var(--fg-muted);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        line-height: 1.5;
+      }
+      .details-note.danger {
+        color: var(--danger);
+        background: var(--danger-bg);
+        border-color: var(--danger);
+      }
+
+      /* Rollout warning */
+      .rollout-warn {
+        font-size: 12px;
+        color: var(--warning);
+        display: none;
+      }
+      .rollout-warn.visible {
+        display: block;
+      }
+
+      /* Modal */
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 500;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-backdrop.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        width: 90%;
+        max-width: 560px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-title {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+      }
+      .modal-close:hover {
+        background: var(--bg-subtle-2);
+        color: var(--fg);
+      }
+      .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+      }
+      .modal-footer {
+        padding: 12px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      pre.json-block {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        white-space: pre;
+        overflow-x: auto;
+        color: var(--fg);
+        line-height: 1.6;
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
+
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
+
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="back">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Feature Flags</span>
+      <div style="flex: 1"></div>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">Generate an HTML feature flags reference for Acme Sync — list every flag, what it controls, which environments it's active in, rollout percentage, and owner.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a feature flags reference for Acme Sync — all flags, what they control, active environments, rollout status, and owner</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a feature flags reference for Acme Sync — include flag names, descriptions, active environments, rollout percentages, and owners</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="page-header">
+      <div class="env-tabs" id="env-tabs">
+        <button class="env-tab" type="button" data-env="dev">Dev</button>
+        <button class="env-tab" type="button" data-env="staging">
+          Staging
+        </button>
+        <button class="env-tab active" type="button" data-env="prod">
+          Prod
+        </button>
+      </div>
+      <div class="header-right">
+        <span class="meta-chip">Last updated: 2026-05-15 14:32 UTC</span>
+        <button class="btn btn-accent" id="copy-json-btn" type="button">
+          Copy as JSON
+        </button>
+      </div>
+    </div>
+
+    <main id="flags-main">
+      <!-- Flag 1: three_way_merge -->
+      <div class="flag-card" id="card-three_way_merge">
+        <div class="flag-row">
+          <div class="flag-left">
+            <div class="flag-name">three_way_merge</div>
+            <div class="flag-desc">
+              Automatic text file conflict resolution using ancestor snapshot
+            </div>
+          </div>
+          <div class="flag-right">
+            <div class="flag-controls">
+              <span class="badge badge-active" id="badge-three_way_merge"
+                >Active</span
+              >
+              <div class="toggle-wrap">
+                <input
+                  type="checkbox"
+                  class="toggle flag-toggle"
+                  id="toggle-three_way_merge"
+                  data-flag="three_way_merge"
+                  checked
+                />
+                <span class="toggle-label" id="toggle-lbl-three_way_merge"
+                  >ON</span
+                >
+              </div>
+            </div>
+            <div class="rollout-wrap">
+              <span class="rollout-label">Rollout</span>
+              <input
+                type="range"
+                class="rollout-slider"
+                id="rollout-three_way_merge"
+                data-flag="three_way_merge"
+                min="0"
+                max="100"
+                value="100"
+              />
+              <span class="rollout-pct" id="pct-three_way_merge">100%</span>
+            </div>
+            <span class="rollout-warn" id="warn-three_way_merge"
+              >Warning: flag is ON but rollout is 0%</span
+            >
+          </div>
+        </div>
+        <details>
+          <summary>Targeting &amp; Rules</summary>
+          <div class="flag-details">
+            <div class="segments-row" id="segs-three_way_merge">
+              <span class="seg-label">Segments:</span>
+              <span class="seg-chip"
+                >all
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="three_way_merge"
+                  data-seg="all"
+                >
+                  ×
+                </button></span
+              >
+              <input
+                class="seg-input"
+                type="text"
+                placeholder="add segment…"
+                data-flag="three_way_merge"
+              />
+            </div>
+            <div class="kill-wrap">
+              <input
+                type="checkbox"
+                class="kill-cb"
+                id="kill-three_way_merge"
+                data-flag="three_way_merge"
+              />
+              <label class="kill-label" for="kill-three_way_merge"
+                >Kill switch</label
+              >
+            </div>
+            <div class="details-note">
+              Stable since v2.1. Monitor P99 latency on merge operations.
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Flag 2: real_time_collab -->
+      <div class="flag-card" id="card-real_time_collab">
+        <div class="flag-row">
+          <div class="flag-left">
+            <div class="flag-name">real_time_collab</div>
+            <div class="flag-desc">
+              Live cursor presence and real-time co-editing (experimental)
+            </div>
+          </div>
+          <div class="flag-right">
+            <div class="flag-controls">
+              <span class="badge badge-staged" id="badge-real_time_collab"
+                >Staged</span
+              >
+              <div class="toggle-wrap">
+                <input
+                  type="checkbox"
+                  class="toggle flag-toggle"
+                  id="toggle-real_time_collab"
+                  data-flag="real_time_collab"
+                />
+                <span class="toggle-label" id="toggle-lbl-real_time_collab"
+                  >OFF</span
+                >
+              </div>
+            </div>
+            <div class="rollout-wrap">
+              <span class="rollout-label">Rollout</span>
+              <input
+                type="range"
+                class="rollout-slider"
+                id="rollout-real_time_collab"
+                data-flag="real_time_collab"
+                min="0"
+                max="100"
+                value="0"
+              />
+              <span class="rollout-pct" id="pct-real_time_collab">0%</span>
+            </div>
+            <span class="rollout-warn" id="warn-real_time_collab"></span>
+          </div>
+        </div>
+        <details>
+          <summary>Targeting &amp; Rules</summary>
+          <div class="flag-details">
+            <div class="segments-row" id="segs-real_time_collab">
+              <span class="seg-label">Segments:</span>
+              <span class="seg-chip"
+                >internal
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="real_time_collab"
+                  data-seg="internal"
+                >
+                  ×
+                </button></span
+              >
+              <input
+                class="seg-input"
+                type="text"
+                placeholder="add segment…"
+                data-flag="real_time_collab"
+              />
+            </div>
+            <div class="kill-wrap">
+              <input
+                type="checkbox"
+                class="kill-cb"
+                id="kill-real_time_collab"
+                data-flag="real_time_collab"
+              />
+              <label class="kill-label" for="kill-real_time_collab"
+                >Kill switch</label
+              >
+            </div>
+            <div class="details-note">
+              WebSocket infrastructure not yet provisioned for prod. Enable only
+              in staging.
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Flag 3: ai_conflict_summary -->
+      <div class="flag-card" id="card-ai_conflict_summary">
+        <div class="flag-row">
+          <div class="flag-left">
+            <div class="flag-name">ai_conflict_summary</div>
+            <div class="flag-desc">
+              AI-generated plain-language summary of what changed in a conflict
+            </div>
+          </div>
+          <div class="flag-right">
+            <div class="flag-controls">
+              <span class="badge badge-active" id="badge-ai_conflict_summary"
+                >Active</span
+              >
+              <div class="toggle-wrap">
+                <input
+                  type="checkbox"
+                  class="toggle flag-toggle"
+                  id="toggle-ai_conflict_summary"
+                  data-flag="ai_conflict_summary"
+                  checked
+                />
+                <span class="toggle-label" id="toggle-lbl-ai_conflict_summary"
+                  >ON</span
+                >
+              </div>
+            </div>
+            <div class="rollout-wrap">
+              <span class="rollout-label">Rollout</span>
+              <input
+                type="range"
+                class="rollout-slider"
+                id="rollout-ai_conflict_summary"
+                data-flag="ai_conflict_summary"
+                min="0"
+                max="100"
+                value="25"
+              />
+              <span class="rollout-pct" id="pct-ai_conflict_summary">25%</span>
+            </div>
+            <span class="rollout-warn" id="warn-ai_conflict_summary"></span>
+          </div>
+        </div>
+        <details>
+          <summary>Targeting &amp; Rules</summary>
+          <div class="flag-details">
+            <div class="segments-row" id="segs-ai_conflict_summary">
+              <span class="seg-label">Segments:</span>
+              <span class="seg-chip"
+                >beta
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="ai_conflict_summary"
+                  data-seg="beta"
+                >
+                  ×
+                </button></span
+              >
+              <span class="seg-chip"
+                >pro
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="ai_conflict_summary"
+                  data-seg="pro"
+                >
+                  ×
+                </button></span
+              >
+              <input
+                class="seg-input"
+                type="text"
+                placeholder="add segment…"
+                data-flag="ai_conflict_summary"
+              />
+            </div>
+            <div class="kill-wrap">
+              <input
+                type="checkbox"
+                class="kill-cb"
+                id="kill-ai_conflict_summary"
+                data-flag="ai_conflict_summary"
+              />
+              <label class="kill-label" for="kill-ai_conflict_summary"
+                >Kill switch</label
+              >
+            </div>
+            <div class="details-note">
+              Monitor OpenAI API costs. Cap at $0.02/request. Roll back if P95
+              latency &gt; 3s.
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Flag 4: offline_mode_v2 -->
+      <div class="flag-card" id="card-offline_mode_v2">
+        <div class="flag-row">
+          <div class="flag-left">
+            <div class="flag-name">offline_mode_v2</div>
+            <div class="flag-desc">
+              Full offline support with conflict queue, replaces offline_mode_v1
+            </div>
+          </div>
+          <div class="flag-right">
+            <div class="flag-controls">
+              <span class="badge badge-staged" id="badge-offline_mode_v2"
+                >Staged</span
+              >
+              <div class="toggle-wrap">
+                <input
+                  type="checkbox"
+                  class="toggle flag-toggle"
+                  id="toggle-offline_mode_v2"
+                  data-flag="offline_mode_v2"
+                  checked
+                />
+                <span class="toggle-label" id="toggle-lbl-offline_mode_v2"
+                  >ON</span
+                >
+              </div>
+            </div>
+            <div class="rollout-wrap">
+              <span class="rollout-label">Rollout</span>
+              <input
+                type="range"
+                class="rollout-slider"
+                id="rollout-offline_mode_v2"
+                data-flag="offline_mode_v2"
+                min="0"
+                max="100"
+                value="50"
+              />
+              <span class="rollout-pct" id="pct-offline_mode_v2">50%</span>
+            </div>
+            <span class="rollout-warn" id="warn-offline_mode_v2"></span>
+          </div>
+        </div>
+        <details>
+          <summary>Targeting &amp; Rules</summary>
+          <div class="flag-details">
+            <div class="segments-row" id="segs-offline_mode_v2">
+              <span class="seg-label">Segments:</span>
+              <span class="seg-chip"
+                >beta
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="offline_mode_v2"
+                  data-seg="beta"
+                >
+                  ×
+                </button></span
+              >
+              <span class="seg-chip"
+                >pro
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="offline_mode_v2"
+                  data-seg="pro"
+                >
+                  ×
+                </button></span
+              >
+              <input
+                class="seg-input"
+                type="text"
+                placeholder="add segment…"
+                data-flag="offline_mode_v2"
+              />
+            </div>
+            <div class="kill-wrap">
+              <input
+                type="checkbox"
+                class="kill-cb"
+                id="kill-offline_mode_v2"
+                data-flag="offline_mode_v2"
+              />
+              <label class="kill-label" for="kill-offline_mode_v2"
+                >Kill switch</label
+              >
+            </div>
+            <div class="details-note" id="note-offline_mode_v2">
+              A/B testing against v1. Currently 50/50 split on eligible users.
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Flag 5: enterprise_sso -->
+      <div class="flag-card kill-active" id="card-enterprise_sso">
+        <div class="flag-row">
+          <div class="flag-left">
+            <div class="flag-name">enterprise_sso</div>
+            <div class="flag-desc">
+              SAML 2.0 SSO login for enterprise accounts
+            </div>
+          </div>
+          <div class="flag-right">
+            <div class="flag-controls">
+              <span class="badge badge-danger" id="badge-enterprise_sso"
+                >KILL SWITCH ACTIVE</span
+              >
+              <div class="toggle-wrap">
+                <input
+                  type="checkbox"
+                  class="toggle flag-toggle"
+                  id="toggle-enterprise_sso"
+                  data-flag="enterprise_sso"
+                  disabled
+                />
+                <span class="toggle-label" id="toggle-lbl-enterprise_sso"
+                  >OFF</span
+                >
+              </div>
+            </div>
+            <div class="rollout-wrap">
+              <span class="rollout-label">Rollout</span>
+              <input
+                type="range"
+                class="rollout-slider"
+                id="rollout-enterprise_sso"
+                data-flag="enterprise_sso"
+                min="0"
+                max="100"
+                value="0"
+                disabled
+              />
+              <span class="rollout-pct" id="pct-enterprise_sso">0%</span>
+            </div>
+            <span class="rollout-warn" id="warn-enterprise_sso"></span>
+          </div>
+        </div>
+        <details open>
+          <summary>Targeting &amp; Rules</summary>
+          <div class="flag-details">
+            <div class="segments-row" id="segs-enterprise_sso">
+              <span class="seg-label">Segments:</span>
+              <span class="seg-chip danger"
+                >enterprise
+                <button
+                  class="seg-remove"
+                  type="button"
+                  data-flag="enterprise_sso"
+                  data-seg="enterprise"
+                >
+                  ×
+                </button></span
+              >
+              <input
+                class="seg-input"
+                type="text"
+                placeholder="add segment…"
+                data-flag="enterprise_sso"
+              />
+            </div>
+            <div class="kill-wrap">
+              <input
+                type="checkbox"
+                class="kill-cb"
+                id="kill-enterprise_sso"
+                data-flag="enterprise_sso"
+                checked
+              />
+              <label class="kill-label" for="kill-enterprise_sso"
+                >Kill switch — ACTIVE</label
+              >
+            </div>
+            <div class="details-note danger">
+              Replaced by enterprise_sso_v2 (SYNC-301). Do not re-enable —
+              deactivate in next release.
+            </div>
+          </div>
+        </details>
+      </div>
+    </main>
+
+    <!-- JSON Modal -->
+    <div class="modal-backdrop" id="json-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">Export as JSON</span>
+          <button class="modal-close" id="modal-close" type="button">×</button>
+        </div>
+        <div class="modal-body">
+          <pre class="json-block" id="json-output"></pre>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="modal-close-2" type="button">
+            Close
+          </button>
+          <button class="btn btn-accent" id="modal-copy-btn" type="button">
+            Copy JSON
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+
+      // Flag state
+      var flags = {
+        three_way_merge: {
+          enabled: true,
+          rollout: 100,
+          segments: ['all'],
+          killSwitch: false,
+          status: 'active',
+          desc: 'Automatic text file conflict resolution using ancestor snapshot',
+        },
+        real_time_collab: {
+          enabled: false,
+          rollout: 0,
+          segments: ['internal'],
+          killSwitch: false,
+          status: 'staged',
+          desc: 'Live cursor presence and real-time co-editing (experimental)',
+        },
+        ai_conflict_summary: {
+          enabled: true,
+          rollout: 25,
+          segments: ['beta', 'pro'],
+          killSwitch: false,
+          status: 'active',
+          desc: 'AI-generated plain-language summary of what changed in a conflict',
+        },
+        offline_mode_v2: {
+          enabled: true,
+          rollout: 50,
+          segments: ['beta', 'pro'],
+          killSwitch: false,
+          status: 'staged',
+          desc: 'Full offline support with conflict queue, replaces offline_mode_v1',
+        },
+        enterprise_sso: {
+          enabled: false,
+          rollout: 0,
+          segments: ['enterprise'],
+          killSwitch: true,
+          status: 'deprecated',
+          desc: 'SAML 2.0 SSO login for enterprise accounts',
+        },
+      }
+
+      var currentEnv = 'prod'
+
+      function computeStatus(flagId) {
+        var f = flags[flagId]
+        if (f.killSwitch) return 'kill'
+        if (flagId === 'enterprise_sso') return 'deprecated'
+        if (!f.enabled) return 'off'
+        if (f.rollout === 0) return 'staged'
+        if (f.enabled && f.rollout > 0) return 'active'
+        return 'staged'
+      }
+
+      function applyBadge(flagId) {
+        var badge = document.getElementById('badge-' + flagId)
+        var status = computeStatus(flagId)
+        badge.className = 'badge'
+        if (status === 'kill') {
+          badge.classList.add('badge-danger')
+          badge.textContent = 'KILL SWITCH ACTIVE'
+        } else if (status === 'active') {
+          badge.classList.add('badge-active')
+          badge.textContent = 'Active'
+        } else if (status === 'staged') {
+          badge.classList.add('badge-staged')
+          badge.textContent = 'Staged'
+        } else if (status === 'deprecated') {
+          badge.classList.add('badge-deprecated')
+          badge.textContent = 'Deprecated'
+        } else if (status === 'off') {
+          badge.classList.add('badge-off')
+          badge.textContent = 'Off'
+        }
+      }
+
+      function applyKillState(flagId) {
+        var f = flags[flagId]
+        var card = document.getElementById('card-' + flagId)
+        var toggle = document.getElementById('toggle-' + flagId)
+        var slider = document.getElementById('rollout-' + flagId)
+        card.classList.toggle('kill-active', f.killSwitch)
+        toggle.disabled = f.killSwitch
+        slider.disabled = f.killSwitch
+        applyBadge(flagId)
+      }
+
+      // Toggles
+      document.querySelectorAll('.flag-toggle').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+          var id = this.dataset.flag
+          flags[id].enabled = this.checked
+          document.getElementById('toggle-lbl-' + id).textContent = this.checked
+            ? 'ON'
+            : 'OFF'
+          checkRolloutWarn(id)
+          applyBadge(id)
+        })
+      })
+
+      // Rollout sliders
+      document.querySelectorAll('.rollout-slider').forEach(function (slider) {
+        slider.addEventListener('input', function () {
+          var id = this.dataset.flag
+          var val = parseInt(this.value, 10)
+          flags[id].rollout = val
+          document.getElementById('pct-' + id).textContent = val + '%'
+          checkRolloutWarn(id)
+          applyBadge(id)
+        })
+      })
+
+      function checkRolloutWarn(id) {
+        var warn = document.getElementById('warn-' + id)
+        var f = flags[id]
+        if (f.enabled && f.rollout === 0) {
+          warn.textContent = 'Warning: flag is ON but rollout is 0%'
+          warn.classList.add('visible')
+        } else {
+          warn.classList.remove('visible')
+        }
+      }
+
+      // Kill switches
+      document.querySelectorAll('.kill-cb').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+          var id = this.dataset.flag
+          flags[id].killSwitch = this.checked
+          applyKillState(id)
+        })
+      })
+
+      // Segments: remove
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.seg-remove')
+        if (!btn) return
+        var flagId = btn.dataset.flag
+        var seg = btn.dataset.seg
+        flags[flagId].segments = flags[flagId].segments.filter(function (s) {
+          return s !== seg
+        })
+        btn.parentElement.remove()
+      })
+
+      // Segments: add
+      document.querySelectorAll('.seg-input').forEach(function (input) {
+        input.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ',') return
+          e.preventDefault()
+          var val = this.value.trim().replace(/,/g, '')
+          if (!val) return
+          var id = this.dataset.flag
+          if (flags[id].segments.indexOf(val) !== -1) {
+            this.value = ''
+            return
+          }
+          flags[id].segments.push(val)
+          var chip = document.createElement('span')
+          chip.className = 'seg-chip'
+          chip.innerHTML = val + ' '
+          var removeBtn = document.createElement('button')
+          removeBtn.className = 'seg-remove'
+          removeBtn.type = 'button'
+          removeBtn.dataset.flag = id
+          removeBtn.dataset.seg = val
+          removeBtn.textContent = '×'
+          chip.appendChild(removeBtn)
+          this.parentElement.insertBefore(chip, this)
+          this.value = ''
+        })
+      })
+
+      // Environment tabs
+      document.querySelectorAll('.env-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('.env-tab').forEach(function (t) {
+            t.classList.remove('active')
+          })
+          this.classList.add('active')
+          currentEnv = this.dataset.env
+        })
+      })
+
+      // JSON export
+      function buildJSON() {
+        var flagArr = Object.keys(flags).map(function (id) {
+          var f = flags[id]
+          return {
+            name: id,
+            enabled: f.enabled,
+            rollout_pct: f.rollout,
+            segments: f.segments.slice(),
+            kill_switch: f.killSwitch,
+            status: computeStatus(id).replace('kill', 'kill_switch_active'),
+          }
+        })
+        return JSON.stringify(
+          {
+            environment: currentEnv,
+            exported_at: '2026-05-15T14:32:00Z',
+            flags: flagArr,
+          },
+          null,
+          2,
+        )
+      }
+
+      document
+        .getElementById('copy-json-btn')
+        .addEventListener('click', function () {
+          var json = buildJSON()
+          document.getElementById('json-output').textContent = json
+          document.getElementById('json-modal').classList.add('open')
+        })
+
+      document
+        .getElementById('modal-close')
+        .addEventListener('click', function () {
+          document.getElementById('json-modal').classList.remove('open')
+        })
+      document
+        .getElementById('modal-close-2')
+        .addEventListener('click', function () {
+          document.getElementById('json-modal').classList.remove('open')
+        })
+      document
+        .getElementById('json-modal')
+        .addEventListener('click', function (e) {
+          if (e.target === this) this.classList.remove('open')
+        })
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape')
+          document.getElementById('json-modal').classList.remove('open')
+      })
+
+      document
+        .getElementById('modal-copy-btn')
+        .addEventListener('click', function () {
+          var json = document.getElementById('json-output').textContent
+          navigator.clipboard.writeText(json).then(function () {
+            var btn = document.getElementById('modal-copy-btn')
+            var orig = btn.textContent
+            btn.textContent = 'Copied!'
+            btn.classList.add('btn-success')
+            btn.classList.remove('btn-accent')
+            setTimeout(function () {
+              btn.textContent = orig
+              btn.classList.remove('btn-success')
+              btn.classList.add('btn-accent')
+            }, 2000)
+          })
+        })
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Editor Feature Flags · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

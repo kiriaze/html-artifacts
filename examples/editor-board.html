@@ -1,600 +1,1456 @@
-<!-- html-artifacts: editor-board example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
-<!DOCTYPE html>
+<!-- html-artifacts: editor-board example | docs: https://github.com/kiriaze/html-artifacts -->
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Acme Sync v1.2 — Feature Triage</title>
-<style>
-:root {
-  --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-  --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-  --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-  --success:#16a34a; --success-bg:#f0fdf4;
-  --warning:#d97706; --warning-bg:#fffbeb;
-  --danger:#dc2626; --danger-bg:#fef2f2;
-  --border:#e5e7eb; --border-strong:#d1d5db;
-  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-  --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-  --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg-subtle);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
-
-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;height:48px;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--border)}
-.back-link{font-size:13px;color:var(--fg-muted);text-decoration:none;flex-shrink:0}
-.back-link:hover{color:var(--fg)}
-.nav-sep{color:var(--fg-faint);font-size:13px;flex-shrink:0}
-.nav-brand{font-size:13px;font-weight:500;color:var(--fg);flex-shrink:0}
-
-.board-header{background:var(--bg);padding:24px 24px 16px;border-bottom:1px solid var(--border)}
-.board-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
-.board-header h1{font-size:20px;font-weight:700;color:var(--fg);letter-spacing:-0.3px}
-.date-chip{background:var(--bg-subtle-2);color:var(--fg-muted);font-size:12px;font-weight:500;padding:4px 10px;border-radius:var(--radius-sm);white-space:nowrap}
-.board-header p{font-size:13px;color:var(--fg-muted);max-width:640px}
-
-.filter-bar{padding:12px 24px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.filter-bar select{appearance:none;-webkit-appearance:none;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 28px 5px 10px;font-size:12px;font-family:var(--font-sans);color:var(--fg);cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-.filter-bar select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-bg)}
-.btn-reset{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 12px;font-size:12px;font-family:var(--font-sans);color:var(--fg-muted);cursor:pointer}
-.btn-reset:hover{background:var(--bg-subtle);color:var(--fg)}
-.btn-copy{background:var(--accent);border:none;border-radius:var(--radius-sm);padding:5px 12px;font-size:12px;font-family:var(--font-sans);color:#fff;cursor:pointer;margin-left:auto}
-.btn-copy:hover{background:#1d4ed8}
-.hidden-chip{background:var(--warning-bg);color:var(--warning);font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--radius-sm);display:none}
-.hidden-chip.visible{display:inline-block}
-
-.board{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:16px 24px;min-height:calc(100vh - 210px);align-items:start}
-
-.column{background:var(--bg-subtle-2);border-radius:var(--radius-lg);padding:12px}
-.column-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.column-title{font-size:13px;font-weight:600;color:var(--fg-muted);text-transform:uppercase;letter-spacing:0.6px}
-.count-badge{background:var(--bg);border:1px solid var(--border);color:var(--fg-muted);font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px;min-width:24px;text-align:center}
-.column-body{display:flex;flex-direction:column;gap:8px;min-height:80px;border-radius:var(--radius-md);padding:2px;transition:background 0.15s,outline 0.15s}
-.column-body.drag-over{background:var(--accent-bg);outline:2px dashed var(--accent-border);outline-offset:2px}
-
-.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;cursor:grab;box-shadow:var(--shadow-sm);transition:box-shadow 0.15s,opacity 0.15s}
-.card:hover{box-shadow:var(--shadow-md)}
-.card.dragging{opacity:0.4;cursor:grabbing}
-.card-row1{display:flex;align-items:center;gap:6px}
-.drag-handle{color:var(--fg-faint);cursor:grab;flex-shrink:0;font-size:13px;line-height:1;user-select:none}
-.ticket-num{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)}
-.priority-badge{font-size:11px;font-weight:600;padding:2px 6px;border-radius:3px}
-.priority-badge.p0{background:var(--danger-bg);color:var(--danger)}
-.priority-badge.p1{background:var(--warning-bg);color:var(--warning)}
-.priority-badge.p2{background:var(--accent-bg);color:var(--accent)}
-.priority-badge.p3{background:var(--bg-subtle-2);color:var(--fg-muted)}
-.points-badge{margin-left:auto;background:var(--bg-subtle-2);font-size:11px;padding:2px 6px;border-radius:3px;color:var(--fg-muted);white-space:nowrap}
-.card-title{font-size:14px;font-weight:500;margin:6px 0;color:var(--fg);line-height:1.4}
-.card-row3{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tag-chip{font-size:11px;background:var(--bg-subtle);border:1px solid var(--border);padding:2px 8px;border-radius:10px;color:var(--fg-muted)}
-.assignee-chip{margin-left:auto;width:24px;height:24px;border-radius:50%;background:var(--accent-bg);color:var(--accent);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.assignee-chip.unassigned{background:var(--bg-subtle-2);color:var(--fg-faint)}
-
-/* Click-to-filter */
-.priority-badge,.tag-chip,.points-badge{cursor:pointer;transition:box-shadow 0.1s}
-.priority-badge:hover,.tag-chip:hover,.points-badge:hover{box-shadow:0 0 0 2px var(--border-strong)}
-.assignee-chip:not(.unassigned){cursor:pointer;transition:box-shadow 0.1s}
-.assignee-chip:not(.unassigned):hover{box-shadow:0 0 0 2px var(--border-strong)}
-.filter-chip-active{outline:2px solid var(--accent)!important;outline-offset:1px}
-.btn-reset.has-filters{border-color:var(--accent);color:var(--accent)}
-.dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-.dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-
-html.dark {
-  --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-  --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-  --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-  --success:#3fb950; --success-bg:#0f2c1a;
-  --warning:#d29922; --warning-bg:#2d1f00;
-  --danger:#f85149; --danger-bg:#3d0000;
-  --border:#30363d; --border-strong:#484f58;
-}
-</style>
-</head>
-<body>
-
-<nav>
-  <a class="back-link" href="../index.html">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Feature Triage</span>
-  <div style="flex:1"></div>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
-
-<div class="board-header">
-  <div class="board-header-top">
-    <h1>Acme Sync v1.2 — Feature Triage</h1>
-    <span class="date-chip">May 2026</span>
-  </div>
-  <p>Drag tickets between columns to set priority. Use the filters below to focus on specific areas. Copy the final ordering as Markdown for your planning doc.</p>
-</div>
-
-<div class="filter-bar">
-  <select id="filter-priority" aria-label="Filter by priority">
-    <option value="">All Priorities</option>
-    <option value="P0">P0</option>
-    <option value="P1">P1</option>
-    <option value="P2">P2</option>
-    <option value="P3">P3</option>
-  </select>
-  <select id="filter-assignee" aria-label="Filter by assignee">
-    <option value="">All Assignees</option>
-    <option value="Alex">Alex</option>
-    <option value="Jordan">Jordan</option>
-    <option value="Sam">Sam</option>
-    <option value="Unassigned">Unassigned</option>
-  </select>
-  <select id="filter-tag" aria-label="Filter by tag">
-    <option value="">All Tags</option>
-    <option value="Sync">Sync</option>
-    <option value="Storage">Storage</option>
-    <option value="CLI">CLI</option>
-    <option value="Reliability">Reliability</option>
-    <option value="Tests">Tests</option>
-    <option value="UX">UX</option>
-    <option value="Infra">Infra</option>
-  </select>
-  <select id="filter-points" aria-label="Filter by points">
-    <option value="">All Points</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="5">5</option>
-    <option value="8">8</option>
-  </select>
-  <button class="btn-reset" id="reset-filters" type="button">Reset</button>
-  <span class="hidden-chip" id="hidden-chip"></span>
-  <button class="btn-copy" id="copy-md" type="button">Copy as Markdown</button>
-</div>
-
-<div class="board">
-
-  <div class="column">
-    <div class="column-header">
-      <span class="column-title">Now</span>
-      <span class="count-badge" id="count-now">3</span>
-    </div>
-    <div class="column-body" id="body-now" data-column="now">
-      <div class="card" id="SYNC-042" draggable="true" data-priority="P1" data-assignee="Alex" data-tags="UX,CLI" data-points="5" data-column="now">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-042</span>
-          <span class="priority-badge p1">P1</span>
-          <span class="points-badge">5 pts</span>
-        </div>
-        <div class="card-title">Binary file conflict UI</div>
-        <div class="card-row3">
-          <span class="tag-chip">UX</span><span class="tag-chip">CLI</span>
-          <span class="assignee-chip" title="Alex">AL</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-043" draggable="true" data-priority="P1" data-assignee="Jordan" data-tags="Infra" data-points="3" data-column="now">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-043</span>
-          <span class="priority-badge p1">P1</span>
-          <span class="points-badge">3 pts</span>
-        </div>
-        <div class="card-title">Windows installer</div>
-        <div class="card-row3">
-          <span class="tag-chip">Infra</span>
-          <span class="assignee-chip" title="Jordan">JO</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-044" draggable="true" data-priority="P0" data-assignee="Alex" data-tags="Sync,Reliability" data-points="2" data-column="now">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-044</span>
-          <span class="priority-badge p0">P0</span>
-          <span class="points-badge">2 pts</span>
-        </div>
-        <div class="card-title">Fix race condition in sync queue</div>
-        <div class="card-row3">
-          <span class="tag-chip">Sync</span><span class="tag-chip">Reliability</span>
-          <span class="assignee-chip" title="Alex">AL</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="column">
-    <div class="column-header">
-      <span class="column-title">Next</span>
-      <span class="count-badge" id="count-next">5</span>
-    </div>
-    <div class="column-body" id="body-next" data-column="next">
-      <div class="card" id="SYNC-045" draggable="true" data-priority="P2" data-assignee="Sam" data-tags="Sync,Storage" data-points="8" data-column="next">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-045</span>
-          <span class="priority-badge p2">P2</span>
-          <span class="points-badge">8 pts</span>
-        </div>
-        <div class="card-title">Team namespaces</div>
-        <div class="card-row3">
-          <span class="tag-chip">Sync</span><span class="tag-chip">Storage</span>
-          <span class="assignee-chip" title="Sam">SA</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-046" draggable="true" data-priority="P2" data-assignee="Unassigned" data-tags="UX" data-points="5" data-column="next">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-046</span>
-          <span class="priority-badge p2">P2</span>
-          <span class="points-badge">5 pts</span>
-        </div>
-        <div class="card-title">Web dashboard (read-only)</div>
-        <div class="card-row3">
-          <span class="tag-chip">UX</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-047" draggable="true" data-priority="P3" data-assignee="Jordan" data-tags="Infra" data-points="3" data-column="next">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-047</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">3 pts</span>
-        </div>
-        <div class="card-title">Webhook on sync complete</div>
-        <div class="card-row3">
-          <span class="tag-chip">Infra</span>
-          <span class="assignee-chip" title="Jordan">JO</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-048" draggable="true" data-priority="P2" data-assignee="Unassigned" data-tags="CLI" data-points="2" data-column="next">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-048</span>
-          <span class="priority-badge p2">P2</span>
-          <span class="points-badge">2 pts</span>
-        </div>
-        <div class="card-title">Import from Dropbox</div>
-        <div class="card-row3">
-          <span class="tag-chip">CLI</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-049" draggable="true" data-priority="P3" data-assignee="Sam" data-tags="UX,CLI" data-points="1" data-column="next">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-049</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">1 pt</span>
-        </div>
-        <div class="card-title">Dark mode for CLI prompts</div>
-        <div class="card-row3">
-          <span class="tag-chip">UX</span><span class="tag-chip">CLI</span>
-          <span class="assignee-chip" title="Sam">SA</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="column">
-    <div class="column-header">
-      <span class="column-title">Later</span>
-      <span class="count-badge" id="count-later">4</span>
-    </div>
-    <div class="column-body" id="body-later" data-column="later">
-      <div class="card" id="SYNC-050" draggable="true" data-priority="P3" data-assignee="Unassigned" data-tags="UX" data-points="13" data-column="later">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-050</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">13 pts</span>
-        </div>
-        <div class="card-title">Mobile app (iOS read-only)</div>
-        <div class="card-row3">
-          <span class="tag-chip">UX</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-051" draggable="true" data-priority="P3" data-assignee="Unassigned" data-tags="Infra" data-points="8" data-column="later">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-051</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">8 pts</span>
-        </div>
-        <div class="card-title">Plugin API</div>
-        <div class="card-row3">
-          <span class="tag-chip">Infra</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-052" draggable="true" data-priority="P3" data-assignee="Unassigned" data-tags="Sync,Reliability" data-points="13" data-column="later">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-052</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">13 pts</span>
-        </div>
-        <div class="card-title">Conflict auto-resolver (ML)</div>
-        <div class="card-row3">
-          <span class="tag-chip">Sync</span><span class="tag-chip">Reliability</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-053" draggable="true" data-priority="P3" data-assignee="Unassigned" data-tags="UX" data-points="3" data-column="later">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-053</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">3 pts</span>
-        </div>
-        <div class="card-title">Animated onboarding</div>
-        <div class="card-row3">
-          <span class="tag-chip">UX</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="column">
-    <div class="column-header">
-      <span class="column-title">Cut</span>
-      <span class="count-badge" id="count-cut">2</span>
-    </div>
-    <div class="column-body" id="body-cut" data-column="cut">
-      <div class="card" id="SYNC-054" draggable="true" data-priority="P3" data-assignee="Unassigned" data-tags="UX,Infra" data-points="5" data-column="cut">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-054</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">5 pts</span>
-        </div>
-        <div class="card-title">Desktop tray app (v1)</div>
-        <div class="card-row3">
-          <span class="tag-chip">UX</span><span class="tag-chip">Infra</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-      <div class="card" id="SYNC-055" draggable="true" data-priority="P3" data-assignee="Unassigned" data-tags="Infra" data-points="8" data-column="cut">
-        <div class="card-row1">
-          <span class="drag-handle" aria-hidden="true">⠿</span>
-          <span class="ticket-num">SYNC-055</span>
-          <span class="priority-badge p3">P3</span>
-          <span class="points-badge">8 pts</span>
-        </div>
-        <div class="card-title">Enterprise SSO</div>
-        <div class="card-row3">
-          <span class="tag-chip">Infra</span>
-          <span class="assignee-chip unassigned" title="Unassigned">—</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-(function () {
-  'use strict';
-
-  // Dark mode
-  var _t = localStorage.getItem('ha-theme') || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-  if (_t === 'dark') document.documentElement.classList.add('dark');
-  document.getElementById('dm-toggle').addEventListener('click', function () {
-    var d = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('ha-theme', d ? 'dark' : 'light');
-  });
-
-  var COLUMNS = ['now', 'next', 'later', 'cut'];
-  var FILTER_IDS = ['filter-priority', 'filter-assignee', 'filter-tag', 'filter-points'];
-  var draggingId = null;
-
-  function allCards() { return Array.from(document.querySelectorAll('.card')); }
-  function columnBody(col) { return document.getElementById('body-' + col); }
-
-  function recountAll() {
-    COLUMNS.forEach(function (col) {
-      var n = Array.from(columnBody(col).querySelectorAll('.card'))
-        .filter(function (c) { return c.style.display !== 'none'; }).length;
-      document.getElementById('count-' + col).textContent = n;
-    });
-  }
-
-  function activeFilters() {
-    var f = {};
-    FILTER_IDS.forEach(function (id) { f[id] = document.getElementById(id).value; });
-    return f;
-  }
-
-  function hasAnyFilter(f) {
-    return FILTER_IDS.some(function (id) { return f[id] !== ''; });
-  }
-
-  function updateResetBtn(f) {
-    var btn = document.getElementById('reset-filters');
-    if (hasAnyFilter(f)) { btn.classList.add('has-filters'); }
-    else { btn.classList.remove('has-filters'); }
-  }
-
-  function updateActiveChips(f) {
-    // Clear existing
-    document.querySelectorAll('.filter-chip-active').forEach(function (el) {
-      el.classList.remove('filter-chip-active');
-    });
-    if (!hasAnyFilter(f)) return;
-    allCards().forEach(function (card) {
-      if (f['filter-priority'] && card.dataset.priority === f['filter-priority']) {
-        var pb = card.querySelector('.priority-badge');
-        if (pb) pb.classList.add('filter-chip-active');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Acme Sync v1.2 — Feature Triage</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
       }
-      if (f['filter-tag']) {
-        card.querySelectorAll('.tag-chip').forEach(function (tc) {
-          if (tc.textContent.trim() === f['filter-tag']) tc.classList.add('filter-chip-active');
-        });
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-      if (f['filter-points'] && card.dataset.points === f['filter-points']) {
-        var ptb = card.querySelector('.points-badge');
-        if (ptb) ptb.classList.add('filter-chip-active');
+      html {
+        scroll-behavior: smooth;
       }
-      if (f['filter-assignee'] && card.dataset.assignee === f['filter-assignee']) {
-        var ac = card.querySelector('.assignee-chip');
-        if (ac) ac.classList.add('filter-chip-active');
+      body {
+        background: var(--bg-subtle);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
       }
-    });
-  }
 
-  function applyFilters() {
-    var f = activeFilters();
-    var hidden = 0;
-
-    allCards().forEach(function (card) {
-      var show = true;
-      if (f['filter-priority'] && card.dataset.priority !== f['filter-priority']) show = false;
-      if (f['filter-assignee'] && card.dataset.assignee !== f['filter-assignee']) show = false;
-      if (f['filter-tag'] && card.dataset.tags.split(',').indexOf(f['filter-tag']) === -1) show = false;
-      if (f['filter-points'] && card.dataset.points !== f['filter-points']) show = false;
-      card.style.display = show ? '' : 'none';
-      if (!show) hidden++;
-    });
-
-    var chip = document.getElementById('hidden-chip');
-    if (hidden > 0) {
-      chip.textContent = hidden + ' card' + (hidden !== 1 ? 's' : '') + ' hidden';
-      chip.classList.add('visible');
-    } else {
-      chip.textContent = '';
-      chip.classList.remove('visible');
-    }
-    recountAll();
-    updateActiveChips(f);
-    updateResetBtn(f);
-  }
-
-  FILTER_IDS.forEach(function (id) {
-    document.getElementById(id).addEventListener('change', applyFilters);
-  });
-
-  // Reset — bulletproof: clear all selects, clear chip states, re-run filter
-  document.getElementById('reset-filters').addEventListener('click', function () {
-    FILTER_IDS.forEach(function (id) { document.getElementById(id).value = ''; });
-    applyFilters();
-  });
-
-  // Click-to-filter on card chips (toggle: click same value again to clear)
-  function optionExists(selectId, value) {
-    var sel = document.getElementById(selectId);
-    return Array.from(sel.options).some(function (o) { return o.value === value; });
-  }
-
-  function chipClickHandler(e) {
-    var t = e.target;
-    var card = t.closest('.card');
-    if (!card) return;
-
-    var selectId = null;
-    var value = null;
-
-    if (t.classList.contains('priority-badge')) {
-      selectId = 'filter-priority'; value = card.dataset.priority;
-    } else if (t.classList.contains('tag-chip')) {
-      selectId = 'filter-tag'; value = t.textContent.trim();
-    } else if (t.classList.contains('points-badge')) {
-      selectId = 'filter-points'; value = card.dataset.points;
-    } else if (t.classList.contains('assignee-chip') && !t.classList.contains('unassigned')) {
-      selectId = 'filter-assignee'; value = card.dataset.assignee;
-    }
-
-    if (!selectId || !value) return;
-    if (!optionExists(selectId, value)) return; // e.g. 13pts not in dropdown
-
-    e.stopPropagation();
-    var sel = document.getElementById(selectId);
-    sel.value = (sel.value === value) ? '' : value; // toggle
-    applyFilters();
-  }
-
-  // Attach to board so it covers dragged cards too
-  document.querySelector('.board').addEventListener('click', chipClickHandler);
-
-  // Drag events on cards
-  allCards().forEach(function (card) {
-    card.addEventListener('dragstart', function (e) {
-      draggingId = card.id;
-      e.dataTransfer.effectAllowed = 'move';
-      setTimeout(function () { card.classList.add('dragging'); }, 0);
-    });
-    card.addEventListener('dragend', function () {
-      card.classList.remove('dragging');
-      draggingId = null;
-    });
-  });
-
-  // Drop zones
-  COLUMNS.forEach(function (col) {
-    var body = columnBody(col);
-
-    body.addEventListener('dragover', function (e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      body.classList.add('drag-over');
-    });
-
-    body.addEventListener('dragleave', function (e) {
-      if (!body.contains(e.relatedTarget)) {
-        body.classList.remove('drag-over');
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 48px;
+        padding: 0 24px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
       }
-    });
-
-    body.addEventListener('drop', function (e) {
-      e.preventDefault();
-      body.classList.remove('drag-over');
-      if (!draggingId) return;
-      var card = document.getElementById(draggingId);
-      if (!card) return;
-
-      // Insert before nearest card at drop point
-      var after = null;
-      var siblings = Array.from(body.querySelectorAll('.card:not(.dragging)'));
-      for (var i = 0; i < siblings.length; i++) {
-        var rect = siblings[i].getBoundingClientRect();
-        if (e.clientY < rect.top + rect.height / 2) { after = siblings[i]; break; }
+      .back-link {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        flex-shrink: 0;
       }
-      if (after) { body.insertBefore(card, after); } else { body.appendChild(card); }
-      card.dataset.column = col;
-      applyFilters();
-    });
-  });
+      .back-link:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
 
-  // Copy as Markdown
-  document.getElementById('copy-md').addEventListener('click', function () {
-    var colCards = {};
-    COLUMNS.forEach(function (col) {
-      colCards[col] = Array.from(columnBody(col).querySelectorAll('.card')).map(function (c) {
-        return c.querySelector('.card-title').textContent.trim() + ' (' + c.id + ')';
-      });
-    });
+      .board-header {
+        background: var(--bg);
+        padding: 24px 24px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .board-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+      .board-header h1 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--fg);
+        letter-spacing: -0.3px;
+      }
+      .date-chip {
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+      }
+      .board-header p {
+        font-size: 13px;
+        color: var(--fg-muted);
+        max-width: 640px;
+      }
 
-    var maxLen = Math.max.apply(null, COLUMNS.map(function (c) { return colCards[c].length; }));
-    var lines = ['| Now | Next | Later | Cut |', '|---|---|---|---|'];
-    for (var i = 0; i < maxLen; i++) {
-      lines.push('| ' + COLUMNS.map(function (c) { return colCards[c][i] || ''; }).join(' | ') + ' |');
-    }
+      .filter-bar {
+        padding: 12px 24px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .filter-bar select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 5px 28px 5px 10px;
+        font-size: 12px;
+        font-family: var(--font-sans);
+        color: var(--fg);
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+      }
+      .filter-bar select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-bg);
+      }
+      .btn-reset {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 5px 12px;
+        font-size: 12px;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+      }
+      .btn-reset:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+      .btn-copy {
+        background: var(--accent);
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 5px 12px;
+        font-size: 12px;
+        font-family: var(--font-sans);
+        color: #fff;
+        cursor: pointer;
+        margin-left: auto;
+      }
+      .btn-copy:hover {
+        background: #1d4ed8;
+      }
+      .hidden-chip {
+        background: var(--warning-bg);
+        color: var(--warning);
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: var(--radius-sm);
+        display: none;
+      }
+      .hidden-chip.visible {
+        display: inline-block;
+      }
 
-    var btn = document.getElementById('copy-md');
-    navigator.clipboard.writeText(lines.join('\n')).then(function () {
-      btn.textContent = 'Copied!';
-      setTimeout(function () { btn.textContent = 'Copy as Markdown'; }, 2000);
-    }).catch(function () {
-      btn.textContent = 'Copy failed';
-      setTimeout(function () { btn.textContent = 'Copy as Markdown'; }, 2000);
-    });
-  });
+      .board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        padding: 16px 24px;
+        min-height: calc(100vh - 210px);
+        align-items: start;
+      }
 
-  recountAll();
-}());
-</script>
+      .column {
+        background: var(--bg-subtle-2);
+        border-radius: var(--radius-lg);
+        padding: 12px;
+      }
+      .column-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .column-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+      }
+      .count-badge {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--fg-muted);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 10px;
+        min-width: 24px;
+        text-align: center;
+      }
+      .column-body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 80px;
+        border-radius: var(--radius-md);
+        padding: 2px;
+        transition:
+          background 0.15s,
+          outline 0.15s;
+      }
+      .column-body.drag-over {
+        background: var(--accent-bg);
+        outline: 2px dashed var(--accent-border);
+        outline-offset: 2px;
+      }
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Editor Board · May 2026
-</footer>
-</body>
+      .card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        cursor: grab;
+        box-shadow: var(--shadow-sm);
+        transition:
+          box-shadow 0.15s,
+          opacity 0.15s;
+      }
+      .card:hover {
+        box-shadow: var(--shadow-md);
+      }
+      .card.dragging {
+        opacity: 0.4;
+        cursor: grabbing;
+      }
+      .card-row1 {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .drag-handle {
+        color: var(--fg-faint);
+        cursor: grab;
+        flex-shrink: 0;
+        font-size: 13px;
+        line-height: 1;
+        user-select: none;
+      }
+      .ticket-num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-faint);
+      }
+      .priority-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 3px;
+      }
+      .priority-badge.p0 {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+      .priority-badge.p1 {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      .priority-badge.p2 {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .priority-badge.p3 {
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+      }
+      .points-badge {
+        margin-left: auto;
+        background: var(--bg-subtle-2);
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: var(--fg-muted);
+        white-space: nowrap;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 6px 0;
+        color: var(--fg);
+        line-height: 1.4;
+      }
+      .card-row3 {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .tag-chip {
+        font-size: 11px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        padding: 2px 8px;
+        border-radius: 10px;
+        color: var(--fg-muted);
+      }
+      .assignee-chip {
+        margin-left: auto;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--accent-bg);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .assignee-chip.unassigned {
+        background: var(--bg-subtle-2);
+        color: var(--fg-faint);
+      }
+
+      /* Click-to-filter */
+      .priority-badge,
+      .tag-chip,
+      .points-badge {
+        cursor: pointer;
+        transition: box-shadow 0.1s;
+      }
+      .priority-badge:hover,
+      .tag-chip:hover,
+      .points-badge:hover {
+        box-shadow: 0 0 0 2px var(--border-strong);
+      }
+      .assignee-chip:not(.unassigned) {
+        cursor: pointer;
+        transition: box-shadow 0.1s;
+      }
+      .assignee-chip:not(.unassigned):hover {
+        box-shadow: 0 0 0 2px var(--border-strong);
+      }
+      .filter-chip-active {
+        outline: 2px solid var(--accent) !important;
+        outline-offset: 1px;
+      }
+      .btn-reset.has-filters {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
+
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
+
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="back-link" href="../index.html">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Feature Triage</span>
+      <div style="flex: 1"></div>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">We need to triage the feature backlog for Acme Sync v1.2 and get alignment on what's in, what's deferred, and what's cut. Generate an HTML feature triage board with items grouped by status and brief rationale for each decision.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a feature triage board for Acme Sync v1.2 with items grouped by status (accepted, deferred, cut) and rationale</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a feature triage board for Acme Sync v1.2 — group features by status (proposed, accepted, deferred, cut) with brief rationale for each decision</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="board-header">
+      <div class="board-header-top">
+        <h1>Acme Sync v1.2 — Feature Triage</h1>
+        <span class="date-chip">May 2026</span>
+      </div>
+      <p>
+        Drag tickets between columns to set priority. Use the filters below to
+        focus on specific areas. Copy the final ordering as Markdown for your
+        planning doc.
+      </p>
+    </div>
+
+    <div class="filter-bar">
+      <select id="filter-priority" aria-label="Filter by priority">
+        <option value="">All Priorities</option>
+        <option value="P0">P0</option>
+        <option value="P1">P1</option>
+        <option value="P2">P2</option>
+        <option value="P3">P3</option>
+      </select>
+      <select id="filter-assignee" aria-label="Filter by assignee">
+        <option value="">All Assignees</option>
+        <option value="Alex">Alex</option>
+        <option value="Jordan">Jordan</option>
+        <option value="Sam">Sam</option>
+        <option value="Unassigned">Unassigned</option>
+      </select>
+      <select id="filter-tag" aria-label="Filter by tag">
+        <option value="">All Tags</option>
+        <option value="Sync">Sync</option>
+        <option value="Storage">Storage</option>
+        <option value="CLI">CLI</option>
+        <option value="Reliability">Reliability</option>
+        <option value="Tests">Tests</option>
+        <option value="UX">UX</option>
+        <option value="Infra">Infra</option>
+      </select>
+      <select id="filter-points" aria-label="Filter by points">
+        <option value="">All Points</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+        <option value="8">8</option>
+      </select>
+      <button class="btn-reset" id="reset-filters" type="button">Reset</button>
+      <span class="hidden-chip" id="hidden-chip"></span>
+      <button class="btn-copy" id="copy-md" type="button">
+        Copy as Markdown
+      </button>
+    </div>
+
+    <div class="board">
+      <div class="column">
+        <div class="column-header">
+          <span class="column-title">Now</span>
+          <span class="count-badge" id="count-now">3</span>
+        </div>
+        <div class="column-body" id="body-now" data-column="now">
+          <div
+            class="card"
+            id="SYNC-042"
+            draggable="true"
+            data-priority="P1"
+            data-assignee="Alex"
+            data-tags="UX,CLI"
+            data-points="5"
+            data-column="now"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-042</span>
+              <span class="priority-badge p1">P1</span>
+              <span class="points-badge">5 pts</span>
+            </div>
+            <div class="card-title">Binary file conflict UI</div>
+            <div class="card-row3">
+              <span class="tag-chip">UX</span><span class="tag-chip">CLI</span>
+              <span class="assignee-chip" title="Alex">AL</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-043"
+            draggable="true"
+            data-priority="P1"
+            data-assignee="Jordan"
+            data-tags="Infra"
+            data-points="3"
+            data-column="now"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-043</span>
+              <span class="priority-badge p1">P1</span>
+              <span class="points-badge">3 pts</span>
+            </div>
+            <div class="card-title">Windows installer</div>
+            <div class="card-row3">
+              <span class="tag-chip">Infra</span>
+              <span class="assignee-chip" title="Jordan">JO</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-044"
+            draggable="true"
+            data-priority="P0"
+            data-assignee="Alex"
+            data-tags="Sync,Reliability"
+            data-points="2"
+            data-column="now"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-044</span>
+              <span class="priority-badge p0">P0</span>
+              <span class="points-badge">2 pts</span>
+            </div>
+            <div class="card-title">Fix race condition in sync queue</div>
+            <div class="card-row3">
+              <span class="tag-chip">Sync</span
+              ><span class="tag-chip">Reliability</span>
+              <span class="assignee-chip" title="Alex">AL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">
+          <span class="column-title">Next</span>
+          <span class="count-badge" id="count-next">5</span>
+        </div>
+        <div class="column-body" id="body-next" data-column="next">
+          <div
+            class="card"
+            id="SYNC-045"
+            draggable="true"
+            data-priority="P2"
+            data-assignee="Sam"
+            data-tags="Sync,Storage"
+            data-points="8"
+            data-column="next"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-045</span>
+              <span class="priority-badge p2">P2</span>
+              <span class="points-badge">8 pts</span>
+            </div>
+            <div class="card-title">Team namespaces</div>
+            <div class="card-row3">
+              <span class="tag-chip">Sync</span
+              ><span class="tag-chip">Storage</span>
+              <span class="assignee-chip" title="Sam">SA</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-046"
+            draggable="true"
+            data-priority="P2"
+            data-assignee="Unassigned"
+            data-tags="UX"
+            data-points="5"
+            data-column="next"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-046</span>
+              <span class="priority-badge p2">P2</span>
+              <span class="points-badge">5 pts</span>
+            </div>
+            <div class="card-title">Web dashboard (read-only)</div>
+            <div class="card-row3">
+              <span class="tag-chip">UX</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-047"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Jordan"
+            data-tags="Infra"
+            data-points="3"
+            data-column="next"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-047</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">3 pts</span>
+            </div>
+            <div class="card-title">Webhook on sync complete</div>
+            <div class="card-row3">
+              <span class="tag-chip">Infra</span>
+              <span class="assignee-chip" title="Jordan">JO</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-048"
+            draggable="true"
+            data-priority="P2"
+            data-assignee="Unassigned"
+            data-tags="CLI"
+            data-points="2"
+            data-column="next"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-048</span>
+              <span class="priority-badge p2">P2</span>
+              <span class="points-badge">2 pts</span>
+            </div>
+            <div class="card-title">Import from Dropbox</div>
+            <div class="card-row3">
+              <span class="tag-chip">CLI</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-049"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Sam"
+            data-tags="UX,CLI"
+            data-points="1"
+            data-column="next"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-049</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">1 pt</span>
+            </div>
+            <div class="card-title">Dark mode for CLI prompts</div>
+            <div class="card-row3">
+              <span class="tag-chip">UX</span><span class="tag-chip">CLI</span>
+              <span class="assignee-chip" title="Sam">SA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">
+          <span class="column-title">Later</span>
+          <span class="count-badge" id="count-later">4</span>
+        </div>
+        <div class="column-body" id="body-later" data-column="later">
+          <div
+            class="card"
+            id="SYNC-050"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Unassigned"
+            data-tags="UX"
+            data-points="13"
+            data-column="later"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-050</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">13 pts</span>
+            </div>
+            <div class="card-title">Mobile app (iOS read-only)</div>
+            <div class="card-row3">
+              <span class="tag-chip">UX</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-051"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Unassigned"
+            data-tags="Infra"
+            data-points="8"
+            data-column="later"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-051</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">8 pts</span>
+            </div>
+            <div class="card-title">Plugin API</div>
+            <div class="card-row3">
+              <span class="tag-chip">Infra</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-052"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Unassigned"
+            data-tags="Sync,Reliability"
+            data-points="13"
+            data-column="later"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-052</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">13 pts</span>
+            </div>
+            <div class="card-title">Conflict auto-resolver (ML)</div>
+            <div class="card-row3">
+              <span class="tag-chip">Sync</span
+              ><span class="tag-chip">Reliability</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-053"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Unassigned"
+            data-tags="UX"
+            data-points="3"
+            data-column="later"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-053</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">3 pts</span>
+            </div>
+            <div class="card-title">Animated onboarding</div>
+            <div class="card-row3">
+              <span class="tag-chip">UX</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">
+          <span class="column-title">Cut</span>
+          <span class="count-badge" id="count-cut">2</span>
+        </div>
+        <div class="column-body" id="body-cut" data-column="cut">
+          <div
+            class="card"
+            id="SYNC-054"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Unassigned"
+            data-tags="UX,Infra"
+            data-points="5"
+            data-column="cut"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-054</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">5 pts</span>
+            </div>
+            <div class="card-title">Desktop tray app (v1)</div>
+            <div class="card-row3">
+              <span class="tag-chip">UX</span
+              ><span class="tag-chip">Infra</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+          <div
+            class="card"
+            id="SYNC-055"
+            draggable="true"
+            data-priority="P3"
+            data-assignee="Unassigned"
+            data-tags="Infra"
+            data-points="8"
+            data-column="cut"
+          >
+            <div class="card-row1">
+              <span class="drag-handle" aria-hidden="true">⠿</span>
+              <span class="ticket-num">SYNC-055</span>
+              <span class="priority-badge p3">P3</span>
+              <span class="points-badge">8 pts</span>
+            </div>
+            <div class="card-title">Enterprise SSO</div>
+            <div class="card-row3">
+              <span class="tag-chip">Infra</span>
+              <span class="assignee-chip unassigned" title="Unassigned">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        'use strict'
+
+        // Dark mode
+        var _t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (_t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+
+        var COLUMNS = ['now', 'next', 'later', 'cut']
+        var FILTER_IDS = [
+          'filter-priority',
+          'filter-assignee',
+          'filter-tag',
+          'filter-points',
+        ]
+        var draggingId = null
+
+        function allCards() {
+          return Array.from(document.querySelectorAll('.card'))
+        }
+        function columnBody(col) {
+          return document.getElementById('body-' + col)
+        }
+
+        function recountAll() {
+          COLUMNS.forEach(function (col) {
+            var n = Array.from(
+              columnBody(col).querySelectorAll('.card'),
+            ).filter(function (c) {
+              return c.style.display !== 'none'
+            }).length
+            document.getElementById('count-' + col).textContent = n
+          })
+        }
+
+        function activeFilters() {
+          var f = {}
+          FILTER_IDS.forEach(function (id) {
+            f[id] = document.getElementById(id).value
+          })
+          return f
+        }
+
+        function hasAnyFilter(f) {
+          return FILTER_IDS.some(function (id) {
+            return f[id] !== ''
+          })
+        }
+
+        function updateResetBtn(f) {
+          var btn = document.getElementById('reset-filters')
+          if (hasAnyFilter(f)) {
+            btn.classList.add('has-filters')
+          } else {
+            btn.classList.remove('has-filters')
+          }
+        }
+
+        function updateActiveChips(f) {
+          // Clear existing
+          document
+            .querySelectorAll('.filter-chip-active')
+            .forEach(function (el) {
+              el.classList.remove('filter-chip-active')
+            })
+          if (!hasAnyFilter(f)) return
+          allCards().forEach(function (card) {
+            if (
+              f['filter-priority'] &&
+              card.dataset.priority === f['filter-priority']
+            ) {
+              var pb = card.querySelector('.priority-badge')
+              if (pb) pb.classList.add('filter-chip-active')
+            }
+            if (f['filter-tag']) {
+              card.querySelectorAll('.tag-chip').forEach(function (tc) {
+                if (tc.textContent.trim() === f['filter-tag'])
+                  tc.classList.add('filter-chip-active')
+              })
+            }
+            if (
+              f['filter-points'] &&
+              card.dataset.points === f['filter-points']
+            ) {
+              var ptb = card.querySelector('.points-badge')
+              if (ptb) ptb.classList.add('filter-chip-active')
+            }
+            if (
+              f['filter-assignee'] &&
+              card.dataset.assignee === f['filter-assignee']
+            ) {
+              var ac = card.querySelector('.assignee-chip')
+              if (ac) ac.classList.add('filter-chip-active')
+            }
+          })
+        }
+
+        function applyFilters() {
+          var f = activeFilters()
+          var hidden = 0
+
+          allCards().forEach(function (card) {
+            var show = true
+            if (
+              f['filter-priority'] &&
+              card.dataset.priority !== f['filter-priority']
+            )
+              show = false
+            if (
+              f['filter-assignee'] &&
+              card.dataset.assignee !== f['filter-assignee']
+            )
+              show = false
+            if (
+              f['filter-tag'] &&
+              card.dataset.tags.split(',').indexOf(f['filter-tag']) === -1
+            )
+              show = false
+            if (
+              f['filter-points'] &&
+              card.dataset.points !== f['filter-points']
+            )
+              show = false
+            card.style.display = show ? '' : 'none'
+            if (!show) hidden++
+          })
+
+          var chip = document.getElementById('hidden-chip')
+          if (hidden > 0) {
+            chip.textContent =
+              hidden + ' card' + (hidden !== 1 ? 's' : '') + ' hidden'
+            chip.classList.add('visible')
+          } else {
+            chip.textContent = ''
+            chip.classList.remove('visible')
+          }
+          recountAll()
+          updateActiveChips(f)
+          updateResetBtn(f)
+        }
+
+        FILTER_IDS.forEach(function (id) {
+          document.getElementById(id).addEventListener('change', applyFilters)
+        })
+
+        // Reset — bulletproof: clear all selects, clear chip states, re-run filter
+        document
+          .getElementById('reset-filters')
+          .addEventListener('click', function () {
+            FILTER_IDS.forEach(function (id) {
+              document.getElementById(id).value = ''
+            })
+            applyFilters()
+          })
+
+        // Click-to-filter on card chips (toggle: click same value again to clear)
+        function optionExists(selectId, value) {
+          var sel = document.getElementById(selectId)
+          return Array.from(sel.options).some(function (o) {
+            return o.value === value
+          })
+        }
+
+        function chipClickHandler(e) {
+          var t = e.target
+          var card = t.closest('.card')
+          if (!card) return
+
+          var selectId = null
+          var value = null
+
+          if (t.classList.contains('priority-badge')) {
+            selectId = 'filter-priority'
+            value = card.dataset.priority
+          } else if (t.classList.contains('tag-chip')) {
+            selectId = 'filter-tag'
+            value = t.textContent.trim()
+          } else if (t.classList.contains('points-badge')) {
+            selectId = 'filter-points'
+            value = card.dataset.points
+          } else if (
+            t.classList.contains('assignee-chip') &&
+            !t.classList.contains('unassigned')
+          ) {
+            selectId = 'filter-assignee'
+            value = card.dataset.assignee
+          }
+
+          if (!selectId || !value) return
+          if (!optionExists(selectId, value)) return // e.g. 13pts not in dropdown
+
+          e.stopPropagation()
+          var sel = document.getElementById(selectId)
+          sel.value = sel.value === value ? '' : value // toggle
+          applyFilters()
+        }
+
+        // Attach to board so it covers dragged cards too
+        document
+          .querySelector('.board')
+          .addEventListener('click', chipClickHandler)
+
+        // Drag events on cards
+        allCards().forEach(function (card) {
+          card.addEventListener('dragstart', function (e) {
+            draggingId = card.id
+            e.dataTransfer.effectAllowed = 'move'
+            setTimeout(function () {
+              card.classList.add('dragging')
+            }, 0)
+          })
+          card.addEventListener('dragend', function () {
+            card.classList.remove('dragging')
+            draggingId = null
+          })
+        })
+
+        // Drop zones
+        COLUMNS.forEach(function (col) {
+          var body = columnBody(col)
+
+          body.addEventListener('dragover', function (e) {
+            e.preventDefault()
+            e.dataTransfer.dropEffect = 'move'
+            body.classList.add('drag-over')
+          })
+
+          body.addEventListener('dragleave', function (e) {
+            if (!body.contains(e.relatedTarget)) {
+              body.classList.remove('drag-over')
+            }
+          })
+
+          body.addEventListener('drop', function (e) {
+            e.preventDefault()
+            body.classList.remove('drag-over')
+            if (!draggingId) return
+            var card = document.getElementById(draggingId)
+            if (!card) return
+
+            // Insert before nearest card at drop point
+            var after = null
+            var siblings = Array.from(
+              body.querySelectorAll('.card:not(.dragging)'),
+            )
+            for (var i = 0; i < siblings.length; i++) {
+              var rect = siblings[i].getBoundingClientRect()
+              if (e.clientY < rect.top + rect.height / 2) {
+                after = siblings[i]
+                break
+              }
+            }
+            if (after) {
+              body.insertBefore(card, after)
+            } else {
+              body.appendChild(card)
+            }
+            card.dataset.column = col
+            applyFilters()
+          })
+        })
+
+        // Copy as Markdown
+        document
+          .getElementById('copy-md')
+          .addEventListener('click', function () {
+            var colCards = {}
+            COLUMNS.forEach(function (col) {
+              colCards[col] = Array.from(
+                columnBody(col).querySelectorAll('.card'),
+              ).map(function (c) {
+                return (
+                  c.querySelector('.card-title').textContent.trim() +
+                  ' (' +
+                  c.id +
+                  ')'
+                )
+              })
+            })
+
+            var maxLen = Math.max.apply(
+              null,
+              COLUMNS.map(function (c) {
+                return colCards[c].length
+              }),
+            )
+            var lines = ['| Now | Next | Later | Cut |', '|---|---|---|---|']
+            for (var i = 0; i < maxLen; i++) {
+              lines.push(
+                '| ' +
+                  COLUMNS.map(function (c) {
+                    return colCards[c][i] || ''
+                  }).join(' | ') +
+                  ' |',
+              )
+            }
+
+            var btn = document.getElementById('copy-md')
+            navigator.clipboard
+              .writeText(lines.join('\n'))
+              .then(function () {
+                btn.textContent = 'Copied!'
+                setTimeout(function () {
+                  btn.textContent = 'Copy as Markdown'
+                }, 2000)
+              })
+              .catch(function () {
+                btn.textContent = 'Copy failed'
+                setTimeout(function () {
+                  btn.textContent = 'Copy as Markdown'
+                }, 2000)
+              })
+          })
+
+        recountAll()
+      })()
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Editor Board · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

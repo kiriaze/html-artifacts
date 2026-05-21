@@ -1,927 +1,1414 @@
-<!-- html-artifacts: slide-deck example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: slide-deck example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/slide-deck.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acme Sync — Series A Pitch Deck</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      -webkit-font-smoothing: antialiased;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* Progress bar */
-    #progress-bar {
-      position: fixed;
-      top: 0; left: 0;
-      height: 3px;
-      background: var(--accent);
-      width: 0%;
-      transition: width 0.25s ease;
-      z-index: 200;
-    }
-
-    /* Slide counter */
-    #slide-counter {
-      position: fixed;
-      bottom: 16px; right: 20px;
-      font-size: 12px;
-      color: var(--fg-faint);
-      font-family: var(--font-mono);
-      z-index: 200;
-      pointer-events: none;
-    }
-
-    /* Fixed UI controls */
-    #dm-toggle {
-      position: fixed;
-      top: 12px; right: 16px;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 4px 8px;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--fg-muted);
-      line-height: 1;
-      z-index: 300;
-    }
-    #dm-toggle:hover { background: var(--bg-subtle); color: var(--fg); }
-
-    #back-link {
-      position: fixed;
-      top: 14px; left: 16px;
-      font-size: 12px;
-      color: var(--fg-faint);
-      text-decoration: none;
-      z-index: 300;
-      display: none;
-    }
-    #back-link:hover { color: var(--fg-muted); }
-    #back-link.visible { display: block; }
-
-    /* Speaker notes panel */
-    #notes-panel {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 30vh;
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      padding: 16px 24px;
-      font-size: 14px;
-      line-height: 1.6;
-      z-index: 500;
-      display: none;
-      overflow-y: auto;
-    }
-    #notes-panel.visible { display: block; }
-    #notes-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 8px;
-    }
-    #notes-text { color: rgba(255,255,255,0.9); }
-
-    /* ? hint */
-    #notes-hint {
-      position: fixed;
-      bottom: 16px; left: 20px;
-      font-size: 11px;
-      color: var(--fg-faint);
-      z-index: 200;
-      pointer-events: none;
-    }
-
-    /* Slides container */
-    #slides {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* Individual slide */
-    .slide {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 80px 96px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .slide.active {
-      display: flex;
-      opacity: 1;
-    }
-    .slide.fade-in {
-      opacity: 1;
-    }
-
-    /* ============ COVER SLIDE ============ */
-    .slide-cover {
-      background: var(--bg);
-      text-align: center;
-      gap: 0;
-    }
-    .cover-logo {
-      width: 64px; height: 64px;
-      background: var(--accent);
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 32px;
-      flex-shrink: 0;
-    }
-    .cover-logo svg { width: 32px; height: 32px; fill: #fff; }
-    .cover-headline {
-      font-size: 64px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: var(--fg);
-      line-height: 1.05;
-      margin-bottom: 16px;
-    }
-    .cover-tagline {
-      font-size: 22px;
-      color: var(--fg-muted);
-      font-weight: 400;
-      margin-bottom: 40px;
-      max-width: 600px;
-      line-height: 1.4;
-    }
-    .cover-meta {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      align-items: center;
-    }
-    .cover-chip {
-      background: var(--accent-bg);
-      border: 1px solid var(--accent-border);
-      color: var(--accent);
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .cover-dot {
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--border-strong);
-    }
-    .cover-date {
-      font-size: 14px;
-      color: var(--fg-faint);
-    }
-
-    /* ============ CONTENT SLIDE ============ */
-    .slide-content {
-      align-items: flex-start;
-      gap: 0;
-    }
-    .slide-eyebrow {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-    .slide-heading {
-      font-size: 42px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--fg);
-      line-height: 1.15;
-      margin-bottom: 40px;
-    }
-    .slide-bullets {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-width: 800px;
-    }
-    .slide-bullets li {
-      font-size: 20px;
-      color: var(--fg);
-      line-height: 1.5;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    }
-    .bullet-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-      margin-top: 9px;
-    }
-    .bullet-text { flex: 1; }
-    .stat-badge {
-      display: inline-block;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: var(--radius-sm);
-      padding: 2px 8px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-
-    /* ============ CODE SLIDE ============ */
-    .slide-code {
-      align-items: flex-start;
-    }
-    .code-block-wrap {
-      width: 100%;
-      max-width: 860px;
-    }
-    .code-block {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 32px 36px;
-      font-family: var(--font-mono);
-      font-size: 17px;
-      line-height: 1.7;
-      color: var(--fg);
-      overflow-x: auto;
-      white-space: pre;
-    }
-    .code-comment { color: var(--fg-faint); }
-    .code-kw { color: var(--accent); font-weight: 600; }
-    .code-fn { color: var(--success); }
-    .code-str { color: var(--warning); }
-    .code-num { color: var(--danger); }
-
-    /* ============ COMPARISON SLIDE ============ */
-    .slide-comparison {
-      align-items: flex-start;
-    }
-    .comparison-grid {
-      display: flex;
-      gap: 24px;
-      width: 100%;
-      max-width: 900px;
-    }
-    .comparison-col {
-      flex: 1;
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      border: 1px solid var(--border);
-    }
-    .comparison-col.bad {
-      background: var(--danger-bg);
-      border-color: color-mix(in srgb, var(--danger) 20%, transparent);
-    }
-    .comparison-col.good {
-      background: var(--success-bg);
-      border-color: color-mix(in srgb, var(--success) 20%, transparent);
-    }
-    html.dark .comparison-col.bad { border-color: #5b1f1f; }
-    html.dark .comparison-col.good { border-color: #1a4228; }
-    .comparison-col-label {
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 24px;
-    }
-    .comparison-col.bad .comparison-col-label { color: var(--danger); }
-    .comparison-col.good .comparison-col-label { color: var(--success); }
-    .comparison-items {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .comparison-items li {
-      font-size: 18px;
-      color: var(--fg);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      line-height: 1.4;
-    }
-    .ci-icon {
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-    .comparison-col.bad .ci-icon { color: var(--danger); }
-    .comparison-col.good .ci-icon { color: var(--success); }
-
-    /* ============ CLOSING COVER SLIDE ============ */
-    .slide-closing {
-      background: var(--bg);
-      text-align: center;
-      gap: 0;
-    }
-    .closing-amount {
-      font-size: 72px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--fg);
-      line-height: 1;
-      margin-bottom: 16px;
-    }
-    .closing-sub {
-      font-size: 18px;
-      color: var(--fg-muted);
-      margin-bottom: 48px;
-      max-width: 620px;
-      line-height: 1.5;
-    }
-    .closing-contact {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
-      align-items: center;
-      font-size: 15px;
-      color: var(--fg-faint);
-    }
-    .closing-contact a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    .closing-contact a:hover { text-decoration: underline; }
-    .closing-divider {
-      width: 1px;
-      height: 16px;
-      background: var(--border);
-    }
-    .closing-use-of-funds {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-bottom: 48px;
-    }
-    .fund-chip {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 10px 20px;
-      font-size: 14px;
-      color: var(--fg-muted);
-      text-align: center;
-    }
-    .fund-chip-pct {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--fg);
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    /* Back link on last slide */
-    .slide-back-bottom {
-      position: absolute;
-      bottom: 48px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .slide-back-bottom a {
-      font-size: 13px;
-      color: var(--fg-faint);
-      text-decoration: none;
-    }
-    .slide-back-bottom a:hover { color: var(--fg-muted); }
-
-    /* Traction slide stat highlights */
-    .traction-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 32px;
-      max-width: 800px;
-    }
-    .traction-card {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 20px 24px;
-    }
-    .traction-card-num {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: -0.02em;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .traction-card-label {
-      font-size: 14px;
-      color: var(--fg-muted);
-    }
-
-    /* Team slide */
-    .team-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      max-width: 900px;
-      width: 100%;
-    }
-    .team-card {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-    .team-avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .team-info { flex: 1; min-width: 0; }
-    .team-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 2px;
-    }
-    .team-role {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .team-bio {
-      font-size: 13px;
-      color: var(--fg-muted);
-      line-height: 1.5;
-    }
-
-    /* Market slide */
-    .market-bars {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 700px;
-      width: 100%;
-      margin-bottom: 24px;
-    }
-    .market-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .market-bar-label {
-      width: 48px;
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--fg-muted);
-      flex-shrink: 0;
-    }
-    .market-bar-track {
-      flex: 1;
-      height: 28px;
-      background: var(--bg-subtle);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-    .market-bar-fill {
-      height: 100%;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .market-bar-fill.tam { background: var(--accent); width: 100%; }
-    .market-bar-fill.sam { background: var(--success); width: 21%; }
-    .market-bar-fill.som { background: var(--warning); width: 1.1%; min-width: 64px; }
-  </style>
-</head>
-<body>
-  <!-- Progress bar -->
-  <div id="progress-bar"></div>
-
-  <!-- Slide counter -->
-  <div id="slide-counter">1 / 8</div>
-
-  <!-- Dark mode toggle -->
-  <button id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-
-  <!-- Back link (shown on slides 1 and 8) -->
-  <a id="back-link" href="../index.html">← html-artifacts examples</a>
-
-  <!-- Speaker notes hint -->
-  <div id="notes-hint">Press ? for speaker notes</div>
-
-  <!-- Speaker notes panel -->
-  <div id="notes-panel">
-    <div id="notes-label">Speaker Notes</div>
-    <div id="notes-text"></div>
-  </div>
-
-  <!-- Slides -->
-  <div id="slides">
-
-    <!-- Slide 1: Cover -->
-    <section class="slide slide-cover active" data-index="0"
-      data-notes="Welcome. We're raising $8M Series A. I'll keep this to 12 minutes.">
-      <div class="cover-logo">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
-      </div>
-      <div class="cover-headline">Acme Sync</div>
-      <div class="cover-tagline">Intelligent file sync for distributed teams</div>
-      <div class="cover-meta">
-        <span class="cover-chip">Series A</span>
-        <span class="cover-dot"></span>
-        <span class="cover-date">May 2026</span>
-      </div>
-      <div class="slide-back-bottom">
-        <a href="../index.html">← html-artifacts examples</a>
-      </div>
-    </section>
-
-    <!-- Slide 2: The Problem -->
-    <section class="slide slide-content" data-index="1"
-      data-notes="Show of hands — how many have lost work to a sync conflict? This is the problem we solve.">
-      <div class="slide-eyebrow">The Problem</div>
-      <div class="slide-heading">Sync tools silently destroy work</div>
-      <ul class="slide-bullets">
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">Teams share files across devices, offices, and time zones</span>
-        </li>
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">Every major sync tool uses last-write-wins — whoever saves last wins, silently overwriting others' work</span>
-        </li>
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">1 in 8 synced files results in a conflict
-            <span class="stat-badge">our survey, n=340 teams</span>
-          </span>
-        </li>
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">Lost work erodes trust in the tool — teams revert to emailing attachments</span>
-        </li>
-      </ul>
-    </section>
-
-    <!-- Slide 3: Code — Three-Way Merge -->
-    <section class="slide slide-code" data-index="2"
-      data-notes="98.3% of conflicts auto-resolved in beta. Users never see a conflict dialog.">
-      <div class="slide-eyebrow">Our Solution</div>
-      <div class="slide-heading">Three-Way Merge</div>
-      <div class="code-block-wrap">
-        <div class="code-block"><span class="code-kw">function</span> <span class="code-fn">threeWayMerge</span>(base, ours, theirs) {
-  <span class="code-kw">if</span> (ours === base)   <span class="code-kw">return</span> theirs   <span class="code-comment">// only theirs changed</span>
-  <span class="code-kw">if</span> (theirs === base) <span class="code-kw">return</span> ours     <span class="code-comment">// only ours changed</span>
-  <span class="code-kw">if</span> (ours === theirs) <span class="code-kw">return</span> ours     <span class="code-comment">// identical edits</span>
-  <span class="code-kw">return</span> <span class="code-fn">applyDiff</span>(base, ours, theirs) <span class="code-comment">// hunk-level merge</span>
-}</div>
-      </div>
-    </section>
-
-    <!-- Slide 4: Comparison -->
-    <section class="slide slide-comparison" data-index="3"
-      data-notes="Dropbox, Google Drive, OneDrive — all last-write-wins. We're the only team-sync product with merge.">
-      <div class="slide-eyebrow">How We Compare</div>
-      <div class="slide-heading">We're the only one with merge</div>
-      <div class="comparison-grid">
-        <div class="comparison-col bad">
-          <div class="comparison-col-label">Others</div>
-          <ul class="comparison-items">
-            <li><span class="ci-icon">✗</span> Last-write-wins</li>
-            <li><span class="ci-icon">✗</span> No merge</li>
-            <li><span class="ci-icon">✗</span> Conflict copies litter your folder</li>
-            <li><span class="ci-icon">✗</span> Manual resolution required</li>
-          </ul>
-        </div>
-        <div class="comparison-col good">
-          <div class="comparison-col-label">Acme Sync ✓</div>
-          <ul class="comparison-items">
-            <li><span class="ci-icon">✓</span> Three-way merge</li>
-            <li><span class="ci-icon">✓</span> Auto-resolution</li>
-            <li><span class="ci-icon">✓</span> Zero duplicate files</li>
-            <li><span class="ci-icon">✓</span> Conflicts only when truly ambiguous</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Slide 5: Traction -->
-    <section class="slide slide-content" data-index="4"
-      data-notes="We've been intentionally slow with growth to get the product right. NPS is the number I'm most proud of.">
-      <div class="slide-eyebrow">Traction</div>
-      <div class="slide-heading">Growing fast, keeping quality</div>
-      <div class="traction-grid">
-        <div class="traction-card">
-          <div class="traction-card-num">1,200</div>
-          <div class="traction-card-label">Teams in closed beta (Apr 2026)</div>
-        </div>
-        <div class="traction-card">
-          <div class="traction-card-num">$42K</div>
-          <div class="traction-card-label">MRR, growing 18% month-over-month</div>
-        </div>
-        <div class="traction-card">
-          <div class="traction-card-num">NPS 71</div>
-          <div class="traction-card-label">Industry average: 28</div>
-        </div>
-        <div class="traction-card">
-          <div class="traction-card-num">3</div>
-          <div class="traction-card-label">Enterprise pilots — Meridian Legal, Kovacs Architecture, Dune Media</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Slide 6: Market -->
-    <section class="slide slide-content" data-index="5"
-      data-notes="We're not trying to beat Dropbox on storage. We're going after the collaboration layer on top.">
-      <div class="slide-eyebrow">Market</div>
-      <div class="slide-heading">$4.2B addressable market</div>
-      <div class="market-bars">
-        <div class="market-bar-row">
-          <div class="market-bar-label">TAM</div>
-          <div class="market-bar-track">
-            <div class="market-bar-fill tam">$4.2B — Team file collaboration tools</div>
-          </div>
-        </div>
-        <div class="market-bar-row">
-          <div class="market-bar-label">SAM</div>
-          <div class="market-bar-track">
-            <div class="market-bar-fill sam">$890M</div>
-          </div>
-        </div>
-        <div class="market-bar-row">
-          <div class="market-bar-label">SOM</div>
-          <div class="market-bar-track">
-            <div class="market-bar-fill som">$44M</div>
-          </div>
-        </div>
-      </div>
-      <ul class="slide-bullets">
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">Distributed-first teams up 3× since 2020 — sync conflicts up proportionally</span>
-        </li>
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">SAM: teams needing conflict-free sync, 5–500 seats</span>
-        </li>
-        <li>
-          <span class="bullet-dot"></span>
-          <span class="bullet-text">SOM: $44M — 3-year target at current growth trajectory</span>
-        </li>
-      </ul>
-    </section>
-
-    <!-- Slide 7: Team -->
-    <section class="slide slide-content" data-index="6"
-      data-notes="We've all felt this pain firsthand. Marco lost 3 hours of work to a Dropbox conflict in 2021 — that's why we're here.">
-      <div class="slide-eyebrow">Team</div>
-      <div class="slide-heading">Built by people who felt the pain</div>
-      <div class="team-grid">
-        <div class="team-card">
-          <div class="team-avatar">MR</div>
-          <div class="team-info">
-            <div class="team-name">Marco Reyes</div>
-            <div class="team-role">CEO</div>
-            <div class="team-bio">Previously eng lead at CloudFiles (acq. by Box 2022)</div>
-          </div>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">PN</div>
-          <div class="team-info">
-            <div class="team-name">Priya Nair</div>
-            <div class="team-role">CTO</div>
-            <div class="team-bio">PhD distributed systems, MIT. Filed 2 patents on conflict resolution</div>
-          </div>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">DP</div>
-          <div class="team-info">
-            <div class="team-name">Dean Park</div>
-            <div class="team-role">CPO</div>
-            <div class="team-bio">Former PM at Notion, drove collaborative blocks feature</div>
-          </div>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">FA</div>
-          <div class="team-info">
-            <div class="team-name">Fatima Al-Hassan</div>
-            <div class="team-role">Head of Sales</div>
-            <div class="team-bio">Built enterprise sales at Superhuman 0→$30M ARR</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Slide 8: Closing Cover -->
-    <section class="slide slide-closing" data-index="7"
-      data-notes="We're talking to 6 funds. Looking for a lead who has enterprise SaaS experience. Happy to go deeper on any slide.">
-      <div class="closing-amount">$8M Series A</div>
-      <div class="closing-sub">18 months of runway to reach profitability</div>
-      <div class="closing-use-of-funds">
-        <div class="fund-chip">
-          <span class="fund-chip-pct">60%</span>
-          Engineering
-        </div>
-        <div class="fund-chip">
-          <span class="fund-chip-pct">25%</span>
-          Sales
-        </div>
-        <div class="fund-chip">
-          <span class="fund-chip-pct">15%</span>
-          Infrastructure
-        </div>
-      </div>
-      <div class="closing-contact">
-        <a href="mailto:marco@acmesync.io">marco@acmesync.io</a>
-        <span class="closing-divider"></span>
-        <a href="https://acmesync.io" target="_blank" rel="noopener">acmesync.io</a>
-      </div>
-      <div class="slide-back-bottom">
-        <a href="../index.html">← html-artifacts examples</a>
-      </div>
-    </section>
-
-  </div><!-- /#slides -->
-
-  <script>
-    /* Dark mode IIFE — first */
-    (function(){
-      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-      if(t==='dark')document.documentElement.classList.add('dark');
-      document.getElementById('dm-toggle').addEventListener('click',function(){
-        var d=document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ha-theme',d?'dark':'light');
-      });
-    })();
-
-    /* Slide deck logic */
-    (function() {
-      var slides = Array.from(document.querySelectorAll('.slide'));
-      var total = slides.length;
-      var current = 0;
-      var notesOpen = false;
-
-      var progressBar = document.getElementById('progress-bar');
-      var counter = document.getElementById('slide-counter');
-      var notesPanel = document.getElementById('notes-panel');
-      var notesText = document.getElementById('notes-text');
-      var backLink = document.getElementById('back-link');
-
-      function updateUI() {
-        // Progress bar
-        progressBar.style.width = ((current + 1) / total * 100) + '%';
-
-        // Counter
-        counter.textContent = (current + 1) + ' / ' + total;
-
-        // Back link — visible on first and last slide
-        if (current === 0 || current === total - 1) {
-          backLink.classList.add('visible');
-        } else {
-          backLink.classList.remove('visible');
-        }
-
-        // Speaker notes
-        var slide = slides[current];
-        var noteText = slide.getAttribute('data-notes') || '';
-        notesText.textContent = noteText;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acme Sync — Series A Pitch Deck</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        font-size: 16px;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
       }
 
-      function goTo(n) {
-        if (n < 0 || n >= total) return;
-
-        // Hide current
-        slides[current].classList.remove('active');
-
-        current = n;
-
-        // Show next
-        var next = slides[current];
-        next.classList.add('active');
-        // Trigger opacity transition
-        requestAnimationFrame(function() {
-          next.classList.add('fade-in');
-        });
-
-        updateUI();
+      /* Progress bar */
+      #progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.25s ease;
+        z-index: 200;
       }
 
-      function advance() { goTo(current + 1); }
-      function back() { goTo(current - 1); }
+      /* Slide counter */
+      #slide-counter {
+        position: fixed;
+        bottom: 16px;
+        right: 20px;
+        font-size: 12px;
+        color: var(--fg-faint);
+        font-family: var(--font-mono);
+        z-index: 200;
+        pointer-events: none;
+      }
 
-      // Keyboard navigation
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'ArrowRight' || e.key === ' ') {
-          e.preventDefault();
-          advance();
-        } else if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          back();
-        } else if (e.key === '?') {
-          notesOpen = !notesOpen;
-          if (notesOpen) {
-            notesPanel.classList.add('visible');
+      /* Fixed UI controls */
+      #dm-toggle {
+        position: fixed;
+        top: 12px;
+        right: 16px;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        z-index: 300;
+      }
+      #dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+
+      #back-link {
+        position: fixed;
+        top: 14px;
+        left: 16px;
+        font-size: 12px;
+        color: var(--fg-faint);
+        text-decoration: none;
+        z-index: 300;
+        display: none;
+      }
+      #back-link:hover {
+        color: var(--fg-muted);
+      }
+      #back-link.visible {
+        display: block;
+      }
+
+      /* Speaker notes panel */
+      #notes-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 30vh;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 16px 24px;
+        font-size: 14px;
+        line-height: 1.6;
+        z-index: 500;
+        display: none;
+        overflow-y: auto;
+      }
+      #notes-panel.visible {
+        display: block;
+      }
+      #notes-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 8px;
+      }
+      #notes-text {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      /* ? hint */
+      #notes-hint {
+        position: fixed;
+        bottom: 16px;
+        left: 20px;
+        font-size: 11px;
+        color: var(--fg-faint);
+        z-index: 200;
+        pointer-events: none;
+      }
+
+      /* Slides container */
+      #slides {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      /* Individual slide */
+      .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 80px 96px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .slide.active {
+        display: flex;
+        opacity: 1;
+      }
+      .slide.fade-in {
+        opacity: 1;
+      }
+
+      /* ============ COVER SLIDE ============ */
+      .slide-cover {
+        background: var(--bg);
+        text-align: center;
+        gap: 0;
+      }
+      .cover-logo {
+        width: 64px;
+        height: 64px;
+        background: var(--accent);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 32px;
+        flex-shrink: 0;
+      }
+      .cover-logo svg {
+        width: 32px;
+        height: 32px;
+        fill: #fff;
+      }
+      .cover-headline {
+        font-size: 64px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--fg);
+        line-height: 1.05;
+        margin-bottom: 16px;
+      }
+      .cover-tagline {
+        font-size: 22px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-bottom: 40px;
+        max-width: 600px;
+        line-height: 1.4;
+      }
+      .cover-meta {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+      }
+      .cover-chip {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        color: var(--accent);
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .cover-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--border-strong);
+      }
+      .cover-date {
+        font-size: 14px;
+        color: var(--fg-faint);
+      }
+
+      /* ============ CONTENT SLIDE ============ */
+      .slide-content {
+        align-items: flex-start;
+        gap: 0;
+      }
+      .slide-eyebrow {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+      .slide-heading {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--fg);
+        line-height: 1.15;
+        margin-bottom: 40px;
+      }
+      .slide-bullets {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 800px;
+      }
+      .slide-bullets li {
+        font-size: 20px;
+        color: var(--fg);
+        line-height: 1.5;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .bullet-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
+        margin-top: 9px;
+      }
+      .bullet-text {
+        flex: 1;
+      }
+      .stat-badge {
+        display: inline-block;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: var(--radius-sm);
+        padding: 2px 8px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+
+      /* ============ CODE SLIDE ============ */
+      .slide-code {
+        align-items: flex-start;
+      }
+      .code-block-wrap {
+        width: 100%;
+        max-width: 860px;
+      }
+      .code-block {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 32px 36px;
+        font-family: var(--font-mono);
+        font-size: 17px;
+        line-height: 1.7;
+        color: var(--fg);
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .code-comment {
+        color: var(--fg-faint);
+      }
+      .code-kw {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .code-fn {
+        color: var(--success);
+      }
+      .code-str {
+        color: var(--warning);
+      }
+      .code-num {
+        color: var(--danger);
+      }
+
+      /* ============ COMPARISON SLIDE ============ */
+      .slide-comparison {
+        align-items: flex-start;
+      }
+      .comparison-grid {
+        display: flex;
+        gap: 24px;
+        width: 100%;
+        max-width: 900px;
+      }
+      .comparison-col {
+        flex: 1;
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        border: 1px solid var(--border);
+      }
+      .comparison-col.bad {
+        background: var(--danger-bg);
+        border-color: color-mix(in srgb, var(--danger) 20%, transparent);
+      }
+      .comparison-col.good {
+        background: var(--success-bg);
+        border-color: color-mix(in srgb, var(--success) 20%, transparent);
+      }
+      html.dark .comparison-col.bad {
+        border-color: #5b1f1f;
+      }
+      html.dark .comparison-col.good {
+        border-color: #1a4228;
+      }
+      .comparison-col-label {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 24px;
+      }
+      .comparison-col.bad .comparison-col-label {
+        color: var(--danger);
+      }
+      .comparison-col.good .comparison-col-label {
+        color: var(--success);
+      }
+      .comparison-items {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .comparison-items li {
+        font-size: 18px;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        line-height: 1.4;
+      }
+      .ci-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      .comparison-col.bad .ci-icon {
+        color: var(--danger);
+      }
+      .comparison-col.good .ci-icon {
+        color: var(--success);
+      }
+
+      /* ============ CLOSING COVER SLIDE ============ */
+      .slide-closing {
+        background: var(--bg);
+        text-align: center;
+        gap: 0;
+      }
+      .closing-amount {
+        font-size: 72px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--fg);
+        line-height: 1;
+        margin-bottom: 16px;
+      }
+      .closing-sub {
+        font-size: 18px;
+        color: var(--fg-muted);
+        margin-bottom: 48px;
+        max-width: 620px;
+        line-height: 1.5;
+      }
+      .closing-contact {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        align-items: center;
+        font-size: 15px;
+        color: var(--fg-faint);
+      }
+      .closing-contact a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .closing-contact a:hover {
+        text-decoration: underline;
+      }
+      .closing-divider {
+        width: 1px;
+        height: 16px;
+        background: var(--border);
+      }
+      .closing-use-of-funds {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 48px;
+      }
+      .fund-chip {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 10px 20px;
+        font-size: 14px;
+        color: var(--fg-muted);
+        text-align: center;
+      }
+      .fund-chip-pct {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--fg);
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      /* Back link on last slide */
+      .slide-back-bottom {
+        position: absolute;
+        bottom: 48px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .slide-back-bottom a {
+        font-size: 13px;
+        color: var(--fg-faint);
+        text-decoration: none;
+      }
+      .slide-back-bottom a:hover {
+        color: var(--fg-muted);
+      }
+
+      /* Traction slide stat highlights */
+      .traction-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 32px;
+        max-width: 800px;
+      }
+      .traction-card {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 20px 24px;
+      }
+      .traction-card-num {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .traction-card-label {
+        font-size: 14px;
+        color: var(--fg-muted);
+      }
+
+      /* Team slide */
+      .team-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 900px;
+        width: 100%;
+      }
+      .team-card {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 24px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .team-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .team-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .team-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--fg);
+        margin-bottom: 2px;
+      }
+      .team-role {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--accent);
+        margin-bottom: 8px;
+      }
+      .team-bio {
+        font-size: 13px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+      }
+
+      /* Market slide */
+      .market-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-width: 700px;
+        width: 100%;
+        margin-bottom: 24px;
+      }
+      .market-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .market-bar-label {
+        width: 48px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--fg-muted);
+        flex-shrink: 0;
+      }
+      .market-bar-track {
+        flex: 1;
+        height: 28px;
+        background: var(--bg-subtle);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .market-bar-fill {
+        height: 100%;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .market-bar-fill.tam {
+        background: var(--accent);
+        width: 100%;
+      }
+      .market-bar-fill.sam {
+        background: var(--success);
+        width: 21%;
+      }
+      .market-bar-fill.som {
+        background: var(--warning);
+        width: 1.1%;
+        min-width: 64px;
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
+
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
+
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">Generate an HTML slide deck for Acme Sync's Series A pitch — cover problem, solution, market size, traction, team, and the ask. Keep it tight, 10–12 slides, presentation-ready.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a Series A pitch deck for Acme Sync — problem, solution, market size, traction, team, and funding ask in 10–12 slides</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a pitch deck for Acme Sync's Series A — include problem/solution slides, market size, traction metrics, team overview, and the funding ask</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div id="progress-bar"></div>
+
+    <!-- Slide counter -->
+    <div id="slide-counter">1 / 8</div>
+
+    <!-- Dark mode toggle -->
+    <button id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
+
+    <!-- Back link (shown on slides 1 and 8) -->
+    <a id="back-link" href="../index.html">← html-artifacts examples</a>
+
+    <!-- Speaker notes hint -->
+    <div id="notes-hint">Press ? for speaker notes</div>
+
+    <!-- Speaker notes panel -->
+    <div id="notes-panel">
+      <div id="notes-label">Speaker Notes</div>
+      <div id="notes-text"></div>
+    </div>
+
+    <!-- Slides -->
+    <div id="slides">
+      <!-- Slide 1: Cover -->
+      <section
+        class="slide slide-cover active"
+        data-index="0"
+        data-notes="Welcome. We're raising $8M Series A. I'll keep this to 12 minutes."
+      >
+        <div class="cover-logo">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="cover-headline">Acme Sync</div>
+        <div class="cover-tagline">
+          Intelligent file sync for distributed teams
+        </div>
+        <div class="cover-meta">
+          <span class="cover-chip">Series A</span>
+          <span class="cover-dot"></span>
+          <span class="cover-date">May 2026</span>
+        </div>
+        <div class="slide-back-bottom">
+          <a href="../index.html">← html-artifacts examples</a>
+        </div>
+      </section>
+
+      <!-- Slide 2: The Problem -->
+      <section
+        class="slide slide-content"
+        data-index="1"
+        data-notes="Show of hands — how many have lost work to a sync conflict? This is the problem we solve."
+      >
+        <div class="slide-eyebrow">The Problem</div>
+        <div class="slide-heading">Sync tools silently destroy work</div>
+        <ul class="slide-bullets">
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >Teams share files across devices, offices, and time zones</span
+            >
+          </li>
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >Every major sync tool uses last-write-wins — whoever saves last
+              wins, silently overwriting others' work</span
+            >
+          </li>
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >1 in 8 synced files results in a conflict
+              <span class="stat-badge">our survey, n=340 teams</span>
+            </span>
+          </li>
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >Lost work erodes trust in the tool — teams revert to emailing
+              attachments</span
+            >
+          </li>
+        </ul>
+      </section>
+
+      <!-- Slide 3: Code — Three-Way Merge -->
+      <section
+        class="slide slide-code"
+        data-index="2"
+        data-notes="98.3% of conflicts auto-resolved in beta. Users never see a conflict dialog."
+      >
+        <div class="slide-eyebrow">Our Solution</div>
+        <div class="slide-heading">Three-Way Merge</div>
+        <div class="code-block-wrap">
+          <div class="code-block">
+            <span class="code-kw">function</span>
+            <span class="code-fn">threeWayMerge</span>(base, ours, theirs) {
+            <span class="code-kw">if</span> (ours === base)
+            <span class="code-kw">return</span> theirs
+            <span class="code-comment">// only theirs changed</span>
+            <span class="code-kw">if</span> (theirs === base)
+            <span class="code-kw">return</span> ours
+            <span class="code-comment">// only ours changed</span>
+            <span class="code-kw">if</span> (ours === theirs)
+            <span class="code-kw">return</span> ours
+            <span class="code-comment">// identical edits</span>
+            <span class="code-kw">return</span>
+            <span class="code-fn">applyDiff</span>(base, ours, theirs)
+            <span class="code-comment">// hunk-level merge</span> }
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 4: Comparison -->
+      <section
+        class="slide slide-comparison"
+        data-index="3"
+        data-notes="Dropbox, Google Drive, OneDrive — all last-write-wins. We're the only team-sync product with merge."
+      >
+        <div class="slide-eyebrow">How We Compare</div>
+        <div class="slide-heading">We're the only one with merge</div>
+        <div class="comparison-grid">
+          <div class="comparison-col bad">
+            <div class="comparison-col-label">Others</div>
+            <ul class="comparison-items">
+              <li><span class="ci-icon">✗</span> Last-write-wins</li>
+              <li><span class="ci-icon">✗</span> No merge</li>
+              <li>
+                <span class="ci-icon">✗</span> Conflict copies litter your
+                folder
+              </li>
+              <li><span class="ci-icon">✗</span> Manual resolution required</li>
+            </ul>
+          </div>
+          <div class="comparison-col good">
+            <div class="comparison-col-label">Acme Sync ✓</div>
+            <ul class="comparison-items">
+              <li><span class="ci-icon">✓</span> Three-way merge</li>
+              <li><span class="ci-icon">✓</span> Auto-resolution</li>
+              <li><span class="ci-icon">✓</span> Zero duplicate files</li>
+              <li>
+                <span class="ci-icon">✓</span> Conflicts only when truly
+                ambiguous
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5: Traction -->
+      <section
+        class="slide slide-content"
+        data-index="4"
+        data-notes="We've been intentionally slow with growth to get the product right. NPS is the number I'm most proud of."
+      >
+        <div class="slide-eyebrow">Traction</div>
+        <div class="slide-heading">Growing fast, keeping quality</div>
+        <div class="traction-grid">
+          <div class="traction-card">
+            <div class="traction-card-num">1,200</div>
+            <div class="traction-card-label">
+              Teams in closed beta (Apr 2026)
+            </div>
+          </div>
+          <div class="traction-card">
+            <div class="traction-card-num">$42K</div>
+            <div class="traction-card-label">
+              MRR, growing 18% month-over-month
+            </div>
+          </div>
+          <div class="traction-card">
+            <div class="traction-card-num">NPS 71</div>
+            <div class="traction-card-label">Industry average: 28</div>
+          </div>
+          <div class="traction-card">
+            <div class="traction-card-num">3</div>
+            <div class="traction-card-label">
+              Enterprise pilots — Meridian Legal, Kovacs Architecture, Dune
+              Media
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 6: Market -->
+      <section
+        class="slide slide-content"
+        data-index="5"
+        data-notes="We're not trying to beat Dropbox on storage. We're going after the collaboration layer on top."
+      >
+        <div class="slide-eyebrow">Market</div>
+        <div class="slide-heading">$4.2B addressable market</div>
+        <div class="market-bars">
+          <div class="market-bar-row">
+            <div class="market-bar-label">TAM</div>
+            <div class="market-bar-track">
+              <div class="market-bar-fill tam">
+                $4.2B — Team file collaboration tools
+              </div>
+            </div>
+          </div>
+          <div class="market-bar-row">
+            <div class="market-bar-label">SAM</div>
+            <div class="market-bar-track">
+              <div class="market-bar-fill sam">$890M</div>
+            </div>
+          </div>
+          <div class="market-bar-row">
+            <div class="market-bar-label">SOM</div>
+            <div class="market-bar-track">
+              <div class="market-bar-fill som">$44M</div>
+            </div>
+          </div>
+        </div>
+        <ul class="slide-bullets">
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >Distributed-first teams up 3× since 2020 — sync conflicts up
+              proportionally</span
+            >
+          </li>
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >SAM: teams needing conflict-free sync, 5–500 seats</span
+            >
+          </li>
+          <li>
+            <span class="bullet-dot"></span>
+            <span class="bullet-text"
+              >SOM: $44M — 3-year target at current growth trajectory</span
+            >
+          </li>
+        </ul>
+      </section>
+
+      <!-- Slide 7: Team -->
+      <section
+        class="slide slide-content"
+        data-index="6"
+        data-notes="We've all felt this pain firsthand. Marco lost 3 hours of work to a Dropbox conflict in 2021 — that's why we're here."
+      >
+        <div class="slide-eyebrow">Team</div>
+        <div class="slide-heading">Built by people who felt the pain</div>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">MR</div>
+            <div class="team-info">
+              <div class="team-name">Marco Reyes</div>
+              <div class="team-role">CEO</div>
+              <div class="team-bio">
+                Previously eng lead at CloudFiles (acq. by Box 2022)
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">PN</div>
+            <div class="team-info">
+              <div class="team-name">Priya Nair</div>
+              <div class="team-role">CTO</div>
+              <div class="team-bio">
+                PhD distributed systems, MIT. Filed 2 patents on conflict
+                resolution
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">DP</div>
+            <div class="team-info">
+              <div class="team-name">Dean Park</div>
+              <div class="team-role">CPO</div>
+              <div class="team-bio">
+                Former PM at Notion, drove collaborative blocks feature
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">FA</div>
+            <div class="team-info">
+              <div class="team-name">Fatima Al-Hassan</div>
+              <div class="team-role">Head of Sales</div>
+              <div class="team-bio">
+                Built enterprise sales at Superhuman 0→$30M ARR
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 8: Closing Cover -->
+      <section
+        class="slide slide-closing"
+        data-index="7"
+        data-notes="We're talking to 6 funds. Looking for a lead who has enterprise SaaS experience. Happy to go deeper on any slide."
+      >
+        <div class="closing-amount">$8M Series A</div>
+        <div class="closing-sub">
+          18 months of runway to reach profitability
+        </div>
+        <div class="closing-use-of-funds">
+          <div class="fund-chip">
+            <span class="fund-chip-pct">60%</span>
+            Engineering
+          </div>
+          <div class="fund-chip">
+            <span class="fund-chip-pct">25%</span>
+            Sales
+          </div>
+          <div class="fund-chip">
+            <span class="fund-chip-pct">15%</span>
+            Infrastructure
+          </div>
+        </div>
+        <div class="closing-contact">
+          <a href="mailto:marco@acmesync.io">marco@acmesync.io</a>
+          <span class="closing-divider"></span>
+          <a href="https://acmesync.io" target="_blank" rel="noopener"
+            >acmesync.io</a
+          >
+        </div>
+        <div class="slide-back-bottom">
+          <a href="../index.html">← html-artifacts examples</a>
+        </div>
+      </section>
+    </div>
+    <!-- /#slides -->
+
+    <script>
+      /* Dark mode IIFE — first */
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+
+      /* Slide deck logic */
+      ;(function () {
+        var slides = Array.from(document.querySelectorAll('.slide'))
+        var total = slides.length
+        var current = 0
+        var notesOpen = false
+
+        var progressBar = document.getElementById('progress-bar')
+        var counter = document.getElementById('slide-counter')
+        var notesPanel = document.getElementById('notes-panel')
+        var notesText = document.getElementById('notes-text')
+        var backLink = document.getElementById('back-link')
+
+        function updateUI() {
+          // Progress bar
+          progressBar.style.width = ((current + 1) / total) * 100 + '%'
+
+          // Counter
+          counter.textContent = current + 1 + ' / ' + total
+
+          // Back link — visible on first and last slide
+          if (current === 0 || current === total - 1) {
+            backLink.classList.add('visible')
           } else {
-            notesPanel.classList.remove('visible');
+            backLink.classList.remove('visible')
           }
-        }
-      });
 
-      // Click navigation — left half = back, right half = advance
-      // Don't fire on buttons or links
-      document.getElementById('slides').addEventListener('click', function(e) {
-        var tag = e.target.tagName.toLowerCase();
-        if (tag === 'button' || tag === 'a' || tag === 'input') return;
-        // Walk up to check for interactive ancestors
-        var node = e.target;
-        while (node && node !== this) {
-          var t2 = node.tagName ? node.tagName.toLowerCase() : '';
-          if (t2 === 'button' || t2 === 'a') return;
-          node = node.parentNode;
+          // Speaker notes
+          var slide = slides[current]
+          var noteText = slide.getAttribute('data-notes') || ''
+          notesText.textContent = noteText
         }
-        if (e.clientX > window.innerWidth / 2) {
-          advance();
-        } else {
-          back();
+
+        function goTo(n) {
+          if (n < 0 || n >= total) return
+
+          // Hide current
+          slides[current].classList.remove('active')
+
+          current = n
+
+          // Show next
+          var next = slides[current]
+          next.classList.add('active')
+          // Trigger opacity transition
+          requestAnimationFrame(function () {
+            next.classList.add('fade-in')
+          })
+
+          updateUI()
         }
-      });
 
-      // Touch swipe
-      var touchStartX = 0;
-      document.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].clientX;
-      }, { passive: true });
-      document.addEventListener('touchend', function(e) {
-        var delta = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(delta) > 50) {
-          if (delta < 0) advance();
-          else back();
+        function advance() {
+          goTo(current + 1)
         }
-      }, { passive: true });
+        function back() {
+          goTo(current - 1)
+        }
 
-      // Init
-      updateUI();
-    })();
-  </script>
+        // Keyboard navigation
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault()
+            advance()
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault()
+            back()
+          } else if (e.key === '?') {
+            notesOpen = !notesOpen
+            if (notesOpen) {
+              notesPanel.classList.add('visible')
+            } else {
+              notesPanel.classList.remove('visible')
+            }
+          }
+        })
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Slide Deck · May 2026
-</footer>
-</body>
+        // Click navigation — left half = back, right half = advance
+        // Don't fire on buttons or links
+        document
+          .getElementById('slides')
+          .addEventListener('click', function (e) {
+            var tag = e.target.tagName.toLowerCase()
+            if (tag === 'button' || tag === 'a' || tag === 'input') return
+            // Walk up to check for interactive ancestors
+            var node = e.target
+            while (node && node !== this) {
+              var t2 = node.tagName ? node.tagName.toLowerCase() : ''
+              if (t2 === 'button' || t2 === 'a') return
+              node = node.parentNode
+            }
+            if (e.clientX > window.innerWidth / 2) {
+              advance()
+            } else {
+              back()
+            }
+          })
+
+        // Touch swipe
+        var touchStartX = 0
+        document.addEventListener(
+          'touchstart',
+          function (e) {
+            touchStartX = e.changedTouches[0].clientX
+          },
+          { passive: true },
+        )
+        document.addEventListener(
+          'touchend',
+          function (e) {
+            var delta = e.changedTouches[0].clientX - touchStartX
+            if (Math.abs(delta) > 50) {
+              if (delta < 0) advance()
+              else back()
+            }
+          },
+          { passive: true },
+        )
+
+        // Init
+        updateUI()
+      })()
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Slide Deck · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

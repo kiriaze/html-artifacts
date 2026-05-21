@@ -1,1041 +1,1821 @@
-<!-- html-artifacts: prototype-interaction example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: prototype-interaction example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/prototype-interaction.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prototype: Conflict Resolution Flow — Acme Sync</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg-subtle);
-      color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prototype: Conflict Resolution Flow — Acme Sync</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg-subtle);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
 
-    /* ── Outer nav ── */
-    .outer-nav {
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .outer-nav a {
-      color: var(--fg-muted);
-      text-decoration: none;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .outer-nav a:hover { color: var(--fg); }
-    .nav-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--fg);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .nav-sep { color: var(--border-strong); }
-    .btn-sm {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--fg-muted);
-      font-family: var(--font-sans);
-      white-space: nowrap;
-      transition: background 0.15s, color 0.15s;
-    }
-    .btn-sm:hover { background: var(--bg-subtle); color: var(--fg); }
-    .btn-sm.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+      /* ── Outer nav ── */
+      .outer-nav {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .outer-nav a {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .outer-nav a:hover {
+        color: var(--fg);
+      }
+      .nav-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-sep {
+        color: var(--border-strong);
+      }
+      .btn-sm {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        font-family: var(--font-sans);
+        white-space: nowrap;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .btn-sm:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+      .btn-sm.active {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-border);
+      }
 
-    /* ── Device frame controls ── */
-    .frame-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 24px 0;
-    }
-    .frame-controls span { font-size: 12px; color: var(--fg-faint); margin-right: 4px; }
-    .frame-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 3px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--fg-muted);
-      font-family: var(--font-sans);
-      transition: all 0.15s;
-    }
-    .frame-btn:hover { background: var(--bg-subtle-2); }
-    .frame-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+      /* ── Device frame controls ── */
+      .frame-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px 0;
+      }
+      .frame-controls span {
+        font-size: 12px;
+        color: var(--fg-faint);
+        margin-right: 4px;
+      }
+      .frame-btn {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 3px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        font-family: var(--font-sans);
+        transition: all 0.15s;
+      }
+      .frame-btn:hover {
+        background: var(--bg-subtle-2);
+      }
+      .frame-btn.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
 
-    /* ── Device frame ── */
-    .device-frame {
-      margin: 16px auto;
-      border: 2px solid var(--border-strong);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg);
-      transition: width 0.3s;
-      box-shadow: var(--shadow-md);
-      position: relative;
-    }
-    .frame-mobile  { width: 375px; }
-    .frame-tablet  { width: 768px; }
-    .frame-desktop { width: 100%; max-width: 900px; }
+      /* ── Device frame ── */
+      .device-frame {
+        margin: 16px auto;
+        border: 2px solid var(--border-strong);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--bg);
+        transition: width 0.3s;
+        box-shadow: var(--shadow-md);
+        position: relative;
+      }
+      .frame-mobile {
+        width: 375px;
+      }
+      .frame-tablet {
+        width: 768px;
+      }
+      .frame-desktop {
+        width: 100%;
+        max-width: 900px;
+      }
 
-    /* Device frame — annotation crosshair cursor */
-    .annotating .device-frame { cursor: crosshair; }
+      /* Device frame — annotation crosshair cursor */
+      .annotating .device-frame {
+        cursor: crosshair;
+      }
 
-    /* ── App chrome inside device ── */
-    .app-chrome {
-      background: var(--bg);
-      min-height: 480px;
-      display: flex;
-      flex-direction: column;
-    }
-    .app-titlebar {
-      background: var(--bg-subtle);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .app-titlebar .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-red { background: #ff5f57; }
-    .dot-yellow { background: #febc2e; }
-    .dot-green { background: #28c840; }
-    .app-logo {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
-      margin-left: 8px;
-    }
-    .app-logo span { color: var(--fg-muted); font-weight: 400; }
+      /* ── App chrome inside device ── */
+      .app-chrome {
+        background: var(--bg);
+        min-height: 480px;
+        display: flex;
+        flex-direction: column;
+      }
+      .app-titlebar {
+        background: var(--bg-subtle);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .app-titlebar .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot-red {
+        background: #ff5f57;
+      }
+      .dot-yellow {
+        background: #febc2e;
+      }
+      .dot-green {
+        background: #28c840;
+      }
+      .app-logo {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-left: 8px;
+      }
+      .app-logo span {
+        color: var(--fg-muted);
+        font-weight: 400;
+      }
 
-    /* ── States ── */
-    .state { display: none; flex: 1; flex-direction: column; }
-    .state.active { display: flex; }
+      /* ── States ── */
+      .state {
+        display: none;
+        flex: 1;
+        flex-direction: column;
+      }
+      .state.active {
+        display: flex;
+      }
 
-    /* ── State 1: File List ── */
-    .conflict-banner {
-      background: var(--warning-bg);
-      border-bottom: 1px solid #fde68a;
-      padding: 8px 16px;
-      font-size: 13px;
-      color: #92400e;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    html.dark .conflict-banner { color: #fcd34d; border-color: var(--border); }
-    .file-list-header {
-      padding: 14px 16px 8px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--fg-faint);
-      border-bottom: 1px solid var(--border);
-    }
-    .file-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 16px;
-      border-bottom: 1px solid var(--border);
-      cursor: default;
-      transition: background 0.1s;
-    }
-    .file-item:hover { background: var(--bg-subtle); }
-    .file-item.conflict { cursor: pointer; }
-    .file-item.conflict:hover { background: var(--danger-bg); }
-    .file-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-subtle-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-    .file-info { flex: 1; min-width: 0; }
-    .file-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .file-sub { font-size: 12px; color: var(--fg-muted); }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-synced { background: var(--success); }
-    .dot-conflict { background: var(--danger); }
-    .conflict-badge {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid var(--danger);
-      border-radius: 99px;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .syncing-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent);
-      animation: pulse-dot 1.2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%,100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.7); }
-    }
+      /* ── State 1: File List ── */
+      .conflict-banner {
+        background: var(--warning-bg);
+        border-bottom: 1px solid #fde68a;
+        padding: 8px 16px;
+        font-size: 13px;
+        color: #92400e;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      html.dark .conflict-banner {
+        color: #fcd34d;
+        border-color: var(--border);
+      }
+      .file-list-header {
+        padding: 14px 16px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--fg-faint);
+        border-bottom: 1px solid var(--border);
+      }
+      .file-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        cursor: default;
+        transition: background 0.1s;
+      }
+      .file-item:hover {
+        background: var(--bg-subtle);
+      }
+      .file-item.conflict {
+        cursor: pointer;
+      }
+      .file-item.conflict:hover {
+        background: var(--danger-bg);
+      }
+      .file-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        background: var(--bg-subtle-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .file-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .file-name {
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .file-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-synced {
+        background: var(--success);
+      }
+      .dot-conflict {
+        background: var(--danger);
+      }
+      .conflict-badge {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        border-radius: 99px;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .syncing-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: pulse-dot 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.7);
+        }
+      }
 
-    /* ── State 2: Conflict Detail ── */
-    .detail-header {
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .detail-header h2 { font-size: 16px; font-weight: 700; }
-    .detail-header p { font-size: 13px; color: var(--fg-muted); margin-top: 2px; }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--fg-muted);
-      cursor: pointer;
-      padding: 4px 0;
-      background: none;
-      border: none;
-      font-family: var(--font-sans);
-      transition: color 0.1s;
-      margin-bottom: 8px;
-    }
-    .back-link:hover { color: var(--accent); }
-    .version-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding: 12px 16px;
-    }
-    .version-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 12px;
-      background: var(--bg-subtle);
-    }
-    .version-card .vc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-faint); }
-    .version-card .vc-name { font-size: 13px; font-weight: 600; margin-top: 6px; }
-    .version-card .vc-meta { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
-    .version-card .vc-size { font-size: 11px; color: var(--fg-faint); margin-top: 8px; font-family: var(--font-mono); }
-    .diff-section {
-      margin: 0 16px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-    .diff-header {
-      padding: 6px 12px;
-      background: var(--bg-subtle-2);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--fg-muted);
-      border-bottom: 1px solid var(--border);
-      font-family: var(--font-mono);
-    }
-    .diff-body { padding: 8px 0; }
-    .diff-line {
-      padding: 2px 12px;
-      font-size: 12px;
-      font-family: var(--font-mono);
-      white-space: nowrap;
-    }
-    .diff-line.ctx { color: var(--fg-muted); }
-    .diff-line.del { background: #fef2f2; color: #b91c1c; }
-    html.dark .diff-line.del { background: #3d0000; color: #f87171; }
-    .diff-line.add { background: #f0fdf4; color: #15803d; }
-    html.dark .diff-line.add { background: #0f2c1a; color: #4ade80; }
-    .action-row {
-      display: flex;
-      gap: 8px;
-      padding: 0 16px 16px;
-    }
-    .btn {
-      border-radius: var(--radius-md);
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      border: 1px solid transparent;
-      transition: all 0.15s;
-      line-height: 1;
-    }
-    .btn-secondary {
-      background: var(--bg);
-      border-color: var(--border-strong);
-      color: var(--fg);
-    }
-    .btn-secondary:hover { background: var(--bg-subtle); }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-primary:hover { opacity: 0.88; }
-    .btn-danger {
-      background: var(--danger);
-      color: #fff;
-    }
+      /* ── State 2: Conflict Detail ── */
+      .detail-header {
+        padding: 16px 16px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .detail-header h2 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .detail-header p {
+        font-size: 13px;
+        color: var(--fg-muted);
+        margin-top: 2px;
+      }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: var(--fg-muted);
+        cursor: pointer;
+        padding: 4px 0;
+        background: none;
+        border: none;
+        font-family: var(--font-sans);
+        transition: color 0.1s;
+        margin-bottom: 8px;
+      }
+      .back-link:hover {
+        color: var(--accent);
+      }
+      .version-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+      .version-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        background: var(--bg-subtle);
+      }
+      .version-card .vc-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--fg-faint);
+      }
+      .version-card .vc-name {
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 6px;
+      }
+      .version-card .vc-meta {
+        font-size: 11px;
+        color: var(--fg-muted);
+        margin-top: 2px;
+      }
+      .version-card .vc-size {
+        font-size: 11px;
+        color: var(--fg-faint);
+        margin-top: 8px;
+        font-family: var(--font-mono);
+      }
+      .diff-section {
+        margin: 0 16px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      .diff-header {
+        padding: 6px 12px;
+        background: var(--bg-subtle-2);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--font-mono);
+      }
+      .diff-body {
+        padding: 8px 0;
+      }
+      .diff-line {
+        padding: 2px 12px;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        white-space: nowrap;
+      }
+      .diff-line.ctx {
+        color: var(--fg-muted);
+      }
+      .diff-line.del {
+        background: #fef2f2;
+        color: #b91c1c;
+      }
+      html.dark .diff-line.del {
+        background: #3d0000;
+        color: #f87171;
+      }
+      .diff-line.add {
+        background: #f0fdf4;
+        color: #15803d;
+      }
+      html.dark .diff-line.add {
+        background: #0f2c1a;
+        color: #4ade80;
+      }
+      .action-row {
+        display: flex;
+        gap: 8px;
+        padding: 0 16px 16px;
+      }
+      .btn {
+        border-radius: var(--radius-md);
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: var(--font-sans);
+        border: 1px solid transparent;
+        transition: all 0.15s;
+        line-height: 1;
+      }
+      .btn-secondary {
+        background: var(--bg);
+        border-color: var(--border-strong);
+        color: var(--fg);
+      }
+      .btn-secondary:hover {
+        background: var(--bg-subtle);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        opacity: 0.88;
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
 
-    /* ── States 3a / 3b: Resolved ── */
-    .resolved-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
-      text-align: center;
-      gap: 12px;
-    }
-    .success-circle {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      background: var(--success-bg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px;
-    }
-    .resolved-body h2 { font-size: 20px; font-weight: 700; }
-    .resolved-body p { font-size: 14px; color: var(--fg-muted); max-width: 320px; }
-    .resolved-note { font-size: 12px; color: var(--fg-faint); max-width: 300px; font-style: italic; margin-top: 4px; }
-    .resolved-actions { display: flex; gap: 8px; margin-top: 8px; }
+      /* ── States 3a / 3b: Resolved ── */
+      .resolved-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+        text-align: center;
+        gap: 12px;
+      }
+      .success-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--success-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+      .resolved-body h2 {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .resolved-body p {
+        font-size: 14px;
+        color: var(--fg-muted);
+        max-width: 320px;
+      }
+      .resolved-note {
+        font-size: 12px;
+        color: var(--fg-faint);
+        max-width: 300px;
+        font-style: italic;
+        margin-top: 4px;
+      }
+      .resolved-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
 
-    /* ── State 4: Manual Merge ── */
-    .merge-header {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .merge-header h2 { font-size: 15px; font-weight: 700; }
-    .merge-panels {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-      flex: 1;
-    }
-    .merge-panel {
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-    }
-    .merge-panel-label {
-      padding: 6px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--fg-faint);
-      background: var(--bg-subtle);
-      border-bottom: 1px solid var(--border);
-    }
-    .merge-panel-label.center { color: var(--accent); background: var(--accent-bg); border-color: var(--accent-border); }
-    .merge-panel textarea {
-      flex: 1;
-      border: none;
-      resize: none;
-      padding: 10px;
-      font-size: 12px;
-      font-family: var(--font-mono);
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.7;
-      min-height: 180px;
-      outline: none;
-    }
-    .merge-panel textarea[readonly] { color: var(--fg-muted); background: var(--bg-subtle); }
-    .merge-footer {
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+      /* ── State 4: Manual Merge ── */
+      .merge-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .merge-header h2 {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .merge-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1px;
+        background: var(--border);
+        flex: 1;
+      }
+      .merge-panel {
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+      }
+      .merge-panel-label {
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--fg-faint);
+        background: var(--bg-subtle);
+        border-bottom: 1px solid var(--border);
+      }
+      .merge-panel-label.center {
+        color: var(--accent);
+        background: var(--accent-bg);
+        border-color: var(--accent-border);
+      }
+      .merge-panel textarea {
+        flex: 1;
+        border: none;
+        resize: none;
+        padding: 10px;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.7;
+        min-height: 180px;
+        outline: none;
+      }
+      .merge-panel textarea[readonly] {
+        color: var(--fg-muted);
+        background: var(--bg-subtle);
+      }
+      .merge-footer {
+        padding: 10px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-    /* ── State 5: Merge Saved ── */
-    .merge-saved-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
-      text-align: center;
-      gap: 16px;
-    }
-    .pulse-ring-wrap { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
-    .pulse-ring {
-      position: absolute; inset: 0;
-      border-radius: 50%;
-      border: 3px solid var(--success);
-      animation: ring-pulse 1.5s ease-out infinite;
-    }
-    @keyframes ring-pulse {
-      0% { transform: scale(0.85); opacity: 1; }
-      100% { transform: scale(1.4); opacity: 0; }
-    }
-    .pulse-inner {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--success-bg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      position: relative; z-index: 1;
-    }
-    .merge-saved-body h2 { font-size: 18px; font-weight: 700; }
-    .merge-saved-body p { font-size: 14px; color: var(--fg-muted); }
-    .sync-complete { font-size: 13px; color: var(--success); font-weight: 600; opacity: 0; transition: opacity 0.4s; }
-    .sync-complete.visible { opacity: 1; }
+      /* ── State 5: Merge Saved ── */
+      .merge-saved-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+        text-align: center;
+        gap: 16px;
+      }
+      .pulse-ring-wrap {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .pulse-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 3px solid var(--success);
+        animation: ring-pulse 1.5s ease-out infinite;
+      }
+      @keyframes ring-pulse {
+        0% {
+          transform: scale(0.85);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.4);
+          opacity: 0;
+        }
+      }
+      .pulse-inner {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--success-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        position: relative;
+        z-index: 1;
+      }
+      .merge-saved-body h2 {
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .merge-saved-body p {
+        font-size: 14px;
+        color: var(--fg-muted);
+      }
+      .sync-complete {
+        font-size: 13px;
+        color: var(--success);
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+      .sync-complete.visible {
+        opacity: 1;
+      }
 
-    /* ── Breadcrumb ── */
-    .breadcrumb-area {
-      padding: 10px 24px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      min-height: 40px;
-    }
-    .breadcrumb-area .bc-label { font-size: 11px; color: var(--fg-faint); margin-right: 4px; }
-    .bc-pill {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      padding: 2px 10px;
-      font-size: 11px;
-      color: var(--fg-muted);
-      cursor: pointer;
-      transition: all 0.1s;
-    }
-    .bc-pill:hover { border-color: var(--accent); color: var(--accent); }
-    .bc-pill.current { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); font-weight: 600; }
-    .bc-sep { font-size: 11px; color: var(--fg-faint); }
+      /* ── Breadcrumb ── */
+      .breadcrumb-area {
+        padding: 10px 24px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        min-height: 40px;
+      }
+      .breadcrumb-area .bc-label {
+        font-size: 11px;
+        color: var(--fg-faint);
+        margin-right: 4px;
+      }
+      .bc-pill {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 99px;
+        padding: 2px 10px;
+        font-size: 11px;
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: all 0.1s;
+      }
+      .bc-pill:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .bc-pill.current {
+        background: var(--accent-bg);
+        border-color: var(--accent-border);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .bc-sep {
+        font-size: 11px;
+        color: var(--fg-faint);
+      }
 
-    /* ── Sticky notes ── */
-    .sticky-note {
-      position: absolute;
-      background: #fef9c3;
-      border: 1px solid #fde68a;
-      border-radius: var(--radius-sm);
-      padding: 6px 8px;
-      min-width: 140px;
-      max-width: 200px;
-      box-shadow: var(--shadow-md);
-      z-index: 50;
-      font-size: 12px;
-      color: #78350f;
-      cursor: move;
-      line-height: 1.4;
-    }
-    html.dark .sticky-note { background: #3d2e00; border-color: #78350f; color: #fcd34d; }
-    .sticky-note .note-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-    .sticky-note .note-ts { font-size: 10px; color: #a16207; }
-    html.dark .sticky-note .note-ts { color: #d97706; }
-    .sticky-note .note-close {
-      background: none; border: none; cursor: pointer;
-      font-size: 14px; line-height: 1; padding: 0; color: #a16207;
-      font-family: var(--font-sans);
-    }
-    .sticky-note [contenteditable] { outline: none; min-height: 24px; }
+      /* ── Sticky notes ── */
+      .sticky-note {
+        position: absolute;
+        background: #fef9c3;
+        border: 1px solid #fde68a;
+        border-radius: var(--radius-sm);
+        padding: 6px 8px;
+        min-width: 140px;
+        max-width: 200px;
+        box-shadow: var(--shadow-md);
+        z-index: 50;
+        font-size: 12px;
+        color: #78350f;
+        cursor: move;
+        line-height: 1.4;
+      }
+      html.dark .sticky-note {
+        background: #3d2e00;
+        border-color: #78350f;
+        color: #fcd34d;
+      }
+      .sticky-note .note-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+      .sticky-note .note-ts {
+        font-size: 10px;
+        color: #a16207;
+      }
+      html.dark .sticky-note .note-ts {
+        color: #d97706;
+      }
+      .sticky-note .note-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0;
+        color: #a16207;
+        font-family: var(--font-sans);
+      }
+      .sticky-note [contenteditable] {
+        outline: none;
+        min-height: 24px;
+      }
 
-    /* ── Export modal ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 200;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-    }
-    .modal-overlay.hidden { display: none; }
-    .modal-box {
-      background: var(--bg);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      width: 100%; max-width: 560px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.15);
-    }
-    .modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-    .modal-box .modal-sub { font-size: 12px; color: var(--fg-muted); margin-bottom: 12px; }
-    .modal-box textarea {
-      width: 100%; height: 220px; border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 10px;
-      font-size: 12px; font-family: var(--font-mono);
-      background: var(--bg-subtle); color: var(--fg);
-      resize: none; outline: none; line-height: 1.6;
-    }
-    .modal-hint {
-      margin-top: 10px; font-size: 12px; color: var(--fg-faint);
-      background: var(--bg-subtle); border-radius: var(--radius-sm);
-      padding: 8px 10px; border-left: 3px solid var(--accent-border);
-    }
-    .modal-hint strong { color: var(--fg-muted); }
-    .modal-footer { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
+      /* ── Export modal ── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .modal-overlay.hidden {
+        display: none;
+      }
+      .modal-box {
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        width: 100%;
+        max-width: 560px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+      }
+      .modal-box h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .modal-box .modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        margin-bottom: 12px;
+      }
+      .modal-box textarea {
+        width: 100%;
+        height: 220px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 10px;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        background: var(--bg-subtle);
+        color: var(--fg);
+        resize: none;
+        outline: none;
+        line-height: 1.6;
+      }
+      .modal-hint {
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--fg-faint);
+        background: var(--bg-subtle);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        border-left: 3px solid var(--accent-border);
+      }
+      .modal-hint strong {
+        color: var(--fg-muted);
+      }
+      .modal-footer {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
 
-    /* ── Outer wrapper ── */
-    .outer-body {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px 64px;
-    }
-  </style>
-</head>
-<body>
+      /* ── Outer wrapper ── */
+      .outer-body {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 24px 64px;
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
 
-  <!-- Outer nav -->
-  <nav class="outer-nav">
-    <a href="../index.html">← Acme Sync</a>
-    <span class="nav-sep">|</span>
-    <span class="nav-title">Conflict Resolution Flow</span>
-    <button class="btn-sm" id="annotate-toggle" type="button">Annotate</button>
-    <button class="btn-sm" id="export-btn" type="button">Export annotations →</button>
-    <button class="btn-sm" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-  </nav>
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
 
-  <div class="outer-body">
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
 
-    <!-- Device frame selector -->
-    <div class="frame-controls">
-      <span>Device:</span>
-      <button class="frame-btn" type="button" data-frame="mobile">Mobile (375px)</button>
-      <button class="frame-btn" type="button" data-frame="tablet">Tablet (768px)</button>
-      <button class="frame-btn active" type="button" data-frame="desktop">Desktop</button>
-    </div>
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
 
-    <!-- Device frame -->
-    <div class="device-frame frame-desktop" id="device-frame">
-      <!-- App chrome -->
-      <div class="app-chrome">
-        <!-- Titlebar -->
-        <div class="app-titlebar">
-          <div class="dot dot-red"></div>
-          <div class="dot dot-yellow"></div>
-          <div class="dot dot-green"></div>
-          <div class="app-logo">Acme Sync <span>— 5 files</span></div>
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <!-- Outer nav -->
+    <nav class="outer-nav">
+      <a href="../index.html">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-title">Conflict Resolution Flow</span>
+      <button class="btn-sm" id="annotate-toggle" type="button">
+        Annotate
+      </button>
+      <button class="btn-sm" id="export-btn" type="button">
+        Export annotations →
+      </button>
+      <button
+        class="btn-sm"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">I want a clickable prototype to walk through the conflict resolution flow before we build the real UI. Generate an HTML prototype with the key screens and interactions — from detecting a conflict to choosing a resolution and confirming sync.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
         </div>
 
-        <!-- State 1: File List -->
-        <div class="state active" id="state-file-list" data-label="File List">
-          <div class="conflict-banner">⚠ 1 file has a conflict that needs your attention</div>
-          <div class="file-list-header">Files</div>
-          <div class="file-item">
-            <div class="file-icon">📄</div>
-            <div class="file-info">
-              <div class="file-name">project-proposal.docx</div>
-              <div class="file-sub">Synced just now</div>
-            </div>
-            <div class="status-dot dot-synced" title="Synced"></div>
-          </div>
-          <div class="file-item">
-            <div class="file-icon">📊</div>
-            <div class="file-info">
-              <div class="file-name">budget-2026.xlsx</div>
-              <div class="file-sub">Synced 4 min ago</div>
-            </div>
-            <div class="status-dot dot-synced" title="Synced"></div>
-          </div>
-          <div class="file-item conflict" id="conflict-row" role="button" tabindex="0" aria-label="Resolve conflict for design-brief.pdf">
-            <div class="file-icon">🎨</div>
-            <div class="file-info">
-              <div class="file-name">design-brief.pdf</div>
-              <div class="file-sub">2 versions · Click to resolve</div>
-            </div>
-            <span class="conflict-badge">⚠ CONFLICT</span>
-          </div>
-          <div class="file-item">
-            <div class="file-icon">📝</div>
-            <div class="file-info">
-              <div class="file-name">meeting-notes.txt</div>
-              <div class="file-sub">Syncing…</div>
-            </div>
-            <div class="syncing-dot" title="Syncing"></div>
-          </div>
-          <div class="file-item">
-            <div class="file-icon">🖼</div>
-            <div class="file-info">
-              <div class="file-name">logo-final.png</div>
-              <div class="file-sub">Synced 12 min ago</div>
-            </div>
-            <div class="status-dot dot-synced" title="Synced"></div>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a prototype for the Acme Sync conflict resolution flow — clickable screens from conflict detection through resolution options and sync confirmation</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
           </div>
         </div>
 
-        <!-- State 2: Conflict Detail -->
-        <div class="state" id="state-conflict-detail" data-label="Conflict Detail">
-          <div class="detail-header">
-            <button class="back-link" type="button" id="back-to-files-1">← Back to files</button>
-            <h2>design-brief.pdf</h2>
-            <p>2 conflicting versions — choose how to resolve</p>
-          </div>
-          <div class="version-cards">
-            <div class="version-card">
-              <div class="vc-label">Your version</div>
-              <div class="vc-name">design-brief.pdf</div>
-              <div class="vc-meta">Modified 2h ago · By You</div>
-              <div class="vc-size">84 KB</div>
-            </div>
-            <div class="version-card">
-              <div class="vc-label">Team version</div>
-              <div class="vc-name">design-brief.pdf (conflict)</div>
-              <div class="vc-meta">Modified 3h ago · By @priya</div>
-              <div class="vc-size">91 KB</div>
-            </div>
-          </div>
-          <div class="diff-section">
-            <div class="diff-header">design-brief.pdf — diff preview</div>
-            <div class="diff-body">
-              <div class="diff-line ctx"> &nbsp; Scope: Brand refresh for Q3 campaign</div>
-              <div class="diff-line ctx"> &nbsp; Timeline: 6 weeks · Kickoff: June 2</div>
-              <div class="diff-line del">-&nbsp; Budget: $45,000</div>
-              <div class="diff-line add">+&nbsp; Budget: $52,000</div>
-              <div class="diff-line ctx"> &nbsp; Deliverables: Logo variants, color system, type scale</div>
-            </div>
-          </div>
-          <div class="action-row">
-            <button class="btn btn-secondary" type="button" id="keep-mine">Keep Mine</button>
-            <button class="btn btn-secondary" type="button" id="keep-theirs">Keep Theirs</button>
-            <button class="btn btn-primary" type="button" id="merge-manually">Merge Manually</button>
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate an interactive prototype for Acme Sync's conflict resolution flow — include clickable screens for conflict detection, resolution option selection, and sync confirmation</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
           </div>
         </div>
 
-        <!-- State 3a: Resolved Mine -->
-        <div class="state" id="state-resolved-mine" data-label="Resolved: Kept Yours">
-          <div class="resolved-body">
-            <div class="success-circle">✓</div>
-            <h2>Conflict resolved</h2>
-            <p>Your version of <strong>design-brief.pdf</strong> has been kept. Priya's version was discarded.</p>
-            <p class="resolved-note">Priya will be notified that their version was not used.</p>
-            <div class="resolved-actions">
-              <button class="btn btn-secondary" type="button">View file</button>
-              <button class="btn btn-primary" type="button" id="back-from-3a">Back to files</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- State 3b: Resolved Theirs -->
-        <div class="state" id="state-resolved-theirs" data-label="Resolved: Kept Theirs">
-          <div class="resolved-body">
-            <div class="success-circle">✓</div>
-            <h2>Conflict resolved</h2>
-            <p>Priya's version of <strong>design-brief.pdf</strong> has been kept. Your local changes were discarded.</p>
-            <p class="resolved-note">Your previous version has been archived in version history for 30 days.</p>
-            <div class="resolved-actions">
-              <button class="btn btn-secondary" type="button">View file</button>
-              <button class="btn btn-primary" type="button" id="back-from-3b">Back to files</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- State 4: Manual Merge -->
-        <div class="state" id="state-manual-merge" data-label="Manual Merge">
-          <div class="merge-header">
-            <h2>Merge editor — design-brief.pdf</h2>
-            <button class="back-link" type="button" id="cancel-merge">← Cancel</button>
-          </div>
-          <div class="merge-panels">
-            <div class="merge-panel">
-              <div class="merge-panel-label">Your version</div>
-              <textarea readonly>Scope: Brand refresh for Q3 campaign
-Timeline: 6 weeks · Kickoff: June 2
-Budget: $45,000
-Deliverables: Logo variants, color system, type scale</textarea>
-            </div>
-            <div class="merge-panel">
-              <div class="merge-panel-label center">Merged result (edit me)</div>
-              <textarea id="merged-ta">Scope: Brand refresh for Q3 campaign
-Timeline: 6 weeks · Kickoff: June 2
-Budget: $52,000
-Deliverables: Logo variants, color system, type scale</textarea>
-            </div>
-            <div class="merge-panel">
-              <div class="merge-panel-label">Their version (@priya)</div>
-              <textarea readonly>Scope: Brand refresh for Q3 campaign
-Timeline: 6 weeks · Kickoff: June 2
-Budget: $52,000
-Deliverables: Logo variants, color system, type scale</textarea>
-            </div>
-          </div>
-          <div class="merge-footer">
-            <button class="btn btn-primary" type="button" id="save-merge">Save merged version</button>
-            <button class="back-link" type="button" id="cancel-merge-2">Cancel</button>
-          </div>
-        </div>
-
-        <!-- State 5: Merge Saved -->
-        <div class="state" id="state-merge-saved" data-label="Merge Saved">
-          <div class="merge-saved-body">
-            <div class="pulse-ring-wrap">
-              <div class="pulse-ring"></div>
-              <div class="pulse-inner">✓</div>
-            </div>
-            <h2>Merge saved</h2>
-            <p>Merged version of <strong>design-brief.pdf</strong> saved and syncing…</p>
-            <div class="sync-complete" id="sync-complete-text">Sync complete ✓</div>
-            <button class="btn btn-primary" type="button" id="back-from-5" style="margin-top:8px">Back to files</button>
-          </div>
-        </div>
-
-      </div><!-- .app-chrome -->
-    </div><!-- .device-frame -->
-
-    <!-- Breadcrumb trail -->
-    <div class="breadcrumb-area" id="breadcrumb-area">
-      <span class="bc-label">Path:</span>
-    </div>
-
-  </div><!-- .outer-body -->
-
-  <!-- Export modal -->
-  <div class="modal-overlay hidden" id="export-modal" role="dialog" aria-modal="true" aria-label="Export annotations">
-    <div class="modal-box">
-      <h3>Export annotations to Claude</h3>
-      <p class="modal-sub">Copy and paste this into Claude to iterate on the design.</p>
-      <textarea id="export-ta" readonly></textarea>
-      <div class="modal-hint"><strong>Tip:</strong> Paste into Claude with: "Here are my prototype annotations — let's iterate on the design."</div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" type="button" id="copy-export">Copy to clipboard</button>
-        <button class="btn btn-primary" type="button" id="close-modal">Close</button>
       </div>
     </div>
-  </div>
 
-  <script>
-    /* ── Dark mode (must be first) ── */
-    (function(){
-      var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-      if(t==='dark')document.documentElement.classList.add('dark');
-      document.getElementById('dm-toggle').addEventListener('click',function(){
-        var d=document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ha-theme',d?'dark':'light');
-      });
-    })();
 
-    /* ── State machine ── */
-    var history_stack = [];
-    var current_state = 'file-list';
+    <div class="outer-body">
+      <!-- Device frame selector -->
+      <div class="frame-controls">
+        <span>Device:</span>
+        <button class="frame-btn" type="button" data-frame="mobile">
+          Mobile (375px)
+        </button>
+        <button class="frame-btn" type="button" data-frame="tablet">
+          Tablet (768px)
+        </button>
+        <button class="frame-btn active" type="button" data-frame="desktop">
+          Desktop
+        </button>
+      </div>
 
-    function goToState(id) {
-      var all = document.querySelectorAll('.state');
-      all.forEach(function(el){ el.classList.remove('active'); });
-      var target = document.getElementById('state-' + id);
-      if (target) {
-        target.classList.add('active');
-        current_state = id;
-        pushHistory(id);
-        updateBreadcrumb();
-        /* State 5 auto-reveal */
-        if (id === 'merge-saved') {
-          var syncText = document.getElementById('sync-complete-text');
-          syncText.classList.remove('visible');
-          setTimeout(function(){ syncText.classList.add('visible'); }, 1500);
-        }
-      }
-    }
+      <!-- Device frame -->
+      <div class="device-frame frame-desktop" id="device-frame">
+        <!-- App chrome -->
+        <div class="app-chrome">
+          <!-- Titlebar -->
+          <div class="app-titlebar">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+            <div class="app-logo">Acme Sync <span>— 5 files</span></div>
+          </div>
 
-    function pushHistory(id) {
-      if (history_stack.length === 0 || history_stack[history_stack.length - 1] !== id) {
-        history_stack.push(id);
-        window.history.pushState({ state: id }, '', '#' + id);
-      }
-    }
+          <!-- State 1: File List -->
+          <div class="state active" id="state-file-list" data-label="File List">
+            <div class="conflict-banner">
+              ⚠ 1 file has a conflict that needs your attention
+            </div>
+            <div class="file-list-header">Files</div>
+            <div class="file-item">
+              <div class="file-icon">📄</div>
+              <div class="file-info">
+                <div class="file-name">project-proposal.docx</div>
+                <div class="file-sub">Synced just now</div>
+              </div>
+              <div class="status-dot dot-synced" title="Synced"></div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon">📊</div>
+              <div class="file-info">
+                <div class="file-name">budget-2026.xlsx</div>
+                <div class="file-sub">Synced 4 min ago</div>
+              </div>
+              <div class="status-dot dot-synced" title="Synced"></div>
+            </div>
+            <div
+              class="file-item conflict"
+              id="conflict-row"
+              role="button"
+              tabindex="0"
+              aria-label="Resolve conflict for design-brief.pdf"
+            >
+              <div class="file-icon">🎨</div>
+              <div class="file-info">
+                <div class="file-name">design-brief.pdf</div>
+                <div class="file-sub">2 versions · Click to resolve</div>
+              </div>
+              <span class="conflict-badge">⚠ CONFLICT</span>
+            </div>
+            <div class="file-item">
+              <div class="file-icon">📝</div>
+              <div class="file-info">
+                <div class="file-name">meeting-notes.txt</div>
+                <div class="file-sub">Syncing…</div>
+              </div>
+              <div class="syncing-dot" title="Syncing"></div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon">🖼</div>
+              <div class="file-info">
+                <div class="file-name">logo-final.png</div>
+                <div class="file-sub">Synced 12 min ago</div>
+              </div>
+              <div class="status-dot dot-synced" title="Synced"></div>
+            </div>
+          </div>
 
-    /* Breadcrumb */
-    var STATE_LABELS = {
-      'file-list': 'File List',
-      'conflict-detail': 'Conflict Detail',
-      'resolved-mine': 'Resolved: Kept Yours',
-      'resolved-theirs': 'Resolved: Kept Theirs',
-      'manual-merge': 'Manual Merge',
-      'merge-saved': 'Merge Saved'
-    };
+          <!-- State 2: Conflict Detail -->
+          <div
+            class="state"
+            id="state-conflict-detail"
+            data-label="Conflict Detail"
+          >
+            <div class="detail-header">
+              <button class="back-link" type="button" id="back-to-files-1">
+                ← Back to files
+              </button>
+              <h2>design-brief.pdf</h2>
+              <p>2 conflicting versions — choose how to resolve</p>
+            </div>
+            <div class="version-cards">
+              <div class="version-card">
+                <div class="vc-label">Your version</div>
+                <div class="vc-name">design-brief.pdf</div>
+                <div class="vc-meta">Modified 2h ago · By You</div>
+                <div class="vc-size">84 KB</div>
+              </div>
+              <div class="version-card">
+                <div class="vc-label">Team version</div>
+                <div class="vc-name">design-brief.pdf (conflict)</div>
+                <div class="vc-meta">Modified 3h ago · By @priya</div>
+                <div class="vc-size">91 KB</div>
+              </div>
+            </div>
+            <div class="diff-section">
+              <div class="diff-header">design-brief.pdf — diff preview</div>
+              <div class="diff-body">
+                <div class="diff-line ctx">
+                  &nbsp; Scope: Brand refresh for Q3 campaign
+                </div>
+                <div class="diff-line ctx">
+                  &nbsp; Timeline: 6 weeks · Kickoff: June 2
+                </div>
+                <div class="diff-line del">-&nbsp; Budget: $45,000</div>
+                <div class="diff-line add">+&nbsp; Budget: $52,000</div>
+                <div class="diff-line ctx">
+                  &nbsp; Deliverables: Logo variants, color system, type scale
+                </div>
+              </div>
+            </div>
+            <div class="action-row">
+              <button class="btn btn-secondary" type="button" id="keep-mine">
+                Keep Mine
+              </button>
+              <button class="btn btn-secondary" type="button" id="keep-theirs">
+                Keep Theirs
+              </button>
+              <button class="btn btn-primary" type="button" id="merge-manually">
+                Merge Manually
+              </button>
+            </div>
+          </div>
 
-    function updateBreadcrumb() {
-      var area = document.getElementById('breadcrumb-area');
-      area.innerHTML = '<span class="bc-label">Path:</span>';
-      var seen = [];
-      history_stack.forEach(function(id, i) {
-        if (seen.indexOf(id) !== -1) return;
-        seen.push(id);
-        if (i > 0) {
-          var sep = document.createElement('span');
-          sep.className = 'bc-sep';
-          sep.textContent = '›';
-          area.appendChild(sep);
-        }
-        var pill = document.createElement('button');
-        pill.type = 'button';
-        pill.className = 'bc-pill' + (id === current_state ? ' current' : '');
-        pill.textContent = STATE_LABELS[id] || id;
-        (function(sid){ pill.addEventListener('click', function(){ goToState(sid); }); })(id);
-        area.appendChild(pill);
-      });
-    }
+          <!-- State 3a: Resolved Mine -->
+          <div
+            class="state"
+            id="state-resolved-mine"
+            data-label="Resolved: Kept Yours"
+          >
+            <div class="resolved-body">
+              <div class="success-circle">✓</div>
+              <h2>Conflict resolved</h2>
+              <p>
+                Your version of <strong>design-brief.pdf</strong> has been kept.
+                Priya's version was discarded.
+              </p>
+              <p class="resolved-note">
+                Priya will be notified that their version was not used.
+              </p>
+              <div class="resolved-actions">
+                <button class="btn btn-secondary" type="button">
+                  View file
+                </button>
+                <button class="btn btn-primary" type="button" id="back-from-3a">
+                  Back to files
+                </button>
+              </div>
+            </div>
+          </div>
 
-    /* Browser back */
-    window.addEventListener('popstate', function(e) {
-      if (e.state && e.state.state) {
-        var all = document.querySelectorAll('.state');
-        all.forEach(function(el){ el.classList.remove('active'); });
-        var target = document.getElementById('state-' + e.state.state);
+          <!-- State 3b: Resolved Theirs -->
+          <div
+            class="state"
+            id="state-resolved-theirs"
+            data-label="Resolved: Kept Theirs"
+          >
+            <div class="resolved-body">
+              <div class="success-circle">✓</div>
+              <h2>Conflict resolved</h2>
+              <p>
+                Priya's version of <strong>design-brief.pdf</strong> has been
+                kept. Your local changes were discarded.
+              </p>
+              <p class="resolved-note">
+                Your previous version has been archived in version history for
+                30 days.
+              </p>
+              <div class="resolved-actions">
+                <button class="btn btn-secondary" type="button">
+                  View file
+                </button>
+                <button class="btn btn-primary" type="button" id="back-from-3b">
+                  Back to files
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- State 4: Manual Merge -->
+          <div class="state" id="state-manual-merge" data-label="Manual Merge">
+            <div class="merge-header">
+              <h2>Merge editor — design-brief.pdf</h2>
+              <button class="back-link" type="button" id="cancel-merge">
+                ← Cancel
+              </button>
+            </div>
+            <div class="merge-panels">
+              <div class="merge-panel">
+                <div class="merge-panel-label">Your version</div>
+                <textarea readonly>
+Scope: Brand refresh for Q3 campaign
+Timeline: 6 weeks · Kickoff: June 2
+Budget: $45,000
+Deliverables: Logo variants, color system, type scale</textarea
+                >
+              </div>
+              <div class="merge-panel">
+                <div class="merge-panel-label center">
+                  Merged result (edit me)
+                </div>
+                <textarea id="merged-ta">
+Scope: Brand refresh for Q3 campaign
+Timeline: 6 weeks · Kickoff: June 2
+Budget: $52,000
+Deliverables: Logo variants, color system, type scale</textarea
+                >
+              </div>
+              <div class="merge-panel">
+                <div class="merge-panel-label">Their version (@priya)</div>
+                <textarea readonly>
+Scope: Brand refresh for Q3 campaign
+Timeline: 6 weeks · Kickoff: June 2
+Budget: $52,000
+Deliverables: Logo variants, color system, type scale</textarea
+                >
+              </div>
+            </div>
+            <div class="merge-footer">
+              <button class="btn btn-primary" type="button" id="save-merge">
+                Save merged version
+              </button>
+              <button class="back-link" type="button" id="cancel-merge-2">
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <!-- State 5: Merge Saved -->
+          <div class="state" id="state-merge-saved" data-label="Merge Saved">
+            <div class="merge-saved-body">
+              <div class="pulse-ring-wrap">
+                <div class="pulse-ring"></div>
+                <div class="pulse-inner">✓</div>
+              </div>
+              <h2>Merge saved</h2>
+              <p>
+                Merged version of <strong>design-brief.pdf</strong> saved and
+                syncing…
+              </p>
+              <div class="sync-complete" id="sync-complete-text">
+                Sync complete ✓
+              </div>
+              <button
+                class="btn btn-primary"
+                type="button"
+                id="back-from-5"
+                style="margin-top: 8px"
+              >
+                Back to files
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- .app-chrome -->
+      </div>
+      <!-- .device-frame -->
+
+      <!-- Breadcrumb trail -->
+      <div class="breadcrumb-area" id="breadcrumb-area">
+        <span class="bc-label">Path:</span>
+      </div>
+    </div>
+    <!-- .outer-body -->
+
+    <!-- Export modal -->
+    <div
+      class="modal-overlay hidden"
+      id="export-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Export annotations"
+    >
+      <div class="modal-box">
+        <h3>Export annotations to Claude</h3>
+        <p class="modal-sub">
+          Copy and paste this into Claude to iterate on the design.
+        </p>
+        <textarea id="export-ta" readonly></textarea>
+        <div class="modal-hint">
+          <strong>Tip:</strong> Paste into Claude with: "Here are my prototype
+          annotations — let's iterate on the design."
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" id="copy-export">
+            Copy to clipboard
+          </button>
+          <button class="btn btn-primary" type="button" id="close-modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ── Dark mode (must be first) ── */
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+
+      /* ── State machine ── */
+      var history_stack = []
+      var current_state = 'file-list'
+
+      function goToState(id) {
+        var all = document.querySelectorAll('.state')
+        all.forEach(function (el) {
+          el.classList.remove('active')
+        })
+        var target = document.getElementById('state-' + id)
         if (target) {
-          target.classList.add('active');
-          current_state = e.state.state;
-          updateBreadcrumb();
+          target.classList.add('active')
+          current_state = id
+          pushHistory(id)
+          updateBreadcrumb()
+          /* State 5 auto-reveal */
+          if (id === 'merge-saved') {
+            var syncText = document.getElementById('sync-complete-text')
+            syncText.classList.remove('visible')
+            setTimeout(function () {
+              syncText.classList.add('visible')
+            }, 1500)
+          }
         }
       }
-    });
 
-    /* ── Wire up transitions ── */
-    function wireClick(id, nextState) {
-      var el = document.getElementById(id);
-      if (el) el.addEventListener('click', function(){ goToState(nextState); });
-    }
-
-    document.getElementById('conflict-row').addEventListener('click', function(){ goToState('conflict-detail'); });
-    document.getElementById('conflict-row').addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') goToState('conflict-detail'); });
-    wireClick('back-to-files-1', 'file-list');
-    wireClick('keep-mine', 'resolved-mine');
-    wireClick('keep-theirs', 'resolved-theirs');
-    wireClick('merge-manually', 'manual-merge');
-    wireClick('back-from-3a', 'file-list');
-    wireClick('back-from-3b', 'file-list');
-    wireClick('cancel-merge', 'conflict-detail');
-    wireClick('cancel-merge-2', 'conflict-detail');
-    wireClick('save-merge', 'merge-saved');
-    wireClick('back-from-5', 'file-list');
-
-    /* Initialise breadcrumb */
-    pushHistory('file-list');
-    updateBreadcrumb();
-
-    /* ── Device frame selector ── */
-    var frameBtns = document.querySelectorAll('.frame-btn');
-    var frame = document.getElementById('device-frame');
-    frameBtns.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        frameBtns.forEach(function(b){ b.classList.remove('active'); });
-        btn.classList.add('active');
-        var f = btn.getAttribute('data-frame');
-        frame.className = 'device-frame frame-' + f;
-      });
-    });
-
-    /* ── Annotation mode ── */
-    var annotating = false;
-    var notes = [];
-    var noteIdCounter = 0;
-    var draggingNote = null;
-    var dragOffX = 0, dragOffY = 0;
-
-    var annotateBtn = document.getElementById('annotate-toggle');
-    annotateBtn.addEventListener('click', function() {
-      annotating = !annotating;
-      annotateBtn.classList.toggle('active', annotating);
-      document.body.classList.toggle('annotating', annotating);
-    });
-
-    function formatTime() {
-      var d = new Date();
-      return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-    }
-
-    frame.addEventListener('click', function(e) {
-      if (!annotating) return;
-      /* Don't create note if clicking an existing note or interactive element */
-      if (e.target.closest('.sticky-note')) return;
-      if (e.target.closest('button') || e.target.closest('textarea') || e.target.closest('[role="button"]')) return;
-
-      var rect = frame.getBoundingClientRect();
-      var xPct = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-      var yPct = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-      createNote(xPct, yPct, current_state, '');
-    });
-
-    function createNote(xPct, yPct, stateId, text) {
-      var id = ++noteIdCounter;
-      var note = document.createElement('div');
-      note.className = 'sticky-note';
-      note.id = 'note-' + id;
-      note.style.left = xPct + '%';
-      note.style.top = yPct + '%';
-
-      var header = document.createElement('div');
-      header.className = 'note-header';
-
-      var ts = document.createElement('span');
-      ts.className = 'note-ts';
-      ts.textContent = formatTime();
-
-      var closeBtn = document.createElement('button');
-      closeBtn.type = 'button';
-      closeBtn.className = 'note-close';
-      closeBtn.setAttribute('aria-label', 'Remove annotation');
-      closeBtn.textContent = '×';
-      closeBtn.addEventListener('click', function() {
-        frame.removeChild(note);
-        notes = notes.filter(function(n){ return n.id !== id; });
-      });
-
-      header.appendChild(ts);
-      header.appendChild(closeBtn);
-
-      var content = document.createElement('div');
-      content.contentEditable = 'true';
-      content.setAttribute('aria-label', 'Annotation text');
-      content.textContent = text || '';
-      content.setAttribute('data-placeholder', 'Type annotation…');
-      content.style.minHeight = '24px';
-
-      content.addEventListener('input', function() {
-        var noteObj = notes.find(function(n){ return n.id === id; });
-        if (noteObj) noteObj.text = content.textContent;
-      });
-
-      note.appendChild(header);
-      note.appendChild(content);
-      frame.style.position = 'relative';
-      frame.appendChild(note);
-
-      var noteData = { id: id, xPct: xPct, yPct: yPct, stateId: stateId, text: text, el: note, ts: formatTime() };
-      notes.push(noteData);
-
-      /* Drag */
-      note.addEventListener('mousedown', function(e) {
-        if (e.target === closeBtn || e.target === content) return;
-        draggingNote = { el: note, data: noteData };
-        var noteRect = note.getBoundingClientRect();
-        dragOffX = e.clientX - noteRect.left;
-        dragOffY = e.clientY - noteRect.top;
-        e.preventDefault();
-      });
-
-      setTimeout(function(){ content.focus(); }, 50);
-    }
-
-    document.addEventListener('mousemove', function(e) {
-      if (!draggingNote) return;
-      var rect = frame.getBoundingClientRect();
-      var x = ((e.clientX - rect.left - dragOffX) / rect.width * 100).toFixed(1);
-      var y = ((e.clientY - rect.top - dragOffY) / rect.height * 100).toFixed(1);
-      draggingNote.el.style.left = x + '%';
-      draggingNote.el.style.top = y + '%';
-      draggingNote.data.xPct = x;
-      draggingNote.data.yPct = y;
-    });
-
-    document.addEventListener('mouseup', function() { draggingNote = null; });
-
-    /* ── Export annotations ── */
-    var exportBtn = document.getElementById('export-btn');
-    var exportModal = document.getElementById('export-modal');
-    var exportTa = document.getElementById('export-ta');
-    var closeModalBtn = document.getElementById('close-modal');
-    var copyExportBtn = document.getElementById('copy-export');
-
-    exportBtn.addEventListener('click', function() {
-      exportTa.value = buildAnnotationMarkdown();
-      exportModal.classList.remove('hidden');
-      exportTa.focus();
-    });
-
-    closeModalBtn.addEventListener('click', function(){ exportModal.classList.add('hidden'); });
-
-    exportModal.addEventListener('click', function(e) {
-      if (e.target === exportModal) exportModal.classList.add('hidden');
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') exportModal.classList.add('hidden');
-    });
-
-    copyExportBtn.addEventListener('click', function() {
-      var text = exportTa.value;
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(function() {
-          var orig = copyExportBtn.textContent;
-          copyExportBtn.textContent = 'Copied!';
-          setTimeout(function(){ copyExportBtn.textContent = orig; }, 1800);
-        });
+      function pushHistory(id) {
+        if (
+          history_stack.length === 0 ||
+          history_stack[history_stack.length - 1] !== id
+        ) {
+          history_stack.push(id)
+          window.history.pushState({ state: id }, '', '#' + id)
+        }
       }
-    });
 
-    function buildAnnotationMarkdown() {
-      if (notes.length === 0) {
-        return '## Prototype Annotations: Conflict Resolution Flow\n\n_No annotations yet. Enable Annotate mode and click on the prototype to add notes._';
+      /* Breadcrumb */
+      var STATE_LABELS = {
+        'file-list': 'File List',
+        'conflict-detail': 'Conflict Detail',
+        'resolved-mine': 'Resolved: Kept Yours',
+        'resolved-theirs': 'Resolved: Kept Theirs',
+        'manual-merge': 'Manual Merge',
+        'merge-saved': 'Merge Saved',
       }
-      var byState = {};
-      notes.forEach(function(n) {
-        if (!byState[n.stateId]) byState[n.stateId] = [];
-        byState[n.stateId].push(n);
-      });
-      var lines = ['## Prototype Annotations: Conflict Resolution Flow', ''];
-      Object.keys(byState).forEach(function(sid) {
-        var label = STATE_LABELS[sid] || sid;
-        lines.push('### State: ' + label);
-        byState[sid].forEach(function(n) {
-          var txt = n.el.querySelector('[contenteditable]').textContent.trim() || '(empty)';
-          lines.push('- [at ' + n.xPct + '%, ' + n.yPct + '%] "' + txt + '" (' + n.ts + ')');
-        });
-        lines.push('');
-      });
-      return lines.join('\n');
-    }
-  </script>
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Prototype Interaction · May 2026
-</footer>
-</body>
+      function updateBreadcrumb() {
+        var area = document.getElementById('breadcrumb-area')
+        area.innerHTML = '<span class="bc-label">Path:</span>'
+        var seen = []
+        history_stack.forEach(function (id, i) {
+          if (seen.indexOf(id) !== -1) return
+          seen.push(id)
+          if (i > 0) {
+            var sep = document.createElement('span')
+            sep.className = 'bc-sep'
+            sep.textContent = '›'
+            area.appendChild(sep)
+          }
+          var pill = document.createElement('button')
+          pill.type = 'button'
+          pill.className = 'bc-pill' + (id === current_state ? ' current' : '')
+          pill.textContent = STATE_LABELS[id] || id
+          ;(function (sid) {
+            pill.addEventListener('click', function () {
+              goToState(sid)
+            })
+          })(id)
+          area.appendChild(pill)
+        })
+      }
+
+      /* Browser back */
+      window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.state) {
+          var all = document.querySelectorAll('.state')
+          all.forEach(function (el) {
+            el.classList.remove('active')
+          })
+          var target = document.getElementById('state-' + e.state.state)
+          if (target) {
+            target.classList.add('active')
+            current_state = e.state.state
+            updateBreadcrumb()
+          }
+        }
+      })
+
+      /* ── Wire up transitions ── */
+      function wireClick(id, nextState) {
+        var el = document.getElementById(id)
+        if (el)
+          el.addEventListener('click', function () {
+            goToState(nextState)
+          })
+      }
+
+      document
+        .getElementById('conflict-row')
+        .addEventListener('click', function () {
+          goToState('conflict-detail')
+        })
+      document
+        .getElementById('conflict-row')
+        .addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') goToState('conflict-detail')
+        })
+      wireClick('back-to-files-1', 'file-list')
+      wireClick('keep-mine', 'resolved-mine')
+      wireClick('keep-theirs', 'resolved-theirs')
+      wireClick('merge-manually', 'manual-merge')
+      wireClick('back-from-3a', 'file-list')
+      wireClick('back-from-3b', 'file-list')
+      wireClick('cancel-merge', 'conflict-detail')
+      wireClick('cancel-merge-2', 'conflict-detail')
+      wireClick('save-merge', 'merge-saved')
+      wireClick('back-from-5', 'file-list')
+
+      /* Initialise breadcrumb */
+      pushHistory('file-list')
+      updateBreadcrumb()
+
+      /* ── Device frame selector ── */
+      var frameBtns = document.querySelectorAll('.frame-btn')
+      var frame = document.getElementById('device-frame')
+      frameBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          frameBtns.forEach(function (b) {
+            b.classList.remove('active')
+          })
+          btn.classList.add('active')
+          var f = btn.getAttribute('data-frame')
+          frame.className = 'device-frame frame-' + f
+        })
+      })
+
+      /* ── Annotation mode ── */
+      var annotating = false
+      var notes = []
+      var noteIdCounter = 0
+      var draggingNote = null
+      var dragOffX = 0,
+        dragOffY = 0
+
+      var annotateBtn = document.getElementById('annotate-toggle')
+      annotateBtn.addEventListener('click', function () {
+        annotating = !annotating
+        annotateBtn.classList.toggle('active', annotating)
+        document.body.classList.toggle('annotating', annotating)
+      })
+
+      function formatTime() {
+        var d = new Date()
+        return (
+          d.getHours().toString().padStart(2, '0') +
+          ':' +
+          d.getMinutes().toString().padStart(2, '0')
+        )
+      }
+
+      frame.addEventListener('click', function (e) {
+        if (!annotating) return
+        /* Don't create note if clicking an existing note or interactive element */
+        if (e.target.closest('.sticky-note')) return
+        if (
+          e.target.closest('button') ||
+          e.target.closest('textarea') ||
+          e.target.closest('[role="button"]')
+        )
+          return
+
+        var rect = frame.getBoundingClientRect()
+        var xPct = (((e.clientX - rect.left) / rect.width) * 100).toFixed(1)
+        var yPct = (((e.clientY - rect.top) / rect.height) * 100).toFixed(1)
+        createNote(xPct, yPct, current_state, '')
+      })
+
+      function createNote(xPct, yPct, stateId, text) {
+        var id = ++noteIdCounter
+        var note = document.createElement('div')
+        note.className = 'sticky-note'
+        note.id = 'note-' + id
+        note.style.left = xPct + '%'
+        note.style.top = yPct + '%'
+
+        var header = document.createElement('div')
+        header.className = 'note-header'
+
+        var ts = document.createElement('span')
+        ts.className = 'note-ts'
+        ts.textContent = formatTime()
+
+        var closeBtn = document.createElement('button')
+        closeBtn.type = 'button'
+        closeBtn.className = 'note-close'
+        closeBtn.setAttribute('aria-label', 'Remove annotation')
+        closeBtn.textContent = '×'
+        closeBtn.addEventListener('click', function () {
+          frame.removeChild(note)
+          notes = notes.filter(function (n) {
+            return n.id !== id
+          })
+        })
+
+        header.appendChild(ts)
+        header.appendChild(closeBtn)
+
+        var content = document.createElement('div')
+        content.contentEditable = 'true'
+        content.setAttribute('aria-label', 'Annotation text')
+        content.textContent = text || ''
+        content.setAttribute('data-placeholder', 'Type annotation…')
+        content.style.minHeight = '24px'
+
+        content.addEventListener('input', function () {
+          var noteObj = notes.find(function (n) {
+            return n.id === id
+          })
+          if (noteObj) noteObj.text = content.textContent
+        })
+
+        note.appendChild(header)
+        note.appendChild(content)
+        frame.style.position = 'relative'
+        frame.appendChild(note)
+
+        var noteData = {
+          id: id,
+          xPct: xPct,
+          yPct: yPct,
+          stateId: stateId,
+          text: text,
+          el: note,
+          ts: formatTime(),
+        }
+        notes.push(noteData)
+
+        /* Drag */
+        note.addEventListener('mousedown', function (e) {
+          if (e.target === closeBtn || e.target === content) return
+          draggingNote = { el: note, data: noteData }
+          var noteRect = note.getBoundingClientRect()
+          dragOffX = e.clientX - noteRect.left
+          dragOffY = e.clientY - noteRect.top
+          e.preventDefault()
+        })
+
+        setTimeout(function () {
+          content.focus()
+        }, 50)
+      }
+
+      document.addEventListener('mousemove', function (e) {
+        if (!draggingNote) return
+        var rect = frame.getBoundingClientRect()
+        var x = (
+          ((e.clientX - rect.left - dragOffX) / rect.width) *
+          100
+        ).toFixed(1)
+        var y = (
+          ((e.clientY - rect.top - dragOffY) / rect.height) *
+          100
+        ).toFixed(1)
+        draggingNote.el.style.left = x + '%'
+        draggingNote.el.style.top = y + '%'
+        draggingNote.data.xPct = x
+        draggingNote.data.yPct = y
+      })
+
+      document.addEventListener('mouseup', function () {
+        draggingNote = null
+      })
+
+      /* ── Export annotations ── */
+      var exportBtn = document.getElementById('export-btn')
+      var exportModal = document.getElementById('export-modal')
+      var exportTa = document.getElementById('export-ta')
+      var closeModalBtn = document.getElementById('close-modal')
+      var copyExportBtn = document.getElementById('copy-export')
+
+      exportBtn.addEventListener('click', function () {
+        exportTa.value = buildAnnotationMarkdown()
+        exportModal.classList.remove('hidden')
+        exportTa.focus()
+      })
+
+      closeModalBtn.addEventListener('click', function () {
+        exportModal.classList.add('hidden')
+      })
+
+      exportModal.addEventListener('click', function (e) {
+        if (e.target === exportModal) exportModal.classList.add('hidden')
+      })
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') exportModal.classList.add('hidden')
+      })
+
+      copyExportBtn.addEventListener('click', function () {
+        var text = exportTa.value
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(function () {
+            var orig = copyExportBtn.textContent
+            copyExportBtn.textContent = 'Copied!'
+            setTimeout(function () {
+              copyExportBtn.textContent = orig
+            }, 1800)
+          })
+        }
+      })
+
+      function buildAnnotationMarkdown() {
+        if (notes.length === 0) {
+          return '## Prototype Annotations: Conflict Resolution Flow\n\n_No annotations yet. Enable Annotate mode and click on the prototype to add notes._'
+        }
+        var byState = {}
+        notes.forEach(function (n) {
+          if (!byState[n.stateId]) byState[n.stateId] = []
+          byState[n.stateId].push(n)
+        })
+        var lines = ['## Prototype Annotations: Conflict Resolution Flow', '']
+        Object.keys(byState).forEach(function (sid) {
+          var label = STATE_LABELS[sid] || sid
+          lines.push('### State: ' + label)
+          byState[sid].forEach(function (n) {
+            var txt =
+              n.el.querySelector('[contenteditable]').textContent.trim() ||
+              '(empty)'
+            lines.push(
+              '- [at ' +
+                n.xPct +
+                '%, ' +
+                n.yPct +
+                '%] "' +
+                txt +
+                '" (' +
+                n.ts +
+                ')',
+            )
+          })
+          lines.push('')
+        })
+        return lines.join('\n')
+      }
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Prototype Interaction · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

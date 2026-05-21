@@ -1,409 +1,785 @@
-<!-- html-artifacts: research-explainer example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: research-explainer example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/research-explainer.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three-Way Merge — Acme Sync Docs</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three-Way Merge — Acme Sync Docs</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    /* ── Nav ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      padding: 0 32px;
-      height: 48px;
-    }
-    nav .back-link { font-size: 13px; color: var(--fg-muted); text-decoration: none; flex-shrink: 0; }
-    nav .back-link:hover { color: var(--fg); }
-    nav .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    nav .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    nav .nav-spacer { flex: 1; }
-    nav a.nav-link {
-      font-size: 13px;
-      color: var(--fg-muted);
-      text-decoration: none;
-    }
-    nav a.nav-link:hover { color: var(--fg); }
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 0 32px;
+        height: 48px;
+      }
+      nav .back-link {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      nav .back-link:hover {
+        color: var(--fg);
+      }
+      nav .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      nav .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      nav .nav-spacer {
+        flex: 1;
+      }
+      nav a.nav-link {
+        font-size: 13px;
+        color: var(--fg-muted);
+        text-decoration: none;
+      }
+      nav a.nav-link:hover {
+        color: var(--fg);
+      }
 
-    /* ── Layout ── */
-    main {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 48px 24px 96px;
-    }
+      /* ── Layout ── */
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
 
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      line-height: 1.3;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      color: var(--fg-muted);
-      font-size: 14px;
-      margin-bottom: 32px;
-    }
+      h1 {
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        color: var(--fg-muted);
+        font-size: 14px;
+        margin-bottom: 32px;
+      }
 
-    /* ── TL;DR chip ── */
-    .tldr {
-      background: var(--bg-subtle);
-      border-left: 3px solid var(--accent);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin-bottom: 40px;
-    }
-    .tldr-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-    .tldr p {
-      font-size: 14px;
-      color: var(--fg-muted);
-      line-height: 1.55;
-    }
+      /* ── TL;DR chip ── */
+      .tldr {
+        background: var(--bg-subtle);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--radius-md);
+        padding: 16px 20px;
+        margin-bottom: 40px;
+      }
+      .tldr-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      .tldr p {
+        font-size: 14px;
+        color: var(--fg-muted);
+        line-height: 1.55;
+      }
 
-    /* ── Section headings ── */
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 16px;
-    }
+      /* ── Section headings ── */
+      .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 16px;
+      }
 
-    section { margin-bottom: 48px; }
+      section {
+        margin-bottom: 48px;
+      }
 
-    /* ── Collapsible steps ── */
-    .steps { display: flex; flex-direction: column; gap: 8px; }
+      /* ── Collapsible steps ── */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-    details {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-    details[open] { border-color: var(--accent-border); }
+      details {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      details[open] {
+        border-color: var(--accent-border);
+      }
 
-    summary {
-      list-style: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      font-size: 14px;
-      font-weight: 500;
-      user-select: none;
-    }
-    summary::-webkit-details-marker { display: none; }
+      summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        user-select: none;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
 
-    .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--bg-subtle-2);
-      color: var(--fg-muted);
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    details[open] .step-num {
-      background: var(--accent);
-      color: #fff;
-    }
+      .step-num {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      details[open] .step-num {
+        background: var(--accent);
+        color: #fff;
+      }
 
-    .chevron {
-      margin-left: auto;
-      font-size: 11px;
-      color: var(--fg-faint);
-      transition: transform .15s;
-    }
-    details[open] .chevron { transform: rotate(180deg); }
+      .chevron {
+        margin-left: auto;
+        font-size: 11px;
+        color: var(--fg-faint);
+        transition: transform 0.15s;
+      }
+      details[open] .chevron {
+        transform: rotate(180deg);
+      }
 
-    .step-body {
-      padding: 0 16px 16px 52px;
-      font-size: 14px;
-      color: var(--fg-muted);
-      line-height: 1.6;
-    }
+      .step-body {
+        padding: 0 16px 16px 52px;
+        font-size: 14px;
+        color: var(--fg-muted);
+        line-height: 1.6;
+      }
 
-    /* ── Tabs ── */
-    .tab-bar {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .tab-btn {
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--fg-muted);
-      padding: 8px 16px;
-      margin-bottom: -1px;
-      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-      transition: color .1s, background .1s;
-    }
-    .tab-btn:hover { color: var(--fg); }
-    .tab-btn[aria-selected="true"] {
-      background: var(--accent);
-      color: #fff;
-      border-bottom-color: var(--accent);
-    }
+      /* ── Tabs ── */
+      .tab-bar {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .tab-btn {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg-muted);
+        padding: 8px 16px;
+        margin-bottom: -1px;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        transition:
+          color 0.1s,
+          background 0.1s;
+      }
+      .tab-btn:hover {
+        color: var(--fg);
+      }
+      .tab-btn[aria-selected='true'] {
+        background: var(--accent);
+        color: #fff;
+        border-bottom-color: var(--accent);
+      }
 
-    .tab-panels { position: relative; }
+      .tab-panels {
+        position: relative;
+      }
 
-    .tab-panel {
-      display: none;
-      background: #1e293b;
-      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
-      padding: 20px;
-      overflow-x: auto;
-    }
-    .tab-panel[aria-hidden="false"] { display: block; }
+      .tab-panel {
+        display: none;
+        background: #1e293b;
+        border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+        padding: 20px;
+        overflow-x: auto;
+      }
+      .tab-panel[aria-hidden='false'] {
+        display: block;
+      }
 
-    pre {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.7;
-      color: #e2e8f0;
-      white-space: pre;
-    }
+      pre {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        line-height: 1.7;
+        color: #e2e8f0;
+        white-space: pre;
+      }
 
-    .comment { color: #64748b; }
-    .key { color: #9ECBFF; }
-    .val { color: #9FD9A3; }
-    .str { color: #FFCA80; }
+      .comment {
+        color: #64748b;
+      }
+      .key {
+        color: #9ecbff;
+      }
+      .val {
+        color: #9fd9a3;
+      }
+      .str {
+        color: #ffca80;
+      }
 
-    /* ── Glossary ── */
-    .glossary { display: flex; flex-direction: column; gap: 4px; }
+      /* ── Glossary ── */
+      .glossary {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-    .term-row {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      cursor: default;
-    }
-    .term-row:hover { background: var(--bg-subtle); }
+      .term-row {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: var(--radius-md);
+        cursor: default;
+      }
+      .term-row:hover {
+        background: var(--bg-subtle);
+      }
 
-    .term {
-      font-weight: 600;
-      font-size: 14px;
-      white-space: nowrap;
-      color: var(--fg);
-      border-bottom: 1px dashed var(--border);
-      position: relative;
-    }
-    .term-row:hover .term { border-bottom-color: var(--accent); color: var(--accent); }
+      .term {
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        color: var(--fg);
+        border-bottom: 1px dashed var(--border);
+        position: relative;
+      }
+      .term-row:hover .term {
+        border-bottom-color: var(--accent);
+        color: var(--accent);
+      }
 
-    .term-def {
-      font-size: 13px;
-      color: var(--fg-muted);
-      line-height: 1.5;
-    }
+      .term-def {
+        font-size: 13px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+      }
 
-    /* ── FAQ ── */
-    .faq { display: flex; flex-direction: column; gap: 8px; }
+      /* ── FAQ ── */
+      .faq {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-    .faq details {
-      background: none;
-      border: 1px solid var(--border);
-    }
-    .faq details[open] { border-color: var(--border); background: var(--bg-subtle); }
+      .faq details {
+        background: none;
+        border: 1px solid var(--border);
+      }
+      .faq details[open] {
+        border-color: var(--border);
+        background: var(--bg-subtle);
+      }
 
-    .faq summary {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--fg);
-      gap: 8px;
-    }
-    .faq summary::before {
-      content: 'Q';
-      width: 20px;
-      height: 20px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-subtle-2);
-      color: var(--fg-muted);
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+      .faq summary {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--fg);
+        gap: 8px;
+      }
+      .faq summary::before {
+        content: 'Q';
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius-sm);
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
 
-    .faq-answer {
-      padding: 0 16px 14px 44px;
-      font-size: 14px;
-      color: var(--fg-muted);
-      line-height: 1.6;
-    }
-    .faq-answer::before {
-      content: 'A: ';
-      font-weight: 600;
-      color: var(--success);
-    }
-    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-  </style>
-</head>
-<body>
+      .faq-answer {
+        padding: 0 16px 14px 44px;
+        font-size: 14px;
+        color: var(--fg-muted);
+        line-height: 1.6;
+      }
+      .faq-answer::before {
+        content: 'A: ';
+        font-weight: 600;
+        color: var(--success);
+      }
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
 
-<nav>
-  <a class="back-link" href="../index.html">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Feature Explainer</span>
-  <span class="nav-spacer"></span>
-  <a class="nav-link" href="#how-it-works">How it works</a>
-  <a class="nav-link" href="#config">Config</a>
-  <a class="nav-link" href="#glossary">Glossary</a>
-  <a class="nav-link" href="#faq">FAQ</a>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
 
-<main>
-  <h1>Three-Way Merge Conflict Resolution</h1>
-  <p class="subtitle">Last updated 2026-05-15 · Acme Sync v1.2</p>
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
 
-  <!-- TL;DR -->
-  <div class="tldr">
-    <div class="tldr-label">TL;DR</div>
-    <p>Acme Sync uses the common ancestor snapshot to merge divergent file versions. Most conflicts resolve automatically. The rest surface in the CLI.</p>
-  </div>
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
 
-  <!-- How it works -->
-  <section id="how-it-works">
-    <div class="section-label">How it works</div>
-    <div class="steps">
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
 
-      <details open>
-        <summary>
-          <span class="step-num">1</span>
-          Snapshot the ancestor on every sync
-          <span class="chevron">▼</span>
-        </summary>
-        <div class="step-body">
-          On every successful sync, Acme Sync records the SHA-256 hash of each file into
-          the local conflict store. This hash becomes the <em>ancestor snapshot</em> — the
-          agreed-upon baseline for both machines.
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="back-link" href="../index.html">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Feature Explainer</span>
+      <span class="nav-spacer"></span>
+      <a class="nav-link" href="#how-it-works">How it works</a>
+      <a class="nav-link" href="#config">Config</a>
+      <a class="nav-link" href="#glossary">Glossary</a>
+      <a class="nav-link" href="#faq">FAQ</a>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
         </div>
-      </details>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
 
-      <details>
-        <summary>
-          <span class="step-num">2</span>
-          Detect divergence on reconnect
-          <span class="chevron">▼</span>
-        </summary>
-        <div class="step-body">
-          When a file changes on two machines while offline, both versions are compared
-          against the ancestor snapshot. If neither hash matches the ancestor, the file is
-          flagged as <em>diverged</em>.
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">I can't tell from our codebase how the three-way merge actually handles edge cases. Read through the sync logic in `src/` and generate a single HTML explainer: walk through the merge flow step by step, annotate the key decision points with the actual code, and add a 'gotchas' section for cases that catch people off guard. Optimize it for someone who needs to understand it once and remember it.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
         </div>
-      </details>
 
-      <details>
-        <summary>
-          <span class="step-num">3</span>
-          Auto-resolve single-side changes
-          <span class="chevron">▼</span>
-        </summary>
-        <div class="step-body">
-          If only one machine changed the file (one hash matches the ancestor, the other
-          doesn't), the changed version wins automatically. No user action required.
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a feature explainer for how our three-way merge handles edge cases — step-by-step flow, annotated decision points, and a gotchas section</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
         </div>
-      </details>
 
-      <details>
-        <summary>
-          <span class="step-num">4</span>
-          Auto-merge non-overlapping edits
-          <span class="chevron">▼</span>
-        </summary>
-        <div class="step-body">
-          If both machines changed the file but on different lines, Acme Sync applies a
-          standard diff3 merge. The result is committed and the ancestor snapshot is updated.
-          Binary files skip this step entirely — they're copied whole.
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a research explainer for how our three-way merge algorithm resolves conflicts — include the step-by-step flow, key decision points from the source code, and a gotchas section for edge cases</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
         </div>
-      </details>
 
-      <details>
-        <summary>
-          <span class="step-num">5</span>
-          Flag true conflicts for manual resolution
-          <span class="chevron">▼</span>
-        </summary>
-        <div class="step-body">
-          When both machines edited the same line differently, Acme Sync writes a conflict
-          record to the conflict store and surfaces it in the CLI with
-          <code>acmesync conflicts list</code>. The file is quarantined until resolved.
-        </div>
-      </details>
-
+      </div>
     </div>
-  </section>
 
-  <!-- Config tabs -->
-  <section id="config">
-    <div class="section-label">Config snippets</div>
+    <main>
+      <h1>Three-Way Merge Conflict Resolution</h1>
+      <p class="subtitle">Last updated 2026-05-15 · Acme Sync v1.2</p>
 
-    <div class="tab-bar" role="tablist" aria-label="Environment configs">
-      <button class="tab-btn" role="tab" aria-selected="true" data-target="tab-local">Local Dev</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-ci">CI</button>
-      <button class="tab-btn" role="tab" aria-selected="false" data-target="tab-prod">Production</button>
-    </div>
+      <!-- TL;DR -->
+      <div class="tldr">
+        <div class="tldr-label">TL;DR</div>
+        <p>
+          Acme Sync uses the common ancestor snapshot to merge divergent file
+          versions. Most conflicts resolve automatically. The rest surface in
+          the CLI.
+        </p>
+      </div>
 
-    <div class="tab-panels">
-      <div class="tab-panel" id="tab-local" role="tabpanel" aria-hidden="false">
-        <pre><span class="comment"># ~/.acmesync/config.toml — Local Dev</span>
+      <!-- How it works -->
+      <section id="how-it-works">
+        <div class="section-label">How it works</div>
+        <div class="steps">
+          <details open>
+            <summary>
+              <span class="step-num">1</span>
+              Snapshot the ancestor on every sync
+              <span class="chevron">▼</span>
+            </summary>
+            <div class="step-body">
+              On every successful sync, Acme Sync records the SHA-256 hash of
+              each file into the local conflict store. This hash becomes the
+              <em>ancestor snapshot</em> — the agreed-upon baseline for both
+              machines.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span class="step-num">2</span>
+              Detect divergence on reconnect
+              <span class="chevron">▼</span>
+            </summary>
+            <div class="step-body">
+              When a file changes on two machines while offline, both versions
+              are compared against the ancestor snapshot. If neither hash
+              matches the ancestor, the file is flagged as <em>diverged</em>.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span class="step-num">3</span>
+              Auto-resolve single-side changes
+              <span class="chevron">▼</span>
+            </summary>
+            <div class="step-body">
+              If only one machine changed the file (one hash matches the
+              ancestor, the other doesn't), the changed version wins
+              automatically. No user action required.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span class="step-num">4</span>
+              Auto-merge non-overlapping edits
+              <span class="chevron">▼</span>
+            </summary>
+            <div class="step-body">
+              If both machines changed the file but on different lines, Acme
+              Sync applies a standard diff3 merge. The result is committed and
+              the ancestor snapshot is updated. Binary files skip this step
+              entirely — they're copied whole.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span class="step-num">5</span>
+              Flag true conflicts for manual resolution
+              <span class="chevron">▼</span>
+            </summary>
+            <div class="step-body">
+              When both machines edited the same line differently, Acme Sync
+              writes a conflict record to the conflict store and surfaces it in
+              the CLI with
+              <code>acmesync conflicts list</code>. The file is quarantined
+              until resolved.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Config tabs -->
+      <section id="config">
+        <div class="section-label">Config snippets</div>
+
+        <div class="tab-bar" role="tablist" aria-label="Environment configs">
+          <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="true"
+            data-target="tab-local"
+          >
+            Local Dev
+          </button>
+          <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            data-target="tab-ci"
+          >
+            CI
+          </button>
+          <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            data-target="tab-prod"
+          >
+            Production
+          </button>
+        </div>
+
+        <div class="tab-panels">
+          <div
+            class="tab-panel"
+            id="tab-local"
+            role="tabpanel"
+            aria-hidden="false"
+          >
+            <pre><span class="comment"># ~/.acmesync/config.toml — Local Dev</span>
 
 <span class="key">[sync]</span>
 <span class="key">debounce_ms</span>     = <span class="val">150</span>
@@ -417,10 +793,10 @@
 
 <span class="key">[logging]</span>
 <span class="key">level</span> = <span class="str">"debug"</span></pre>
-      </div>
+          </div>
 
-      <div class="tab-panel" id="tab-ci" role="tabpanel" aria-hidden="true">
-        <pre><span class="comment"># ~/.acmesync/config.toml — CI</span>
+          <div class="tab-panel" id="tab-ci" role="tabpanel" aria-hidden="true">
+            <pre><span class="comment"># ~/.acmesync/config.toml — CI</span>
 
 <span class="key">[sync]</span>
 <span class="key">debounce_ms</span>     = <span class="val">0</span>
@@ -435,10 +811,15 @@
 <span class="key">[logging]</span>
 <span class="key">level</span> = <span class="str">"warn"</span>
 <span class="key">format</span> = <span class="str">"json"</span></pre>
-      </div>
+          </div>
 
-      <div class="tab-panel" id="tab-prod" role="tabpanel" aria-hidden="true">
-        <pre><span class="comment"># ~/.acmesync/config.toml — Production</span>
+          <div
+            class="tab-panel"
+            id="tab-prod"
+            role="tabpanel"
+            aria-hidden="true"
+          >
+            <pre><span class="comment"># ~/.acmesync/config.toml — Production</span>
 
 <span class="key">[sync]</span>
 <span class="key">debounce_ms</span>     = <span class="val">500</span>
@@ -455,91 +836,203 @@
 <span class="key">[logging]</span>
 <span class="key">level</span>  = <span class="str">"error"</span>
 <span class="key">format</span> = <span class="str">"json"</span></pre>
-      </div>
-    </div>
-  </section>
+          </div>
+        </div>
+      </section>
 
-  <!-- Glossary -->
-  <section id="glossary">
-    <div class="section-label">Glossary</div>
-    <div class="glossary">
-      <div class="term-row">
-        <span class="term">ancestor snapshot</span>
-        <span class="term-def">The file state (SHA-256 hash) recorded at the last successful sync. Used as the common base when comparing diverged versions.</span>
-      </div>
-      <div class="term-row">
-        <span class="term">three-way merge</span>
-        <span class="term-def">A merge strategy that compares both changed versions against a common base, enabling auto-resolution of non-overlapping edits.</span>
-      </div>
-      <div class="term-row">
-        <span class="term">conflict store</span>
-        <span class="term-def">An SQLite table on each device that records unresolved conflicts, including both versions and the ancestor hash.</span>
-      </div>
-      <div class="term-row">
-        <span class="term">debounce window</span>
-        <span class="term-def">The delay (default 150 ms) between a file-change event and the sync trigger. Prevents excessive syncs during rapid edits.</span>
-      </div>
-      <div class="term-row">
-        <span class="term">presigned URL</span>
-        <span class="term-def">A temporary S3 access URL generated per transfer. Valid for 15 minutes by default (configurable via <code>presign_ttl_s</code>).</span>
-      </div>
-    </div>
-  </section>
+      <!-- Glossary -->
+      <section id="glossary">
+        <div class="section-label">Glossary</div>
+        <div class="glossary">
+          <div class="term-row">
+            <span class="term">ancestor snapshot</span>
+            <span class="term-def"
+              >The file state (SHA-256 hash) recorded at the last successful
+              sync. Used as the common base when comparing diverged
+              versions.</span
+            >
+          </div>
+          <div class="term-row">
+            <span class="term">three-way merge</span>
+            <span class="term-def"
+              >A merge strategy that compares both changed versions against a
+              common base, enabling auto-resolution of non-overlapping
+              edits.</span
+            >
+          </div>
+          <div class="term-row">
+            <span class="term">conflict store</span>
+            <span class="term-def"
+              >An SQLite table on each device that records unresolved conflicts,
+              including both versions and the ancestor hash.</span
+            >
+          </div>
+          <div class="term-row">
+            <span class="term">debounce window</span>
+            <span class="term-def"
+              >The delay (default 150 ms) between a file-change event and the
+              sync trigger. Prevents excessive syncs during rapid edits.</span
+            >
+          </div>
+          <div class="term-row">
+            <span class="term">presigned URL</span>
+            <span class="term-def"
+              >A temporary S3 access URL generated per transfer. Valid for 15
+              minutes by default (configurable via
+              <code>presign_ttl_s</code>).</span
+            >
+          </div>
+        </div>
+      </section>
 
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="section-label">FAQ</div>
-    <div class="faq">
+      <!-- FAQ -->
+      <section id="faq">
+        <div class="section-label">FAQ</div>
+        <div class="faq">
+          <details>
+            <summary>
+              Does Acme Sync handle binary files?<span class="chevron">▼</span>
+            </summary>
+            <div class="faq-answer">
+              Binary files are copied whole — no line-level merge is attempted.
+              The most recently modified version wins. A warning is logged if
+              both sides changed.
+            </div>
+          </details>
 
-      <details>
-        <summary>Does Acme Sync handle binary files?<span class="chevron">▼</span></summary>
-        <div class="faq-answer">Binary files are copied whole — no line-level merge is attempted. The most recently modified version wins. A warning is logged if both sides changed.</div>
-      </details>
+          <details>
+            <summary>
+              What happens if I'm offline?<span class="chevron">▼</span>
+            </summary>
+            <div class="faq-answer">
+              Changes queue locally in the conflict store and are synced
+              automatically on reconnect. No data is lost during offline
+              periods.
+            </div>
+          </details>
 
-      <details>
-        <summary>What happens if I'm offline?<span class="chevron">▼</span></summary>
-        <div class="faq-answer">Changes queue locally in the conflict store and are synced automatically on reconnect. No data is lost during offline periods.</div>
-      </details>
+          <details>
+            <summary>
+              How long are ancestor snapshots kept?<span class="chevron"
+                >▼</span
+              >
+            </summary>
+            <div class="faq-answer">
+              30 days by default. Set <code>ancestor_ttl_days</code> in your
+              config to override. Expired ancestors cause the next sync to treat
+              the file as new.
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
 
-      <details>
-        <summary>How long are ancestor snapshots kept?<span class="chevron">▼</span></summary>
-        <div class="faq-answer">30 days by default. Set <code>ancestor_ttl_days</code> in your config to override. Expired ancestors cause the next sync to treat the file as new.</div>
-      </details>
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
 
-    </div>
-  </section>
-</main>
+      // Tab switching
+      const tabBar = document.querySelector('.tab-bar')
+      const tabBtns = tabBar.querySelectorAll('.tab-btn')
+      const tabPanels = document.querySelectorAll('.tab-panel')
 
-<script>
-(function(){
-  var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  if(t==='dark')document.documentElement.classList.add('dark');
-  document.getElementById('dm-toggle').addEventListener('click',function(){
-    var d=document.documentElement.classList.toggle('dark');
-    localStorage.setItem('ha-theme',d?'dark':'light');
-  });
-})();
+      tabBar.addEventListener('click', function (e) {
+        const btn = e.target.closest('.tab-btn')
+        if (!btn) return
 
-  // Tab switching
-  const tabBar = document.querySelector('.tab-bar');
-  const tabBtns = tabBar.querySelectorAll('.tab-btn');
-  const tabPanels = document.querySelectorAll('.tab-panel');
+        tabBtns.forEach(function (b) {
+          b.setAttribute('aria-selected', 'false')
+        })
+        tabPanels.forEach(function (p) {
+          p.setAttribute('aria-hidden', 'true')
+        })
 
-  tabBar.addEventListener('click', function(e) {
-    const btn = e.target.closest('.tab-btn');
-    if (!btn) return;
+        btn.setAttribute('aria-selected', 'true')
+        const target = document.getElementById(btn.getAttribute('data-target'))
+        if (target) target.setAttribute('aria-hidden', 'false')
+      })
+    </script>
 
-    tabBtns.forEach(function(b) { b.setAttribute('aria-selected', 'false'); });
-    tabPanels.forEach(function(p) { p.setAttribute('aria-hidden', 'true'); });
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
 
-    btn.setAttribute('aria-selected', 'true');
-    const target = document.getElementById(btn.getAttribute('data-target'));
-    if (target) target.setAttribute('aria-hidden', 'false');
-  });
-</script>
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Research Explainer · May 2026
-</footer>
-</body>
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Research Explainer · May 2026
+    </footer>
+  </body>
 </html>

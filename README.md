@@ -11,7 +11,7 @@ Inspired by [ThariqS/html-effectiveness](https://github.com/ThariqS/html-effecti
 **Option A — clone directly into your skills directory:**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/html-artifacts ~/.agents/skills/html-artifacts
+git clone https://github.com/kiriaze/html-artifacts ~/.agents/skills/html-artifacts
 
 # Symlink for Claude Code (if your skills live in ~/.agents/skills/)
 ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts
@@ -21,7 +21,7 @@ ln -s ~/.agents/skills/html-artifacts ~/.claude/skills/html-artifacts
 
 ```bash
 # Inside your dotfiles repo
-git submodule add https://github.com/YOUR_USERNAME/html-artifacts skills/html-artifacts
+git submodule add https://github.com/kiriaze/html-artifacts skills/html-artifacts
 ln -s ~/dotfiles/skills/html-artifacts ~/.claude/skills/html-artifacts
 ```
 

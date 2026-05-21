@@ -1,937 +1,1774 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>explore · milestone-plan variations</title>
-  <style>
-    /* ─── Shared tokens ───────────────────────────────────────────────── */
-    :root {
-      --exp-bg: #f0efed;
-      --exp-border: #dddbd8;
-      --frame-bg: #ffffff;
-      --fg: #111827;
-      --fg-muted: #6b7280;
-      --fg-faint: #9ca3af;
-      --accent: #2563eb;
-      --accent-bg: #eff6ff;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --danger: #dc2626;
-      --border: #e5e7eb;
-      --border-strong: #d1d5db;
-      --bg-subtle: #f9fafb;
-      --bg-subtle-2: #f3f4f6;
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
-      /* Phase palette */
-      --ph1: #4f46e5; --ph1-bg: #eef2ff;
-      --ph2: #0891b2; --ph2-bg: #ecfeff;
-      --ph3: #7c3aed; --ph3-bg: #f5f3ff;
-      --ph4: #be185d; --ph4-bg: #fdf2f8;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--exp-bg); font-family: var(--font-sans); color: var(--fg); -webkit-font-smoothing: antialiased; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>explore · milestone-plan variations</title>
+    <style>
+      /* ─── Shared tokens ───────────────────────────────────────────────── */
+      :root {
+        --exp-bg: #f0efed;
+        --exp-border: #dddbd8;
+        --frame-bg: #ffffff;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+        /* Phase palette */
+        --ph1: #4f46e5;
+        --ph1-bg: #eef2ff;
+        --ph2: #0891b2;
+        --ph2-bg: #ecfeff;
+        --ph3: #7c3aed;
+        --ph3-bg: #f5f3ff;
+        --ph4: #be185d;
+        --ph4-bg: #fdf2f8;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--exp-bg);
+        font-family: var(--font-sans);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+      }
 
-    /* Exploration chrome */
-    .exp-toc {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(240,239,237,0.96); backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--exp-border);
-      padding: 0 32px; height: 44px;
-      display: flex; align-items: center; gap: 0;
-    }
-    .exp-toc-title { font-size: 12px; font-weight: 700; color: #888; font-family: var(--font-mono); margin-right: 24px; flex-shrink: 0; }
-    .exp-toc a { font-size: 12px; color: var(--fg-muted); text-decoration: none; padding: 0 16px; height: 44px; display: flex; align-items: center; border-right: 1px solid var(--exp-border); }
-    .exp-toc a:first-of-type { border-left: 1px solid var(--exp-border); }
-    .exp-toc a:hover { color: var(--fg); background: rgba(0,0,0,0.04); }
+      /* Exploration chrome */
+      .exp-toc {
+        position: sticky;
+        top: 0;
+        z-index: 200;
+        background: rgba(240, 239, 237, 0.96);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--exp-border);
+        padding: 0 32px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 0;
+      }
+      .exp-toc-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #888;
+        font-family: var(--font-mono);
+        margin-right: 24px;
+        flex-shrink: 0;
+      }
+      .exp-toc a {
+        font-size: 12px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        padding: 0 16px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        border-right: 1px solid var(--exp-border);
+      }
+      .exp-toc a:first-of-type {
+        border-left: 1px solid var(--exp-border);
+      }
+      .exp-toc a:hover {
+        color: var(--fg);
+        background: rgba(0, 0, 0, 0.04);
+      }
 
-    .exp-section { padding: 48px 32px 0; }
-    .exp-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 20px; }
-    .variant { margin-bottom: 24px; }
-    .variant-tag { font-size: 11px; font-weight: 600; color: #888; margin-bottom: 8px; font-family: var(--font-mono); }
-    .variant-frame { background: var(--frame-bg); border: 1px solid var(--exp-border); border-radius: 10px; overflow: hidden; }
-    .exp-spacer { height: 64px; }
+      .exp-section {
+        padding: 48px 32px 0;
+      }
+      .exp-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #888;
+        margin-bottom: 20px;
+      }
+      .variant {
+        margin-bottom: 24px;
+      }
+      .variant-tag {
+        font-size: 11px;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 8px;
+        font-family: var(--font-mono);
+      }
+      .variant-frame {
+        background: var(--frame-bg);
+        border: 1px solid var(--exp-border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .exp-spacer {
+        height: 64px;
+      }
 
+      /* ─── SHARED MILESTONE DATA STYLES ───────────────────────────────── */
+      .ring-wrap {
+        flex-shrink: 0;
+        position: relative;
+        width: 44px;
+        height: 44px;
+      }
+      .ring-wrap svg {
+        transform: rotate(-90deg);
+        width: 100%;
+        height: 100%;
+      }
+      .ring-bg {
+        fill: none;
+        stroke: var(--border);
+        stroke-width: 2;
+      }
+      .ring-fill {
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .rf-shipped {
+        stroke: var(--success);
+      }
+      .rf-progress {
+        stroke: var(--accent);
+      }
+      .rf-planned {
+        stroke: var(--border-strong);
+      }
+      .rf-deferred {
+        stroke: var(--fg-faint);
+      }
+      .ring-pct {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        font-weight: 700;
+        color: var(--fg-muted);
+      }
+      .shipped-check {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        width: 12px;
+        height: 12px;
+        background: var(--success);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 7px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 7px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .chip-s {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .chip-p {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .chip-pl {
+        background: var(--bg-subtle-2);
+        color: var(--fg-muted);
+      }
+      .chip-d {
+        background: var(--bg-subtle);
+        color: var(--fg-faint);
+      }
 
-    /* ─── SHARED MILESTONE DATA STYLES ───────────────────────────────── */
-    .ring-wrap { flex-shrink: 0; position: relative; width: 44px; height: 44px; }
-    .ring-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .ring-bg { fill: none; stroke: var(--border); stroke-width: 2; }
-    .ring-fill { fill: none; stroke-width: 2; stroke-linecap: round; }
-    .rf-shipped { stroke: var(--success); }
-    .rf-progress { stroke: var(--accent); }
-    .rf-planned { stroke: var(--border-strong); }
-    .rf-deferred { stroke: var(--fg-faint); }
-    .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: var(--fg-muted); }
-    .shipped-check { position: absolute; top: -2px; right: -2px; width: 12px; height: 12px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 7px; }
-    .chip { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 600; white-space: nowrap; }
-    .chip-s { background: var(--success-bg); color: var(--success); }
-    .chip-p { background: var(--accent-bg); color: var(--accent); }
-    .chip-pl { background: var(--bg-subtle-2); color: var(--fg-muted); }
-    .chip-d { background: var(--bg-subtle); color: var(--fg-faint); }
-
-
-    /* ══════════════════════════════════════════════════════════════════
+      /* ══════════════════════════════════════════════════════════════════
        LAYOUT 1 — Current 4-column grid (simplified baseline)
     ══════════════════════════════════════════════════════════════════ */
-    .grid-l1 { padding: 0; }
+      .grid-l1 {
+        padding: 0;
+      }
 
-    .grid-l1 .phase-headers-bar {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      border-bottom: 1px solid var(--border);
-    }
-    .grid-l1 .ph {
-      padding: 14px 16px 12px;
-      border-top: 4px solid transparent;
-      border-right: 1px solid var(--border);
-    }
-    .grid-l1 .ph:last-child { border-right: none; }
-    .grid-l1 .ph1h { border-top-color: var(--ph1); background: var(--ph1-bg); }
-    .grid-l1 .ph2h { border-top-color: var(--ph2); background: var(--ph2-bg); }
-    .grid-l1 .ph3h { border-top-color: var(--ph3); background: var(--ph3-bg); }
-    .grid-l1 .ph4h { border-top-color: var(--ph4); background: var(--ph4-bg); }
-    .grid-l1 .ph-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
-    .grid-l1 .ph1h .ph-num { color: var(--ph1); }
-    .grid-l1 .ph2h .ph-num { color: var(--ph2); }
-    .grid-l1 .ph3h .ph-num { color: var(--ph3); }
-    .grid-l1 .ph4h .ph-num { color: var(--ph4); }
-    .grid-l1 .ph-name { font-size: 15px; font-weight: 700; color: var(--fg); }
-    .grid-l1 .ph-dates { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
+      .grid-l1 .phase-headers-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-bottom: 1px solid var(--border);
+      }
+      .grid-l1 .ph {
+        padding: 14px 16px 12px;
+        border-top: 4px solid transparent;
+        border-right: 1px solid var(--border);
+      }
+      .grid-l1 .ph:last-child {
+        border-right: none;
+      }
+      .grid-l1 .ph1h {
+        border-top-color: var(--ph1);
+        background: var(--ph1-bg);
+      }
+      .grid-l1 .ph2h {
+        border-top-color: var(--ph2);
+        background: var(--ph2-bg);
+      }
+      .grid-l1 .ph3h {
+        border-top-color: var(--ph3);
+        background: var(--ph3-bg);
+      }
+      .grid-l1 .ph4h {
+        border-top-color: var(--ph4);
+        background: var(--ph4-bg);
+      }
+      .grid-l1 .ph-num {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 2px;
+      }
+      .grid-l1 .ph1h .ph-num {
+        color: var(--ph1);
+      }
+      .grid-l1 .ph2h .ph-num {
+        color: var(--ph2);
+      }
+      .grid-l1 .ph3h .ph-num {
+        color: var(--ph3);
+      }
+      .grid-l1 .ph4h .ph-num {
+        color: var(--ph4);
+      }
+      .grid-l1 .ph-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--fg);
+      }
+      .grid-l1 .ph-dates {
+        font-size: 11px;
+        color: var(--fg-muted);
+        margin-top: 2px;
+      }
 
-    .grid-l1 .milestones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 14px; }
-    .grid-l1 .mc {
-      background: var(--frame-bg); border: 1px solid var(--border); border-radius: 8px;
-      padding: 12px; position: relative;
-    }
-    .grid-l1 .mc.ms { border-left: 3px solid var(--success); }
-    .grid-l1 .mc.mi { border-left: 3px solid var(--accent); }
-    .grid-l1 .mc.mp { border-left: 3px solid var(--border-strong); }
-    .grid-l1 .mc.md { border-left: 3px solid var(--fg-faint); opacity: 0.7; }
-    .grid-l1 .mc-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-    .grid-l1 .mc-info { flex: 1; }
-    .grid-l1 .mc-title { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--fg); }
-    .grid-l1 .mc-date { font-size: 11px; color: var(--fg-muted); margin-top: 2px; font-family: var(--font-mono); }
-    .grid-l1 .spacer-cell { }
+      .grid-l1 .milestones {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 14px;
+      }
+      .grid-l1 .mc {
+        background: var(--frame-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        position: relative;
+      }
+      .grid-l1 .mc.ms {
+        border-left: 3px solid var(--success);
+      }
+      .grid-l1 .mc.mi {
+        border-left: 3px solid var(--accent);
+      }
+      .grid-l1 .mc.mp {
+        border-left: 3px solid var(--border-strong);
+      }
+      .grid-l1 .mc.md {
+        border-left: 3px solid var(--fg-faint);
+        opacity: 0.7;
+      }
+      .grid-l1 .mc-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .grid-l1 .mc-info {
+        flex: 1;
+      }
+      .grid-l1 .mc-title {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--fg);
+      }
+      .grid-l1 .mc-date {
+        font-size: 11px;
+        color: var(--fg-muted);
+        margin-top: 2px;
+        font-family: var(--font-mono);
+      }
+      .grid-l1 .spacer-cell {
+      }
 
-
-    /* ══════════════════════════════════════════════════════════════════
+      /* ══════════════════════════════════════════════════════════════════
        LAYOUT 2 — Vertical Timeline
     ══════════════════════════════════════════════════════════════════ */
-    .vtl-wrap { padding: 32px 40px 40px; max-width: 880px; margin: 0 auto; }
+      .vtl-wrap {
+        padding: 32px 40px 40px;
+        max-width: 880px;
+        margin: 0 auto;
+      }
 
-    .vtl {
-      position: relative;
-    }
+      .vtl {
+        position: relative;
+      }
 
-    /* The spine — a continuous vertical line */
-    .vtl-spine {
-      position: absolute;
-      left: 11px; /* center of the 24px dot column */
-      top: 28px;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(
-        to bottom,
-        var(--ph1) 0%,   var(--ph1) 25%,
-        var(--ph2) 25%,  var(--ph2) 50%,
-        var(--ph3) 50%,  var(--ph3) 75%,
-        var(--ph4) 75%,  var(--ph4) 100%
-      );
-      border-radius: 2px;
-    }
+      /* The spine — a continuous vertical line */
+      .vtl-spine {
+        position: absolute;
+        left: 59px; /* center at 60px — gives visual breathing room */
+        top: 28px;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(
+          to bottom,
+          var(--ph1) 0%,
+          var(--ph1) 25%,
+          var(--ph2) 25%,
+          var(--ph2) 50%,
+          var(--ph3) 50%,
+          var(--ph3) 75%,
+          var(--ph4) 75%,
+          var(--ph4) 100%
+        );
+        border-radius: 2px;
+      }
 
-    /* Phase group */
-    .vtl-phase {
-      margin-bottom: 8px;
-      padding-left: 48px; /* space for spine + dot */
-      position: relative;
-    }
+      /* Phase group */
+      .vtl-phase {
+        margin-bottom: 8px;
+        padding-left: 65px; /* C = S+5 = 65px; ensures connector start = dot right edge */
+        position: relative;
+      }
 
-    /* Phase header row */
-    .vtl-phase-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 20px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      margin-left: -48px; /* extend back to left edge */
-      padding-left: 60px; /* accommodate spine area */
-      position: relative;
-    }
-    .vtl-phase-header.ph1 { background: var(--ph1-bg); border: 1px solid #c7d2fe; }
-    .vtl-phase-header.ph2 { background: var(--ph2-bg); border: 1px solid #a5f3fc; }
-    .vtl-phase-header.ph3 { background: var(--ph3-bg); border: 1px solid #ddd6fe; }
-    .vtl-phase-header.ph4 { background: var(--ph4-bg); border: 1px solid #fbcfe8; }
+      /* Phase header row */
+      .vtl-phase-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        margin-left: -65px; /* extend back to left edge */
+        padding-left: 80px; /* accommodate spine area, text past diamond */
+        position: relative;
+      }
+      .vtl-phase-header.ph1 {
+        background: var(--ph1-bg);
+        border: 1px solid #c7d2fe;
+      }
+      .vtl-phase-header.ph2 {
+        background: var(--ph2-bg);
+        border: 1px solid #a5f3fc;
+      }
+      .vtl-phase-header.ph3 {
+        background: var(--ph3-bg);
+        border: 1px solid #ddd6fe;
+      }
+      .vtl-phase-header.ph4 {
+        background: var(--ph4-bg);
+        border: 1px solid #fbcfe8;
+      }
 
-    /* Diamond marker on the spine for each phase */
-    .vtl-phase-diamond {
-      position: absolute;
-      left: 4px; /* centered on spine (spine at 11px - 7px radius = 4px) */
-      top: 50%; transform: translateY(-50%) rotate(45deg);
-      width: 14px; height: 14px;
-      border-radius: 2px;
-    }
-    .ph1 .vtl-phase-diamond { background: var(--ph1); }
-    .ph2 .vtl-phase-diamond { background: var(--ph2); }
-    .ph3 .vtl-phase-diamond { background: var(--ph3); }
-    .ph4 .vtl-phase-diamond { background: var(--ph4); }
+      /* Diamond marker on the spine for each phase */
+      .vtl-phase-diamond {
+        position: absolute;
+        left: 52px; /* center at 60px = spine center */
+        top: 50%;
+        transform: translateY(-50%) rotate(45deg);
+        width: 14px;
+        height: 14px;
+        border-radius: 2px;
+      }
+      .ph1 .vtl-phase-diamond {
+        background: var(--ph1);
+      }
+      .ph2 .vtl-phase-diamond {
+        background: var(--ph2);
+      }
+      .ph3 .vtl-phase-diamond {
+        background: var(--ph3);
+      }
+      .ph4 .vtl-phase-diamond {
+        background: var(--ph4);
+      }
 
-    .vtl-phase-label { flex: 0 0 auto; }
-    .vtl-phase-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
-    .ph1 .vtl-phase-num { color: var(--ph1); }
-    .ph2 .vtl-phase-num { color: var(--ph2); }
-    .ph3 .vtl-phase-num { color: var(--ph3); }
-    .ph4 .vtl-phase-num { color: var(--ph4); }
-    .vtl-phase-name { font-size: 16px; font-weight: 700; color: var(--fg); }
-    .vtl-phase-sep { color: var(--border-strong); margin: 0 4px; }
-    .vtl-phase-dates { font-size: 12px; color: var(--fg-muted); margin-left: auto; font-variant-numeric: tabular-nums; }
-    .vtl-phase-count { font-size: 11px; color: var(--fg-faint); }
+      .vtl-phase-label {
+        flex: 0 0 auto;
+      }
+      .vtl-phase-num {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 2px;
+      }
+      .ph1 .vtl-phase-num {
+        color: var(--ph1);
+      }
+      .ph2 .vtl-phase-num {
+        color: var(--ph2);
+      }
+      .ph3 .vtl-phase-num {
+        color: var(--ph3);
+      }
+      .ph4 .vtl-phase-num {
+        color: var(--ph4);
+      }
+      .vtl-phase-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--fg);
+      }
+      .vtl-phase-sep {
+        color: var(--border-strong);
+        margin: 0 4px;
+      }
+      .vtl-phase-dates {
+        font-size: 12px;
+        color: var(--fg-muted);
+        margin-left: auto;
+        font-variant-numeric: tabular-nums;
+      }
+      .vtl-phase-count {
+        font-size: 11px;
+        color: var(--fg-faint);
+      }
 
-    /* Milestone rows inside each phase */
-    .vtl-milestones { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; padding-left: 0; }
+      /* Milestone rows inside each phase */
+      .vtl-milestones {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 4px;
+        padding-left: 0;
+      }
 
-    .vtl-m {
-      display: flex;
-      align-items: flex-start;
-      gap: 0;
-      position: relative;
-    }
+      .vtl-m {
+        display: flex;
+        align-items: flex-start;
+        gap: 0;
+        position: relative;
+      }
 
-    /* Dot + connector on the spine */
-    .vtl-m-dot-wrap {
-      position: absolute;
-      left: -41px; /* dot center = (48-41)+5 = 12px, matching spine center at left:11px + 1px half-width */
-      top: 14px;
-      display: flex;
-      align-items: center;
-    }
-    .vtl-m-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      border: 2px solid var(--frame-bg);
-      box-shadow: 0 0 0 1.5px;
-      z-index: 1;
-    }
-    .vtl-m-dot.ds { box-shadow: 0 0 0 1.5px var(--success); background: var(--success); }
-    .vtl-m-dot.dp { box-shadow: 0 0 0 1.5px var(--accent); background: var(--accent); }
-    .vtl-m-dot.dpl { box-shadow: 0 0 0 1.5px var(--border-strong); background: var(--bg-subtle-2); }
-    .vtl-m-dot.dd { box-shadow: 0 0 0 1.5px var(--fg-faint); background: var(--bg-subtle); }
+      /* Dot + connector on the spine */
+      .vtl-m-dot-wrap {
+        position: absolute;
+        left: -10px; /* dot left = C-10 = 55px, center = 60px = spine center; dot right = 65px = C, so connector starts exactly at dot edge */
+        top: 14px;
+        display: flex;
+        align-items: center;
+      }
+      .vtl-m-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        border: 2px solid var(--frame-bg);
+        box-shadow: 0 0 0 1.5px;
+        z-index: 1;
+      }
+      .vtl-m-dot.ds {
+        box-shadow: 0 0 0 1.5px var(--success);
+        background: var(--success);
+      }
+      .vtl-m-dot.dp {
+        box-shadow: 0 0 0 1.5px var(--accent);
+        background: var(--accent);
+      }
+      .vtl-m-dot.dpl {
+        box-shadow: 0 0 0 1.5px var(--border-strong);
+        background: var(--bg-subtle-2);
+      }
+      .vtl-m-dot.dd {
+        box-shadow: 0 0 0 1.5px var(--fg-faint);
+        background: var(--bg-subtle);
+      }
 
-    /* Short horizontal connector from dot to card */
-    .vtl-m-connector {
-      width: 24px; height: 1.5px;
-      background: var(--border);
-      flex-shrink: 0;
-      margin-top: 19px; /* align with card top content */
-    }
+      /* Short horizontal connector from dot to card */
+      .vtl-m-connector {
+        width: 24px;
+        height: 1.5px;
+        background: var(--border);
+        flex-shrink: 0;
+        margin-top: 19px; /* align with card top content */
+      }
 
-    /* Milestone card */
-    .vtl-m-card {
-      flex: 1;
-      background: var(--frame-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: box-shadow 0.15s, border-color 0.15s;
-    }
-    .vtl-m-card:hover { border-color: var(--border-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .vtl-m-card.shipped { border-left: 3px solid var(--success); }
-    .vtl-m-card.in-progress { border-left: 3px solid var(--accent); }
-    .vtl-m-card.planned { border-left: 3px solid var(--border-strong); }
-    .vtl-m-card.deferred { border-left: 3px solid var(--fg-faint); opacity: 0.75; }
+      /* Milestone card */
+      .vtl-m-card {
+        flex: 1;
+        background: var(--frame-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition:
+          box-shadow 0.15s,
+          border-color 0.15s;
+      }
+      .vtl-m-card:hover {
+        border-color: var(--border-strong);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+      .vtl-m-card.shipped {
+        border-left: 3px solid var(--success);
+      }
+      .vtl-m-card.in-progress {
+        border-left: 3px solid var(--accent);
+      }
+      .vtl-m-card.planned {
+        border-left: 3px solid var(--border-strong);
+      }
+      .vtl-m-card.deferred {
+        border-left: 3px solid var(--fg-faint);
+        opacity: 0.75;
+      }
 
-    .vtl-m-inner { display: flex; align-items: center; gap: 12px; }
-    .vtl-m-info { flex: 1; min-width: 0; }
-    .vtl-m-title { font-size: 14px; font-weight: 600; color: var(--fg); line-height: 1.3; }
-    .vtl-m-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
-    .vtl-m-date { font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono); }
-    .vtl-m-dep { font-size: 11px; color: var(--fg-faint); }
-    .vtl-m-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+      .vtl-m-inner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .vtl-m-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .vtl-m-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        line-height: 1.3;
+      }
+      .vtl-m-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 3px;
+      }
+      .vtl-m-date {
+        font-size: 11px;
+        color: var(--fg-muted);
+        font-family: var(--font-mono);
+      }
+      .vtl-m-dep {
+        font-size: 11px;
+        color: var(--fg-faint);
+      }
+      .vtl-m-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
 
-    /* Progress bar variant (instead of ring) */
-    .vtl-progress {
-      width: 80px; height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .vtl-progress-fill { height: 100%; border-radius: 2px; }
-    .pf-s { background: var(--success); }
-    .pf-p { background: var(--accent); }
-    .pf-pl { background: var(--border-strong); }
+      /* Progress bar variant (instead of ring) */
+      .vtl-progress {
+        width: 80px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .vtl-progress-fill {
+        height: 100%;
+        border-radius: 2px;
+      }
+      .pf-s {
+        background: var(--success);
+      }
+      .pf-p {
+        background: var(--accent);
+      }
+      .pf-pl {
+        background: var(--border-strong);
+      }
 
-
-    /* ══════════════════════════════════════════════════════════════════
+      /* ══════════════════════════════════════════════════════════════════
        LAYOUT 3 — Vertical timeline, 2-column (timeline left, cards right)
     ══════════════════════════════════════════════════════════════════ */
-    .vtl2-wrap { padding: 32px 40px 40px; }
-    .vtl2 { display: grid; grid-template-columns: 200px 1fr; gap: 0; }
+      .vtl2-wrap {
+        padding: 32px 40px 40px;
+      }
+      .vtl2 {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 0;
+      }
 
-    .vtl2-left { position: relative; padding-right: 24px; }
-    .vtl2-spine {
-      position: absolute;
-      right: 0; top: 28px; bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom,
-        var(--ph1) 0%, var(--ph1) 25%,
-        var(--ph2) 25%, var(--ph2) 50%,
-        var(--ph3) 50%, var(--ph3) 75%,
-        var(--ph4) 75%, var(--ph4) 100%
-      );
-    }
-    .vtl2-right { padding-left: 24px; }
+      /* Phase label cell (left column) — border-right IS the spine */
+      .vtl2-ph-label {
+        padding: 32px 28px 32px 0;
+        border-right: 2px solid;
+        text-align: right;
+        position: relative;
+      }
+      .vtl2-ph-label.ph1 {
+        border-right-color: var(--ph1);
+      }
+      .vtl2-ph-label.ph2 {
+        border-right-color: var(--ph2);
+      }
+      .vtl2-ph-label.ph3 {
+        border-right-color: var(--ph3);
+      }
+      .vtl2-ph-label.ph4 {
+        border-right-color: var(--ph4);
+      }
+      /* Diamond sits on the spine */
+      .vtl2-ph-label::after {
+        content: '';
+        position: absolute;
+        right: -7px;
+        top: -6px;
+        transform: rotate(45deg);
+        width: 12px;
+        height: 12px;
+        border-radius: 1px;
+      }
+      .vtl2-ph-label.ph1::after {
+        background: var(--ph1);
+      }
+      .vtl2-ph-label.ph2::after {
+        background: var(--ph2);
+      }
+      .vtl2-ph-label.ph3::after {
+        background: var(--ph3);
+      }
+      .vtl2-ph-label.ph4::after {
+        background: var(--ph4);
+      }
 
-    .vtl2-phase-block { margin-bottom: 0; }
-    .vtl2-phase-label {
-      padding: 14px 0 10px;
-      position: relative;
-      text-align: right;
-    }
-    .vtl2-phase-label::after { /* diamond on spine */
-      content: '';
-      position: absolute;
-      right: -7px; top: 50%;
-      transform: translateY(-50%) rotate(45deg);
-      width: 12px; height: 12px;
-      border-radius: 1px;
-    }
-    .vtl2-phase-label.ph1::after { background: var(--ph1); }
-    .vtl2-phase-label.ph2::after { background: var(--ph2); }
-    .vtl2-phase-label.ph3::after { background: var(--ph3); }
-    .vtl2-phase-label.ph4::after { background: var(--ph4); }
-    .vtl2-pnum { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
-    .vtl2-phase-label.ph1 .vtl2-pnum { color: var(--ph1); }
-    .vtl2-phase-label.ph2 .vtl2-pnum { color: var(--ph2); }
-    .vtl2-phase-label.ph3 .vtl2-pnum { color: var(--ph3); }
-    .vtl2-phase-label.ph4 .vtl2-pnum { color: var(--ph4); }
-    .vtl2-pname { font-size: 14px; font-weight: 700; color: var(--fg); }
-    .vtl2-pdates { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
+      /* Cards cell (right column) */
+      .vtl2-ph-cards {
+        padding: 32px 16px 32px 24px;
+      }
 
-    .vtl2-milestones-right { padding-top: 14px; padding-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .vtl2-m {
-      display: flex; align-items: center; gap: 0; position: relative;
-    }
-    .vtl2-m-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      flex-shrink: 0; margin-left: -30px; /* pull dot back to spine center: content at 224px, spine center at 199px, so -(224-194)=-30 */
-      border: 2px solid var(--frame-bg);
-      z-index: 1;
-      position: relative;
-    }
-    .vtl2-m-dot.ds { background: var(--success); box-shadow: 0 0 0 1.5px var(--success); }
-    .vtl2-m-dot.dp { background: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }
-    .vtl2-m-dot.dpl { background: var(--bg-subtle-2); box-shadow: 0 0 0 1.5px var(--border-strong); }
-    .vtl2-m-dot.dd { background: var(--bg-subtle); box-shadow: 0 0 0 1.5px var(--fg-faint); }
-    .vtl2-m-line { width: 20px; height: 1.5px; background: var(--border); flex-shrink: 0; }
-    .vtl2-m-card {
-      flex: 1; background: var(--frame-bg); border: 1px solid var(--border);
-      border-radius: 6px; padding: 10px 14px;
-      transition: border-color 0.15s;
-    }
-    .vtl2-m-card:hover { border-color: var(--border-strong); }
-    .vtl2-m-card.cs { border-left: 3px solid var(--success); }
-    .vtl2-m-card.cp { border-left: 3px solid var(--accent); }
-    .vtl2-m-card.cpl { border-left: 3px solid var(--border-strong); }
-    .vtl2-m-card.cd { border-left: 3px solid var(--fg-faint); opacity: 0.7; }
-    .vtl2-m-row { display: flex; align-items: center; gap: 10px; }
-    .vtl2-m-title { font-size: 13px; font-weight: 600; flex: 1; }
-    .vtl2-m-date { font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono); }
+      /* Horizontal divider between phase rows (all but first pair) */
+      .vtl2 > :nth-child(n + 3) {
+        border-top: 1px solid var(--border);
+      }
+      .vtl2-pnum {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 2px;
+      }
+      .vtl2-ph-label.ph1 .vtl2-pnum {
+        color: var(--ph1);
+      }
+      .vtl2-ph-label.ph2 .vtl2-pnum {
+        color: var(--ph2);
+      }
+      .vtl2-ph-label.ph3 .vtl2-pnum {
+        color: var(--ph3);
+      }
+      .vtl2-ph-label.ph4 .vtl2-pnum {
+        color: var(--ph4);
+      }
+      .vtl2-pname {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--fg);
+      }
+      .vtl2-pdates {
+        font-size: 11px;
+        color: var(--fg-muted);
+        margin-top: 2px;
+      }
 
-    /* Phase divider in right column */
-    .vtl2-right .vtl2-phase-block + .vtl2-phase-block { border-top: 1px solid var(--border); padding-top: 0; }
-  </style>
-</head>
-<body>
+      .vtl2-milestones {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .vtl2-m {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        position: relative;
+      }
+      .vtl2-m-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-left: -30px; /* pull dot center onto spine: cards padding=24px, dot half=5px, so -30px = center at spine right-border */
+        border: 2px solid var(--frame-bg);
+        z-index: 1;
+        position: relative;
+      }
+      .vtl2-m-dot.ds {
+        background: var(--success);
+        box-shadow: 0 0 0 1.5px var(--success);
+      }
+      .vtl2-m-dot.dp {
+        background: var(--accent);
+        box-shadow: 0 0 0 1.5px var(--accent);
+      }
+      .vtl2-m-dot.dpl {
+        background: var(--bg-subtle-2);
+        box-shadow: 0 0 0 1.5px var(--border-strong);
+      }
+      .vtl2-m-dot.dd {
+        background: var(--bg-subtle);
+        box-shadow: 0 0 0 1.5px var(--fg-faint);
+      }
+      .vtl2-m-line {
+        width: 20px;
+        height: 1.5px;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+      .vtl2-m-card {
+        flex: 1;
+        background: var(--frame-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 14px;
+        transition: border-color 0.15s;
+      }
+      .vtl2-m-card:hover {
+        border-color: var(--border-strong);
+      }
+      .vtl2-m-card.cs {
+        border-left: 3px solid var(--success);
+      }
+      .vtl2-m-card.cp {
+        border-left: 3px solid var(--accent);
+      }
+      .vtl2-m-card.cpl {
+        border-left: 3px solid var(--border-strong);
+      }
+      .vtl2-m-card.cd {
+        border-left: 3px solid var(--fg-faint);
+        opacity: 0.7;
+      }
+      .vtl2-m-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .vtl2-m-title {
+        font-size: 13px;
+        font-weight: 600;
+        flex: 1;
+      }
+      .vtl2-m-date {
+        font-size: 11px;
+        color: var(--fg-muted);
+        font-family: var(--font-mono);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="exp-toc">
+      <span class="exp-toc-title">explore · milestone-plan</span>
+      <a href="#grid">Current: 4-column grid</a>
+      <a href="#vtl">V-A: Vertical timeline</a>
+      <a href="#vtl2">V-B: Sidebar timeline</a>
+    </nav>
 
-<nav class="exp-toc">
-  <span class="exp-toc-title">explore · milestone-plan</span>
-  <a href="#grid">Current: 4-column grid</a>
-  <a href="#vtl">V-A: Vertical timeline</a>
-  <a href="#vtl2">V-B: Sidebar timeline</a>
-</nav>
-
-
-<!-- ══════════════════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════════════════
      LAYOUT 1 — Current 4-column grid (baseline)
 ════════════════════════════════════════════════════════════════════════ -->
-<div class="exp-section" id="grid">
-  <p class="exp-section-label">01 · Current baseline — 4-column phase grid</p>
-  <div class="variant">
-    <div class="variant-tag">Sticky phase headers above scrollable milestone cards — columns = phases</div>
-    <div class="variant-frame">
-      <div class="grid-l1">
-
-        <!-- Phase headers (sticky in real version) -->
-        <div class="phase-headers-bar">
-          <div class="ph ph1h"><div class="ph-num">Phase 1</div><div class="ph-name">Core</div><div class="ph-dates">Jan – Mar 2026</div></div>
-          <div class="ph ph2h"><div class="ph-num">Phase 2</div><div class="ph-name">Teams</div><div class="ph-dates">Apr – Jun 2026</div></div>
-          <div class="ph ph3h"><div class="ph-num">Phase 3</div><div class="ph-name">Enterprise</div><div class="ph-dates">Jul – Sep 2026</div></div>
-          <div class="ph ph4h"><div class="ph-num">Phase 4</div><div class="ph-name">Mobile</div><div class="ph-dates">Oct – Dec 2026</div></div>
+    <div class="exp-section" id="grid">
+      <p class="exp-section-label">
+        01 · Current baseline — 4-column phase grid
+      </p>
+      <div class="variant">
+        <div class="variant-tag">
+          Sticky phase headers above scrollable milestone cards — columns =
+          phases
         </div>
+        <div class="variant-frame">
+          <div class="grid-l1">
+            <!-- Phase headers (sticky in real version) -->
+            <div class="phase-headers-bar">
+              <div class="ph ph1h">
+                <div class="ph-num">Phase 1</div>
+                <div class="ph-name">Core</div>
+                <div class="ph-dates">Jan – Mar 2026</div>
+              </div>
+              <div class="ph ph2h">
+                <div class="ph-num">Phase 2</div>
+                <div class="ph-name">Teams</div>
+                <div class="ph-dates">Apr – Jun 2026</div>
+              </div>
+              <div class="ph ph3h">
+                <div class="ph-num">Phase 3</div>
+                <div class="ph-name">Enterprise</div>
+                <div class="ph-dates">Jul – Sep 2026</div>
+              </div>
+              <div class="ph ph4h">
+                <div class="ph-num">Phase 4</div>
+                <div class="ph-name">Mobile</div>
+                <div class="ph-dates">Oct – Dec 2026</div>
+              </div>
+            </div>
 
-        <div class="milestones">
-          <!-- Row 1 -->
-          <div class="mc ms">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-shipped" cx="18" cy="18" r="14" stroke-dasharray="87.96 87.96"/></svg><div class="ring-pct" style="color:var(--success)">100%</div><div class="shipped-check">✓</div></div>
-              <div class="mc-info"><div class="mc-title">v1.0 — Initial Release</div><div class="mc-date">Jan 2026</div></div>
+            <div class="milestones">
+              <!-- Row 1 -->
+              <div class="mc ms">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-shipped"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="87.96 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct" style="color: var(--success)">
+                      100%
+                    </div>
+                    <div class="shipped-check">✓</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v1.0 — Initial Release</div>
+                    <div class="mc-date">Jan 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-s">✓ Shipped</span>
+              </div>
+              <div class="mc ms">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-shipped"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="87.96 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct" style="color: var(--success)">
+                      100%
+                    </div>
+                    <div class="shipped-check">✓</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v2.0 — Team Workspaces</div>
+                    <div class="mc-date">Apr 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-s">✓ Shipped</span>
+              </div>
+              <div class="mc mp">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-planned"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="0 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct">0%</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v3.0 — SSO / SAML</div>
+                    <div class="mc-date">Jul 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-pl">Planned</span>
+              </div>
+              <div class="mc mp">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-planned"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="0 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct">0%</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v4.0 — iOS App</div>
+                    <div class="mc-date">Oct 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-pl">Planned</span>
+              </div>
+              <!-- Row 2 -->
+              <div class="mc ms">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-shipped"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="87.96 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct" style="color: var(--success)">
+                      100%
+                    </div>
+                    <div class="shipped-check">✓</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v1.1 — Conflict Alerts</div>
+                    <div class="mc-date">Feb 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-s">✓ Shipped</span>
+              </div>
+              <div class="mc mi">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-progress"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="57.17 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct" style="color: var(--accent)">65%</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v2.2 — Selective Sync</div>
+                    <div class="mc-date">May 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-p">In Progress</span>
+              </div>
+              <div class="mc mp">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-planned"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="0 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct">0%</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v3.1 — Audit Log Export</div>
+                    <div class="mc-date">Aug 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-pl">Planned</span>
+              </div>
+              <div class="mc mp">
+                <div class="mc-top">
+                  <div class="ring-wrap">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle class="ring-bg" cx="18" cy="18" r="14" />
+                      <circle
+                        class="ring-fill rf-planned"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        stroke-dasharray="0 87.96"
+                      />
+                    </svg>
+                    <div class="ring-pct">0%</div>
+                  </div>
+                  <div class="mc-info">
+                    <div class="mc-title">v4.1 — Android App</div>
+                    <div class="mc-date">Nov 2026</div>
+                  </div>
+                </div>
+                <span class="chip chip-pl">Planned</span>
+              </div>
             </div>
-            <span class="chip chip-s">✓ Shipped</span>
-          </div>
-          <div class="mc ms">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-shipped" cx="18" cy="18" r="14" stroke-dasharray="87.96 87.96"/></svg><div class="ring-pct" style="color:var(--success)">100%</div><div class="shipped-check">✓</div></div>
-              <div class="mc-info"><div class="mc-title">v2.0 — Team Workspaces</div><div class="mc-date">Apr 2026</div></div>
-            </div>
-            <span class="chip chip-s">✓ Shipped</span>
-          </div>
-          <div class="mc mp">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-planned" cx="18" cy="18" r="14" stroke-dasharray="0 87.96"/></svg><div class="ring-pct">0%</div></div>
-              <div class="mc-info"><div class="mc-title">v3.0 — SSO / SAML</div><div class="mc-date">Jul 2026</div></div>
-            </div>
-            <span class="chip chip-pl">Planned</span>
-          </div>
-          <div class="mc mp">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-planned" cx="18" cy="18" r="14" stroke-dasharray="0 87.96"/></svg><div class="ring-pct">0%</div></div>
-              <div class="mc-info"><div class="mc-title">v4.0 — iOS App</div><div class="mc-date">Oct 2026</div></div>
-            </div>
-            <span class="chip chip-pl">Planned</span>
-          </div>
-          <!-- Row 2 -->
-          <div class="mc ms">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-shipped" cx="18" cy="18" r="14" stroke-dasharray="87.96 87.96"/></svg><div class="ring-pct" style="color:var(--success)">100%</div><div class="shipped-check">✓</div></div>
-              <div class="mc-info"><div class="mc-title">v1.1 — Conflict Alerts</div><div class="mc-date">Feb 2026</div></div>
-            </div>
-            <span class="chip chip-s">✓ Shipped</span>
-          </div>
-          <div class="mc mi">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-progress" cx="18" cy="18" r="14" stroke-dasharray="57.17 87.96"/></svg><div class="ring-pct" style="color:var(--accent)">65%</div></div>
-              <div class="mc-info"><div class="mc-title">v2.2 — Selective Sync</div><div class="mc-date">May 2026</div></div>
-            </div>
-            <span class="chip chip-p">In Progress</span>
-          </div>
-          <div class="mc mp">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-planned" cx="18" cy="18" r="14" stroke-dasharray="0 87.96"/></svg><div class="ring-pct">0%</div></div>
-              <div class="mc-info"><div class="mc-title">v3.1 — Audit Log Export</div><div class="mc-date">Aug 2026</div></div>
-            </div>
-            <span class="chip chip-pl">Planned</span>
-          </div>
-          <div class="mc mp">
-            <div class="mc-top">
-              <div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="14"/><circle class="ring-fill rf-planned" cx="18" cy="18" r="14" stroke-dasharray="0 87.96"/></svg><div class="ring-pct">0%</div></div>
-              <div class="mc-info"><div class="mc-title">v4.1 — Android App</div><div class="mc-date">Nov 2026</div></div>
-            </div>
-            <span class="chip chip-pl">Planned</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-
-<!-- ══════════════════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════════════════
      LAYOUT 2 — Vertical Timeline (single column)
 ════════════════════════════════════════════════════════════════════════ -->
-<div class="exp-section" id="vtl">
-  <p class="exp-section-label">02 · V-A — Vertical timeline, chronological flow</p>
-  <div class="variant">
-    <div class="variant-tag">Spine on left · phase diamonds · milestone dots + horizontal connector · progress bar</div>
-    <div class="variant-frame">
-      <div class="vtl-wrap">
-        <div class="vtl">
-          <div class="vtl-spine"></div>
+    <div class="exp-section" id="vtl">
+      <p class="exp-section-label">
+        02 · V-A — Vertical timeline, chronological flow
+      </p>
+      <div class="variant">
+        <div class="variant-tag">
+          Spine on left · phase diamonds · milestone dots + horizontal connector
+          · progress bar
+        </div>
+        <div class="variant-frame">
+          <div class="vtl-wrap">
+            <div class="vtl">
+              <div class="vtl-spine"></div>
 
-          <!-- ── Phase 1: Core ── -->
-          <div class="vtl-phase">
-            <div class="vtl-phase-header ph1">
-              <div class="vtl-phase-diamond"></div>
-              <div class="vtl-phase-label">
-                <div class="vtl-phase-num">Phase 1</div>
-                <div class="vtl-phase-name">Core</div>
-              </div>
-              <span class="vtl-phase-sep">·</span>
-              <div class="vtl-phase-count">3 milestones</div>
-              <div class="vtl-phase-dates">Jan – Mar 2026</div>
-            </div>
-            <div class="vtl-milestones">
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot ds"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card shipped">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v1.0 — Initial Release</div>
-                      <div class="vtl-m-meta">
-                        <span class="vtl-m-date">Jan 2026</span>
-                        <span class="chip chip-s">✓ Shipped</span>
+              <!-- ── Phase 1: Core ── -->
+              <div class="vtl-phase">
+                <div class="vtl-phase-header ph1">
+                  <div class="vtl-phase-diamond"></div>
+                  <div class="vtl-phase-label">
+                    <div class="vtl-phase-num">Phase 1</div>
+                    <div class="vtl-phase-name">Core</div>
+                  </div>
+                  <span class="vtl-phase-sep">·</span>
+                  <div class="vtl-phase-count">3 milestones</div>
+                  <div class="vtl-phase-dates">Jan – Mar 2026</div>
+                </div>
+                <div class="vtl-milestones">
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot ds"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card shipped">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v1.0 — Initial Release</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Jan 2026</span>
+                            <span class="chip chip-s">✓ Shipped</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-s"
+                              style="width: 100%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--success);
+                              font-weight: 600;
+                            "
+                            >100%</span
+                          >
+                        </div>
                       </div>
                     </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-s" style="width:100%"></div></div>
-                      <span style="font-size:10px;color:var(--success);font-weight:600;">100%</span>
-                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot ds"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card shipped">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v1.1 — Conflict Alerts</div>
-                      <div class="vtl-m-meta">
-                        <span class="vtl-m-date">Feb 2026</span>
-                        <span class="chip chip-s">✓ Shipped</span>
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot ds"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card shipped">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v1.1 — Conflict Alerts</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Feb 2026</span>
+                            <span class="chip chip-s">✓ Shipped</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-s"
+                              style="width: 100%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--success);
+                              font-weight: 600;
+                            "
+                            >100%</span
+                          >
+                        </div>
                       </div>
                     </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-s" style="width:100%"></div></div>
-                      <span style="font-size:10px;color:var(--success);font-weight:600;">100%</span>
-                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot ds"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card shipped">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v1.2 — Performance</div>
-                      <div class="vtl-m-meta">
-                        <span class="vtl-m-date">Mar 2026</span>
-                        <span class="chip chip-s">✓ Shipped</span>
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot ds"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card shipped">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v1.2 — Performance</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Mar 2026</span>
+                            <span class="chip chip-s">✓ Shipped</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-s"
+                              style="width: 100%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--success);
+                              font-weight: 600;
+                            "
+                            >100%</span
+                          >
+                        </div>
                       </div>
                     </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-s" style="width:100%"></div></div>
-                      <span style="font-size:10px;color:var(--success);font-weight:600;">100%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Phase 2: Teams ── -->
+              <div class="vtl-phase">
+                <div class="vtl-phase-header ph2">
+                  <div class="vtl-phase-diamond"></div>
+                  <div class="vtl-phase-label">
+                    <div class="vtl-phase-num">Phase 2</div>
+                    <div class="vtl-phase-name">Teams</div>
+                  </div>
+                  <span class="vtl-phase-sep">·</span>
+                  <div class="vtl-phase-count">4 milestones</div>
+                  <div class="vtl-phase-dates">Apr – Jun 2026</div>
+                </div>
+                <div class="vtl-milestones">
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot ds"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card shipped">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v2.0 — Team Workspaces</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Apr 2026</span
+                            ><span class="chip chip-s">✓ Shipped</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-s"
+                              style="width: 100%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--success);
+                              font-weight: 600;
+                            "
+                            >100%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot ds"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card shipped">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v2.1 — Three-Way Merge</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Apr 2026</span
+                            ><span class="chip chip-s">✓ Shipped</span
+                            ><span class="vtl-m-dep">↳ depends on v1.2</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-s"
+                              style="width: 100%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--success);
+                              font-weight: 600;
+                            "
+                            >100%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dp"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card in-progress">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v2.2 — Selective Sync</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">May 2026</span
+                            ><span class="chip chip-p">In Progress</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-p"
+                              style="width: 65%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--accent);
+                              font-weight: 600;
+                            "
+                            >65%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dp"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card in-progress">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">
+                            v2.3 — Shared Invitations
+                          </div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Jun 2026</span
+                            ><span class="chip chip-p">In Progress</span
+                            ><span class="vtl-m-dep">↳ depends on v2.0</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-p"
+                              style="width: 30%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--accent);
+                              font-weight: 600;
+                            "
+                            >30%</span
+                          >
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
+              <!-- ── Phase 3: Enterprise ── -->
+              <div class="vtl-phase">
+                <div class="vtl-phase-header ph3">
+                  <div class="vtl-phase-diamond"></div>
+                  <div class="vtl-phase-label">
+                    <div class="vtl-phase-num">Phase 3</div>
+                    <div class="vtl-phase-name">Enterprise</div>
+                  </div>
+                  <span class="vtl-phase-sep">·</span>
+                  <div class="vtl-phase-count">3 milestones</div>
+                  <div class="vtl-phase-dates">Jul – Sep 2026</div>
+                </div>
+                <div class="vtl-milestones">
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dpl"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card planned">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v3.0 — SSO / SAML</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Jul 2026</span
+                            ><span class="chip chip-pl">Planned</span
+                            ><span class="vtl-m-dep">↳ depends on v2.3</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-pl"
+                              style="width: 0%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--fg-faint);
+                              font-weight: 600;
+                            "
+                            >0%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dpl"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card planned">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v3.1 — Audit Log Export</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Aug 2026</span
+                            ><span class="chip chip-pl">Planned</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-pl"
+                              style="width: 0%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--fg-faint);
+                              font-weight: 600;
+                            "
+                            >0%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dpl"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card planned">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">
+                            v3.2 — Advanced Permissions
+                          </div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Sep 2026</span
+                            ><span class="chip chip-pl">Planned</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill pf-pl"
+                              style="width: 0%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--fg-faint);
+                              font-weight: 600;
+                            "
+                            >0%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Phase 4: Mobile ── -->
+              <div class="vtl-phase">
+                <div class="vtl-phase-header ph4">
+                  <div class="vtl-phase-diamond"></div>
+                  <div class="vtl-phase-label">
+                    <div class="vtl-phase-num">Phase 4</div>
+                    <div class="vtl-phase-name">Mobile</div>
+                  </div>
+                  <span class="vtl-phase-sep">·</span>
+                  <div class="vtl-phase-count">3 milestones</div>
+                  <div class="vtl-phase-dates">Oct – Dec 2026</div>
+                </div>
+                <div class="vtl-milestones">
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dpl"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card planned">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v4.0 — iOS App</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Oct 2026</span
+                            ><span class="chip chip-pl">Planned</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill"
+                              style="width: 0%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--fg-faint);
+                              font-weight: 600;
+                            "
+                            >0%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dpl"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card planned">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v4.1 — Android App</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Nov 2026</span
+                            ><span class="chip chip-pl">Planned</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill"
+                              style="width: 0%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--fg-faint);
+                              font-weight: 600;
+                            "
+                            >0%</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="vtl-m">
+                    <div class="vtl-m-dot-wrap">
+                      <div class="vtl-m-dot dd"></div>
+                    </div>
+                    <div class="vtl-m-connector"></div>
+                    <div class="vtl-m-card deferred">
+                      <div class="vtl-m-inner">
+                        <div class="vtl-m-info">
+                          <div class="vtl-m-title">v4.2 — Web Fallback</div>
+                          <div class="vtl-m-meta">
+                            <span class="vtl-m-date">Dec 2026</span
+                            ><span class="chip chip-d">Deferred</span>
+                          </div>
+                        </div>
+                        <div class="vtl-m-right">
+                          <div class="vtl-progress">
+                            <div
+                              class="vtl-progress-fill"
+                              style="width: 0%"
+                            ></div>
+                          </div>
+                          <span
+                            style="
+                              font-size: 10px;
+                              color: var(--fg-faint);
+                              font-weight: 600;
+                            "
+                            >—</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            <!-- /vtl -->
           </div>
-
-          <!-- ── Phase 2: Teams ── -->
-          <div class="vtl-phase">
-            <div class="vtl-phase-header ph2">
-              <div class="vtl-phase-diamond"></div>
-              <div class="vtl-phase-label">
-                <div class="vtl-phase-num">Phase 2</div>
-                <div class="vtl-phase-name">Teams</div>
-              </div>
-              <span class="vtl-phase-sep">·</span>
-              <div class="vtl-phase-count">4 milestones</div>
-              <div class="vtl-phase-dates">Apr – Jun 2026</div>
-            </div>
-            <div class="vtl-milestones">
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot ds"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card shipped">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v2.0 — Team Workspaces</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Apr 2026</span><span class="chip chip-s">✓ Shipped</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-s" style="width:100%"></div></div>
-                      <span style="font-size:10px;color:var(--success);font-weight:600;">100%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot ds"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card shipped">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v2.1 — Three-Way Merge</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Apr 2026</span><span class="chip chip-s">✓ Shipped</span><span class="vtl-m-dep">↳ depends on v1.2</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-s" style="width:100%"></div></div>
-                      <span style="font-size:10px;color:var(--success);font-weight:600;">100%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dp"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card in-progress">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v2.2 — Selective Sync</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">May 2026</span><span class="chip chip-p">In Progress</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-p" style="width:65%"></div></div>
-                      <span style="font-size:10px;color:var(--accent);font-weight:600;">65%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dp"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card in-progress">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v2.3 — Shared Invitations</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Jun 2026</span><span class="chip chip-p">In Progress</span><span class="vtl-m-dep">↳ depends on v2.0</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-p" style="width:30%"></div></div>
-                      <span style="font-size:10px;color:var(--accent);font-weight:600;">30%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- ── Phase 3: Enterprise ── -->
-          <div class="vtl-phase">
-            <div class="vtl-phase-header ph3">
-              <div class="vtl-phase-diamond"></div>
-              <div class="vtl-phase-label">
-                <div class="vtl-phase-num">Phase 3</div>
-                <div class="vtl-phase-name">Enterprise</div>
-              </div>
-              <span class="vtl-phase-sep">·</span>
-              <div class="vtl-phase-count">3 milestones</div>
-              <div class="vtl-phase-dates">Jul – Sep 2026</div>
-            </div>
-            <div class="vtl-milestones">
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dpl"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card planned">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v3.0 — SSO / SAML</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Jul 2026</span><span class="chip chip-pl">Planned</span><span class="vtl-m-dep">↳ depends on v2.3</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-pl" style="width:0%"></div></div>
-                      <span style="font-size:10px;color:var(--fg-faint);font-weight:600;">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dpl"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card planned">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v3.1 — Audit Log Export</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Aug 2026</span><span class="chip chip-pl">Planned</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-pl" style="width:0%"></div></div>
-                      <span style="font-size:10px;color:var(--fg-faint);font-weight:600;">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dpl"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card planned">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v3.2 — Advanced Permissions</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Sep 2026</span><span class="chip chip-pl">Planned</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill pf-pl" style="width:0%"></div></div>
-                      <span style="font-size:10px;color:var(--fg-faint);font-weight:600;">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- ── Phase 4: Mobile ── -->
-          <div class="vtl-phase">
-            <div class="vtl-phase-header ph4">
-              <div class="vtl-phase-diamond"></div>
-              <div class="vtl-phase-label">
-                <div class="vtl-phase-num">Phase 4</div>
-                <div class="vtl-phase-name">Mobile</div>
-              </div>
-              <span class="vtl-phase-sep">·</span>
-              <div class="vtl-phase-count">3 milestones</div>
-              <div class="vtl-phase-dates">Oct – Dec 2026</div>
-            </div>
-            <div class="vtl-milestones">
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dpl"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card planned">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v4.0 — iOS App</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Oct 2026</span><span class="chip chip-pl">Planned</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill" style="width:0%"></div></div>
-                      <span style="font-size:10px;color:var(--fg-faint);font-weight:600;">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dpl"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card planned">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v4.1 — Android App</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Nov 2026</span><span class="chip chip-pl">Planned</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill" style="width:0%"></div></div>
-                      <span style="font-size:10px;color:var(--fg-faint);font-weight:600;">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vtl-m">
-                <div class="vtl-m-dot-wrap"><div class="vtl-m-dot dd"></div></div>
-                <div class="vtl-m-connector"></div>
-                <div class="vtl-m-card deferred">
-                  <div class="vtl-m-inner">
-                    <div class="vtl-m-info">
-                      <div class="vtl-m-title">v4.2 — Web Fallback</div>
-                      <div class="vtl-m-meta"><span class="vtl-m-date">Dec 2026</span><span class="chip chip-d">Deferred</span></div>
-                    </div>
-                    <div class="vtl-m-right">
-                      <div class="vtl-progress"><div class="vtl-progress-fill" style="width:0%"></div></div>
-                      <span style="font-size:10px;color:var(--fg-faint);font-weight:600;">—</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div><!-- /vtl -->
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-
-<!-- ══════════════════════════════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════════════════════════════
      LAYOUT 3 — Sidebar Timeline (2-column: phase labels left, cards right)
 ════════════════════════════════════════════════════════════════════════ -->
-<div class="exp-section" id="vtl2">
-  <p class="exp-section-label">03 · V-B — Sidebar timeline, phase labels on left</p>
-  <div class="variant">
-    <div class="variant-tag">Phase panel on left · colored spine · milestone cards fill right column</div>
-    <div class="variant-frame">
-      <div class="vtl2-wrap">
-        <div class="vtl2">
-          <!-- Left: Phase labels -->
-          <div class="vtl2-left">
-            <div class="vtl2-spine"></div>
-
-            <!-- Phase 1 -->
-            <div class="vtl2-phase-block">
-              <div class="vtl2-phase-label ph1">
+    <div class="exp-section" id="vtl2">
+      <p class="exp-section-label">
+        03 · V-B — Sidebar timeline, phase labels on left
+      </p>
+      <div class="variant">
+        <div class="variant-tag">
+          Phase panel on left · colored spine · milestone cards fill right
+          column
+        </div>
+        <div class="variant-frame">
+          <div class="vtl2-wrap">
+            <div class="vtl2">
+              <!-- Phase 1 -->
+              <div class="vtl2-ph-label ph1">
                 <div class="vtl2-pnum">Phase 1</div>
                 <div class="vtl2-pname">Core</div>
                 <div class="vtl2-pdates">Jan–Mar 2026</div>
               </div>
-            </div>
-            <!-- spacer matching 3 milestone cards -->
-            <div style="height:128px;"></div>
+              <div class="vtl2-ph-cards">
+                <div class="vtl2-milestones">
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot ds"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cs">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v1.0 — Initial Release</span
+                        ><span class="vtl2-m-date">Jan 2026</span
+                        ><span class="chip chip-s">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot ds"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cs">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v1.1 — Conflict Alerts</span
+                        ><span class="vtl2-m-date">Feb 2026</span
+                        ><span class="chip chip-s">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot ds"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cs">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v1.2 — Performance</span
+                        ><span class="vtl2-m-date">Mar 2026</span
+                        ><span class="chip chip-s">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Phase 2 -->
-            <div class="vtl2-phase-block" style="border-top:1px solid var(--border);padding-top:0;">
-              <div class="vtl2-phase-label ph2" style="margin-top:0;">
+              <!-- Phase 2 -->
+              <div class="vtl2-ph-label ph2">
                 <div class="vtl2-pnum">Phase 2</div>
                 <div class="vtl2-pname">Teams</div>
                 <div class="vtl2-pdates">Apr–Jun 2026</div>
               </div>
-            </div>
-            <div style="height:172px;"></div>
+              <div class="vtl2-ph-cards">
+                <div class="vtl2-milestones">
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot ds"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cs">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v2.0 — Team Workspaces</span
+                        ><span class="vtl2-m-date">Apr 2026</span
+                        ><span class="chip chip-s">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot ds"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cs">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v2.1 — Three-Way Merge</span
+                        ><span class="vtl2-m-date">Apr 2026</span
+                        ><span class="chip chip-s">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dp"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cp">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v2.2 — Selective Sync</span
+                        ><span class="vtl2-m-date">May 2026</span
+                        ><span class="chip chip-p">65%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dp"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cp">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title"
+                          >v2.3 — Shared Invitations</span
+                        ><span class="vtl2-m-date">Jun 2026</span
+                        ><span class="chip chip-p">30%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Phase 3 -->
-            <div class="vtl2-phase-block" style="border-top:1px solid var(--border);">
-              <div class="vtl2-phase-label ph3">
+              <!-- Phase 3 -->
+              <div class="vtl2-ph-label ph3">
                 <div class="vtl2-pnum">Phase 3</div>
                 <div class="vtl2-pname">Enterprise</div>
                 <div class="vtl2-pdates">Jul–Sep 2026</div>
               </div>
-            </div>
-            <div style="height:128px;"></div>
+              <div class="vtl2-ph-cards">
+                <div class="vtl2-milestones">
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dpl"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cpl">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v3.0 — SSO / SAML</span
+                        ><span class="vtl2-m-date">Jul 2026</span
+                        ><span class="chip chip-pl">Planned</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dpl"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cpl">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v3.1 — Audit Log Export</span
+                        ><span class="vtl2-m-date">Aug 2026</span
+                        ><span class="chip chip-pl">Planned</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dpl"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cpl">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title"
+                          >v3.2 — Advanced Permissions</span
+                        ><span class="vtl2-m-date">Sep 2026</span
+                        ><span class="chip chip-pl">Planned</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Phase 4 -->
-            <div class="vtl2-phase-block" style="border-top:1px solid var(--border);">
-              <div class="vtl2-phase-label ph4">
+              <!-- Phase 4 -->
+              <div class="vtl2-ph-label ph4">
                 <div class="vtl2-pnum">Phase 4</div>
                 <div class="vtl2-pname">Mobile</div>
                 <div class="vtl2-pdates">Oct–Dec 2026</div>
               </div>
+              <div class="vtl2-ph-cards">
+                <div class="vtl2-milestones">
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dpl"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cpl">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v4.0 — iOS App</span
+                        ><span class="vtl2-m-date">Oct 2026</span
+                        ><span class="chip chip-pl">Planned</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dpl"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cpl">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v4.1 — Android App</span
+                        ><span class="vtl2-m-date">Nov 2026</span
+                        ><span class="chip chip-pl">Planned</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="vtl2-m">
+                    <div class="vtl2-m-dot dd"></div>
+                    <div class="vtl2-m-line"></div>
+                    <div class="vtl2-m-card cd">
+                      <div class="vtl2-m-row">
+                        <span class="vtl2-m-title">v4.2 — Web Fallback</span
+                        ><span class="vtl2-m-date">Dec 2026</span
+                        ><span class="chip chip-d">Deferred</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            <!-- /vtl2 -->
           </div>
-
-          <!-- Right: Cards -->
-          <div class="vtl2-right">
-
-            <!-- Phase 1 milestones -->
-            <div class="vtl2-milestones-right" style="padding-top:8px;">
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot ds"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cs">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v1.0 — Initial Release</span><span class="vtl2-m-date">Jan 2026</span><span class="chip chip-s">✓</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot ds"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cs">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v1.1 — Conflict Alerts</span><span class="vtl2-m-date">Feb 2026</span><span class="chip chip-s">✓</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot ds"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cs">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v1.2 — Performance</span><span class="vtl2-m-date">Mar 2026</span><span class="chip chip-s">✓</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Phase 2 milestones -->
-            <div class="vtl2-milestones-right" style="border-top:1px solid var(--border);">
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot ds"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cs">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v2.0 — Team Workspaces</span><span class="vtl2-m-date">Apr 2026</span><span class="chip chip-s">✓</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot ds"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cs">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v2.1 — Three-Way Merge</span><span class="vtl2-m-date">Apr 2026</span><span class="chip chip-s">✓</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dp"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cp">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v2.2 — Selective Sync</span><span class="vtl2-m-date">May 2026</span><span class="chip chip-p">65%</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dp"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cp">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v2.3 — Shared Invitations</span><span class="vtl2-m-date">Jun 2026</span><span class="chip chip-p">30%</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Phase 3 milestones -->
-            <div class="vtl2-milestones-right" style="border-top:1px solid var(--border);">
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dpl"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cpl">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v3.0 — SSO / SAML</span><span class="vtl2-m-date">Jul 2026</span><span class="chip chip-pl">Planned</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dpl"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cpl">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v3.1 — Audit Log Export</span><span class="vtl2-m-date">Aug 2026</span><span class="chip chip-pl">Planned</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dpl"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cpl">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v3.2 — Advanced Permissions</span><span class="vtl2-m-date">Sep 2026</span><span class="chip chip-pl">Planned</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Phase 4 milestones -->
-            <div class="vtl2-milestones-right" style="border-top:1px solid var(--border);">
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dpl"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cpl">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v4.0 — iOS App</span><span class="vtl2-m-date">Oct 2026</span><span class="chip chip-pl">Planned</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dpl"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cpl">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v4.1 — Android App</span><span class="vtl2-m-date">Nov 2026</span><span class="chip chip-pl">Planned</span></div>
-                </div>
-              </div>
-              <div class="vtl2-m">
-                <div class="vtl2-m-dot dd"></div>
-                <div class="vtl2-m-line"></div>
-                <div class="vtl2-m-card cd">
-                  <div class="vtl2-m-row"><span class="vtl2-m-title">v4.2 — Web Fallback</span><span class="vtl2-m-date">Dec 2026</span><span class="chip chip-d">Deferred</span></div>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /vtl2-right -->
-        </div><!-- /vtl2 -->
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="exp-spacer"></div>
-
-</body>
+    <div class="exp-spacer"></div>
+  </body>
 </html>

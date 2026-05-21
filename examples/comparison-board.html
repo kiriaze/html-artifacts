@@ -1,351 +1,1016 @@
-<!-- html-artifacts: comparison-board example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: comparison-board example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/comparison-board.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File Sync Tools — Comparison Board</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
-
-    /* Nav */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg); border-bottom: 1px solid var(--border);
-      padding: 0 32px; display: flex; align-items: center; gap: 24px; height: 48px;
-    }
-    .back-link { color: var(--fg-muted); text-decoration: none; font-size: 13px; white-space: nowrap; transition: color 0.15s; flex-shrink: 0; }
-    .back-link:hover { color: var(--fg); }
-    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    .nav-links { display: flex; gap: 20px; list-style: none; }
-    .nav-links a { color: var(--fg-muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
-    .nav-links a:hover { color: var(--accent); }
-
-    /* Layout */
-    main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 96px; }
-    section { margin-bottom: 56px; }
-    h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-
-    /* Header */
-    .page-header { margin-bottom: 40px; }
-    .page-title { font-size: 30px; font-weight: 700; margin-bottom: 8px; }
-    .page-sub { font-size: 14px; color: var(--fg-muted); margin-bottom: 16px; }
-    .positioning-callout {
-      background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: var(--radius-md);
-      padding: 16px 20px; font-size: 14px; color: var(--fg-muted); line-height: 1.6;
-      border-left: 4px solid var(--accent);
-    }
-    .positioning-callout strong { color: var(--fg); }
-
-    /* Matrix table */
-    .matrix-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .matrix {
-      width: 100%; border-collapse: collapse; font-size: 13px;
-      min-width: 680px;
-    }
-    .matrix th {
-      padding: 10px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; text-align: center; border-bottom: 2px solid var(--border);
-      background: var(--bg); cursor: pointer; user-select: none; white-space: nowrap;
-    }
-    .matrix th:first-child { text-align: left; cursor: default; }
-    .matrix th.our-col { background: var(--accent-bg); color: var(--accent); }
-    .matrix th .sort-arrow { font-size: 10px; color: var(--fg-faint); margin-left: 4px; }
-    .matrix th.sorted-asc .sort-arrow::after { content: '▲'; color: var(--accent); }
-    .matrix th.sorted-desc .sort-arrow::after { content: '▼'; color: var(--accent); }
-    .matrix th:not(.sorted-asc):not(.sorted-desc) .sort-arrow::after { content: '⇅'; }
-    .matrix td {
-      padding: 10px 12px; border-bottom: 1px solid var(--bg-subtle);
-      text-align: center; vertical-align: middle;
-    }
-    .matrix td:first-child { text-align: left; font-size: 13px; font-weight: 500; color: var(--fg); }
-    .matrix td.our-col { background: var(--bg-subtle); }
-    .matrix tr:hover td { background: var(--bg-subtle); }
-    .matrix tr:hover td.our-col { background: var(--accent-bg); }
-
-    /* Feature matrix icon cells — centered */
-    .matrix td { text-align: center; vertical-align: middle; }
-    .cell-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1;
-    }
-    .cell-yes  { background: var(--success-bg); color: var(--success); }
-    .cell-partial { background: var(--warning-bg); color: var(--warning); }
-    .cell-no   { background: var(--danger-bg);   color: var(--danger);  }
-
-    .legend { display: flex; gap: 16px; font-size: 12px; color: var(--fg-muted); margin-top: 12px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-
-    /* Positioning map */
-    .map-container { position: relative; }
-    .map-canvas {
-      width: 100%; aspect-ratio: 16/9; max-height: 380px;
-      background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-lg);
-      position: relative; overflow: hidden;
-    }
-    /* Axes */
-    .map-axis-x {
-      position: absolute; left: 0; right: 0; top: 50%; height: 1px;
-      background: var(--border);
-    }
-    .map-axis-y {
-      position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
-      background: var(--border);
-    }
-    .map-label {
-      position: absolute; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--fg-muted);
-    }
-    .map-label.left   { left: 12px; top: 50%; transform: translateY(-50%); }
-    .map-label.right  { right: 12px; top: 50%; transform: translateY(-50%); }
-    .map-label.top    { top: 10px; left: 50%; transform: translateX(-50%); }
-    .map-label.bottom { bottom: 10px; left: 50%; transform: translateX(-50%); }
-    .map-chip {
-      position: absolute; transform: translate(-50%, -50%);
-      border-radius: 100px; padding: 4px 10px; font-size: 11px; font-weight: 600;
-      white-space: nowrap; border: 1.5px solid transparent; cursor: default;
-    }
-    .map-chip.ours {
-      background: var(--accent); color: #fff; border-color: var(--accent);
-      box-shadow: 0 2px 8px rgba(37,99,235,0.30);
-    }
-    .map-chip.other {
-      background: #fff; color: var(--fg-muted); border-color: var(--border);
-    }
-    .map-chip:hover { z-index: 10; box-shadow: var(--shadow-md); }
-
-    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-
-    /* Tooltip on hover for chips */
-    .map-chip[data-tip] { position: absolute; }
-    .map-chip[data-tip]:hover::after {
-      content: attr(data-tip);
-      position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
-      background: var(--fg); color: #fff; font-size: 11px; font-weight: normal;
-      padding: 4px 8px; border-radius: var(--radius-sm); white-space: nowrap; pointer-events: none;
-    }
-  </style>
-</head>
-<body>
-
-<nav>
-  <a href="../index.html" class="back-link">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Comparison Board</span>
-  <div style="flex:1"></div>
-  <ul class="nav-links">
-    <li><a href="#matrix">Feature Matrix</a></li>
-    <li><a href="#map">Positioning Map</a></li>
-  </ul>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
-
-<main>
-
-  <div class="page-header">
-    <div class="page-title">File Sync Tools for Developers</div>
-    <div class="page-sub">Acme Sync vs Syncthing, Resilio Sync, Dropbox, rsync, Unison</div>
-    <div class="positioning-callout">
-      <strong>Our angle:</strong> Acme Sync is the only tool in this space that is <strong>CLI-first, git-aware, and cloud-backed</strong> simultaneously — closing the gap between the power of rsync and the convenience of Dropbox without either tool's critical weakness.
-    </div>
-  </div>
-
-  <!-- Feature Matrix -->
-  <section id="matrix">
-    <h2>Feature Matrix</h2>
-    <div class="matrix-wrap">
-      <table class="matrix" id="featureMatrix">
-        <thead>
-          <tr>
-            <th>Feature</th>
-            <th class="our-col">Acme Sync<span class="sort-arrow"></span></th>
-            <th>Syncthing<span class="sort-arrow"></span></th>
-            <th>Resilio<span class="sort-arrow"></span></th>
-            <th>Dropbox<span class="sort-arrow"></span></th>
-            <th>rsync<span class="sort-arrow"></span></th>
-            <th>Unison<span class="sort-arrow"></span></th>
-          </tr>
-        </thead>
-        <tbody id="matrixBody">
-        </tbody>
-      </table>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><span class="cell-icon cell-yes">✓</span> Has it</div>
-      <div class="legend-item"><span class="cell-icon cell-partial">~</span> Partial</div>
-      <div class="legend-item"><span class="cell-icon cell-no">✗</span> Missing</div>
-      <div style="margin-left:auto;color:var(--fg-faint);font-size:11px;">Click a column header to sort</div>
-    </div>
-  </section>
-
-  <!-- Positioning Map -->
-  <section id="map">
-    <h2>Positioning Map</h2>
-    <div class="map-container">
-      <div class="map-canvas">
-        <div class="map-axis-x"></div>
-        <div class="map-axis-y"></div>
-        <span class="map-label left">Local-only</span>
-        <span class="map-label right">Cloud-backed</span>
-        <span class="map-label top">Automated</span>
-        <span class="map-label bottom">Manual</span>
-
-        <!-- Chips: position as % (left, top). X=local→cloud, Y=auto→manual (top=auto) -->
-        <!-- Acme Sync: cloud-backed + automated → right + top -->
-        <span class="map-chip ours" style="left:78%;top:22%;" data-tip="Cloud-backed · Automated">Acme Sync</span>
-        <!-- Syncthing: local P2P + automated → left-center + top -->
-        <span class="map-chip other" style="left:22%;top:28%;" data-tip="P2P only · Automated">Syncthing</span>
-        <!-- Resilio: P2P + automated, slightly more cloud-aware -->
-        <span class="map-chip other" style="left:32%;top:22%;" data-tip="P2P · Automated">Resilio</span>
-        <!-- Dropbox: cloud + automated but not git-aware -->
-        <span class="map-chip other" style="left:82%;top:30%;" data-tip="Cloud · Automated">Dropbox</span>
-        <!-- rsync: local + manual -->
-        <span class="map-chip other" style="left:18%;top:78%;" data-tip="Local · Manual">rsync</span>
-        <!-- Unison: local + semi-manual -->
-        <span class="map-chip other" style="left:24%;top:65%;" data-tip="Local · Semi-manual">Unison</span>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<script>
-  (function(){
-    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-    if(t==='dark')document.documentElement.classList.add('dark');
-    document.getElementById('dm-toggle').addEventListener('click',function(){
-      var d=document.documentElement.classList.toggle('dark');
-      localStorage.setItem('ha-theme',d?'dark':'light');
-    });
-  })();
-  (function () {
-    // Feature data — values: 'yes' | 'partial' | 'no'
-    var features = [
-      { name: 'Git-aware diff',        acme:'yes', syncthing:'no',      resilio:'no',      dropbox:'no',      rsync:'no',  unison:'no'  },
-      { name: 'Continuous watch mode', acme:'yes', syncthing:'yes',     resilio:'yes',     dropbox:'yes',     rsync:'no',  unison:'no'  },
-      { name: 'Conflict detection UI', acme:'yes', syncthing:'no',      resilio:'no',      dropbox:'partial', rsync:'no',  unison:'partial' },
-      { name: 'S3-compatible backend', acme:'yes', syncthing:'no',      resilio:'no',      dropbox:'no',      rsync:'no',  unison:'no'  },
-      { name: 'CLI-first',             acme:'yes', syncthing:'partial', resilio:'partial', dropbox:'no',      rsync:'yes', unison:'yes' },
-      { name: 'Team namespaces',       acme:'partial', syncthing:'no',  resilio:'partial', dropbox:'yes',     rsync:'no',  unison:'no'  },
-      { name: 'Free tier',             acme:'yes', syncthing:'yes',     resilio:'no',      dropbox:'partial', rsync:'yes', unison:'yes' },
-      { name: 'Offline support',       acme:'yes', syncthing:'yes',     resilio:'yes',     dropbox:'partial', rsync:'yes', unison:'yes' },
-    ];
-
-    var colOrder = ['acme', 'syncthing', 'resilio', 'dropbox', 'rsync', 'unison'];
-    var sortState = { col: null, dir: 1 }; // dir: 1=asc, -1=desc
-
-    function cellHTML(val) {
-      if (val === 'yes')     return '<span class="cell-icon cell-yes">✓</span>';
-      if (val === 'partial') return '<span class="cell-icon cell-partial">~</span>';
-      return '<span class="cell-icon cell-no">✗</span>';
-    }
-
-    function scoreVal(val) {
-      if (val === 'yes') return 2;
-      if (val === 'partial') return 1;
-      return 0;
-    }
-
-    function render(data) {
-      var tbody = document.getElementById('matrixBody');
-      // Use textContent/createElement approach — no innerHTML with external input
-      tbody.textContent = '';
-      data.forEach(function (row) {
-        var tr = document.createElement('tr');
-
-        var tdName = document.createElement('td');
-        tdName.textContent = row.name;
-        tr.appendChild(tdName);
-
-        colOrder.forEach(function (col) {
-          var td = document.createElement('td');
-          if (col === 'acme') td.className = 'our-col';
-          // Safe: cellHTML uses only hardcoded strings, never external input
-          td.innerHTML = cellHTML(row[col]);
-          tr.appendChild(td);
-        });
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function sortBy(colIdx) {
-      // colIdx 1-based, 0 = feature name col
-      var col = colOrder[colIdx - 1];
-      if (sortState.col === col) {
-        sortState.dir *= -1;
-      } else {
-        sortState.col = col;
-        sortState.dir = -1; // desc first (yes → no)
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Sync Tools — Comparison Board</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
       }
 
-      var sorted = features.slice().sort(function (a, b) {
-        var diff = (scoreVal(b[col]) - scoreVal(a[col])) * sortState.dir;
-        return diff !== 0 ? diff : a.name.localeCompare(b.name);
-      });
+      /* Nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 32px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 48px;
+      }
+      .back-link {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+        transition: color 0.15s;
+        flex-shrink: 0;
+      }
+      .back-link:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.15s;
+      }
+      .nav-links a:hover {
+        color: var(--accent);
+      }
 
-      // Update header classes
-      var ths = document.querySelectorAll('#featureMatrix thead th');
-      ths.forEach(function (th, i) {
-        th.classList.remove('sorted-asc', 'sorted-desc');
-        if (i === colIdx) {
-          th.classList.add(sortState.dir === 1 ? 'sorted-asc' : 'sorted-desc');
+      /* Layout */
+      main {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 24px 96px;
+      }
+      section {
+        margin-bottom: 56px;
+      }
+      h2 {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 24px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* Header */
+      .page-header {
+        margin-bottom: 40px;
+      }
+      .page-title {
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .page-sub {
+        font-size: 14px;
+        color: var(--fg-muted);
+        margin-bottom: 16px;
+      }
+      .positioning-callout {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-md);
+        padding: 16px 20px;
+        font-size: 14px;
+        color: var(--fg-muted);
+        line-height: 1.6;
+        border-left: 4px solid var(--accent);
+      }
+      .positioning-callout strong {
+        color: var(--fg);
+      }
+
+      /* Matrix table */
+      .matrix-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .matrix {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 680px;
+      }
+      .matrix th {
+        padding: 10px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-align: center;
+        border-bottom: 2px solid var(--border);
+        background: var(--bg);
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+      }
+      .matrix th:first-child {
+        text-align: left;
+        cursor: default;
+      }
+      .matrix th.our-col {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .matrix th .sort-arrow {
+        font-size: 10px;
+        color: var(--fg-faint);
+        margin-left: 4px;
+      }
+      .matrix th.sorted-asc .sort-arrow::after {
+        content: '▲';
+        color: var(--accent);
+      }
+      .matrix th.sorted-desc .sort-arrow::after {
+        content: '▼';
+        color: var(--accent);
+      }
+      .matrix th:not(.sorted-asc):not(.sorted-desc) .sort-arrow::after {
+        content: '⇅';
+      }
+      .matrix td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--bg-subtle);
+        text-align: center;
+        vertical-align: middle;
+      }
+      .matrix td:first-child {
+        text-align: left;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+      }
+      .matrix td.our-col {
+        background: var(--bg-subtle);
+      }
+      .matrix tr:hover td {
+        background: var(--bg-subtle);
+      }
+      .matrix tr:hover td.our-col {
+        background: var(--accent-bg);
+      }
+
+      /* Feature matrix icon cells — centered */
+      .matrix td {
+        text-align: center;
+        vertical-align: middle;
+      }
+      .cell-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .cell-yes {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .cell-partial {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      .cell-no {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+
+      .legend {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: var(--fg-muted);
+        margin-top: 12px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Positioning map */
+      .map-container {
+        position: relative;
+      }
+      .map-canvas {
+        width: 100%;
+        aspect-ratio: 16/9;
+        max-height: 380px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        position: relative;
+        overflow: hidden;
+      }
+      /* Axes */
+      .map-axis-x {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: var(--border);
+      }
+      .map-axis-y {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background: var(--border);
+      }
+      .map-label {
+        position: absolute;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+      }
+      .map-label.left {
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .map-label.right {
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .map-label.top {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .map-label.bottom {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .map-chip {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        border-radius: 100px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+        border: 1.5px solid transparent;
+        cursor: default;
+      }
+      .map-chip.ours {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+      }
+      .map-chip.other {
+        background: #fff;
+        color: var(--fg-muted);
+        border-color: var(--border);
+      }
+      .map-chip:hover {
+        z-index: 10;
+        box-shadow: var(--shadow-md);
+      }
+
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+
+      /* Tooltip on hover for chips */
+      .map-chip[data-tip] {
+        position: absolute;
+      }
+      .map-chip[data-tip]:hover::after {
+        content: attr(data-tip);
+        position: absolute;
+        bottom: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--fg);
+        color: #fff;
+        font-size: 11px;
+        font-weight: normal;
+        padding: 4px 8px;
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+        pointer-events: none;
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
+
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
+
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="back-link">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Comparison Board</span>
+      <div style="flex: 1"></div>
+      <ul class="nav-links">
+        <li><a href="#matrix">Feature Matrix</a></li>
+        <li><a href="#map">Positioning Map</a></li>
+      </ul>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">We need to pick a file sync library and I want the options side by side before we decide. Generate an HTML comparison board for the top contenders — evaluate conflict handling, platform support, performance, and integration complexity.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a comparison board for file sync tools — evaluate conflict handling, platform support, performance, and integration complexity side by side</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a comparison board for file sync tools — compare the top options on conflict handling, cross-platform support, performance characteristics, and integration complexity</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <main>
+      <div class="page-header">
+        <div class="page-title">File Sync Tools for Developers</div>
+        <div class="page-sub">
+          Acme Sync vs Syncthing, Resilio Sync, Dropbox, rsync, Unison
+        </div>
+        <div class="positioning-callout">
+          <strong>Our angle:</strong> Acme Sync is the only tool in this space
+          that is
+          <strong>CLI-first, git-aware, and cloud-backed</strong> simultaneously
+          — closing the gap between the power of rsync and the convenience of
+          Dropbox without either tool's critical weakness.
+        </div>
+      </div>
+
+      <!-- Feature Matrix -->
+      <section id="matrix">
+        <h2>Feature Matrix</h2>
+        <div class="matrix-wrap">
+          <table class="matrix" id="featureMatrix">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th class="our-col">
+                  Acme Sync<span class="sort-arrow"></span>
+                </th>
+                <th>Syncthing<span class="sort-arrow"></span></th>
+                <th>Resilio<span class="sort-arrow"></span></th>
+                <th>Dropbox<span class="sort-arrow"></span></th>
+                <th>rsync<span class="sort-arrow"></span></th>
+                <th>Unison<span class="sort-arrow"></span></th>
+              </tr>
+            </thead>
+            <tbody id="matrixBody"></tbody>
+          </table>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="cell-icon cell-yes">✓</span> Has it
+          </div>
+          <div class="legend-item">
+            <span class="cell-icon cell-partial">~</span> Partial
+          </div>
+          <div class="legend-item">
+            <span class="cell-icon cell-no">✗</span> Missing
+          </div>
+          <div
+            style="margin-left: auto; color: var(--fg-faint); font-size: 11px"
+          >
+            Click a column header to sort
+          </div>
+        </div>
+      </section>
+
+      <!-- Positioning Map -->
+      <section id="map">
+        <h2>Positioning Map</h2>
+        <div class="map-container">
+          <div class="map-canvas">
+            <div class="map-axis-x"></div>
+            <div class="map-axis-y"></div>
+            <span class="map-label left">Local-only</span>
+            <span class="map-label right">Cloud-backed</span>
+            <span class="map-label top">Automated</span>
+            <span class="map-label bottom">Manual</span>
+
+            <!-- Chips: position as % (left, top). X=local→cloud, Y=auto→manual (top=auto) -->
+            <!-- Acme Sync: cloud-backed + automated → right + top -->
+            <span
+              class="map-chip ours"
+              style="left: 78%; top: 22%"
+              data-tip="Cloud-backed · Automated"
+              >Acme Sync</span
+            >
+            <!-- Syncthing: local P2P + automated → left-center + top -->
+            <span
+              class="map-chip other"
+              style="left: 22%; top: 28%"
+              data-tip="P2P only · Automated"
+              >Syncthing</span
+            >
+            <!-- Resilio: P2P + automated, slightly more cloud-aware -->
+            <span
+              class="map-chip other"
+              style="left: 32%; top: 22%"
+              data-tip="P2P · Automated"
+              >Resilio</span
+            >
+            <!-- Dropbox: cloud + automated but not git-aware -->
+            <span
+              class="map-chip other"
+              style="left: 82%; top: 30%"
+              data-tip="Cloud · Automated"
+              >Dropbox</span
+            >
+            <!-- rsync: local + manual -->
+            <span
+              class="map-chip other"
+              style="left: 18%; top: 78%"
+              data-tip="Local · Manual"
+              >rsync</span
+            >
+            <!-- Unison: local + semi-manual -->
+            <span
+              class="map-chip other"
+              style="left: 24%; top: 65%"
+              data-tip="Local · Semi-manual"
+              >Unison</span
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+      ;(function () {
+        // Feature data — values: 'yes' | 'partial' | 'no'
+        var features = [
+          {
+            name: 'Git-aware diff',
+            acme: 'yes',
+            syncthing: 'no',
+            resilio: 'no',
+            dropbox: 'no',
+            rsync: 'no',
+            unison: 'no',
+          },
+          {
+            name: 'Continuous watch mode',
+            acme: 'yes',
+            syncthing: 'yes',
+            resilio: 'yes',
+            dropbox: 'yes',
+            rsync: 'no',
+            unison: 'no',
+          },
+          {
+            name: 'Conflict detection UI',
+            acme: 'yes',
+            syncthing: 'no',
+            resilio: 'no',
+            dropbox: 'partial',
+            rsync: 'no',
+            unison: 'partial',
+          },
+          {
+            name: 'S3-compatible backend',
+            acme: 'yes',
+            syncthing: 'no',
+            resilio: 'no',
+            dropbox: 'no',
+            rsync: 'no',
+            unison: 'no',
+          },
+          {
+            name: 'CLI-first',
+            acme: 'yes',
+            syncthing: 'partial',
+            resilio: 'partial',
+            dropbox: 'no',
+            rsync: 'yes',
+            unison: 'yes',
+          },
+          {
+            name: 'Team namespaces',
+            acme: 'partial',
+            syncthing: 'no',
+            resilio: 'partial',
+            dropbox: 'yes',
+            rsync: 'no',
+            unison: 'no',
+          },
+          {
+            name: 'Free tier',
+            acme: 'yes',
+            syncthing: 'yes',
+            resilio: 'no',
+            dropbox: 'partial',
+            rsync: 'yes',
+            unison: 'yes',
+          },
+          {
+            name: 'Offline support',
+            acme: 'yes',
+            syncthing: 'yes',
+            resilio: 'yes',
+            dropbox: 'partial',
+            rsync: 'yes',
+            unison: 'yes',
+          },
+        ]
+
+        var colOrder = [
+          'acme',
+          'syncthing',
+          'resilio',
+          'dropbox',
+          'rsync',
+          'unison',
+        ]
+        var sortState = { col: null, dir: 1 } // dir: 1=asc, -1=desc
+
+        function cellHTML(val) {
+          if (val === 'yes') return '<span class="cell-icon cell-yes">✓</span>'
+          if (val === 'partial')
+            return '<span class="cell-icon cell-partial">~</span>'
+          return '<span class="cell-icon cell-no">✗</span>'
         }
-      });
 
-      render(sorted);
-    }
+        function scoreVal(val) {
+          if (val === 'yes') return 2
+          if (val === 'partial') return 1
+          return 0
+        }
 
-    // Attach header click listeners
-    var ths = document.querySelectorAll('#featureMatrix thead th');
-    ths.forEach(function (th, i) {
-      if (i === 0) return; // feature name col — not sortable
-      th.addEventListener('click', function () { sortBy(i); });
-    });
+        function render(data) {
+          var tbody = document.getElementById('matrixBody')
+          // Use textContent/createElement approach — no innerHTML with external input
+          tbody.textContent = ''
+          data.forEach(function (row) {
+            var tr = document.createElement('tr')
 
-    // Initial render (unsorted)
-    render(features);
-  }());
-</script>
+            var tdName = document.createElement('td')
+            tdName.textContent = row.name
+            tr.appendChild(tdName)
 
+            colOrder.forEach(function (col) {
+              var td = document.createElement('td')
+              if (col === 'acme') td.className = 'our-col'
+              // Safe: cellHTML uses only hardcoded strings, never external input
+              td.innerHTML = cellHTML(row[col])
+              tr.appendChild(td)
+            })
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Comparison Board · May 2026
-</footer>
-</body>
+            tbody.appendChild(tr)
+          })
+        }
+
+        function sortBy(colIdx) {
+          // colIdx 1-based, 0 = feature name col
+          var col = colOrder[colIdx - 1]
+          if (sortState.col === col) {
+            sortState.dir *= -1
+          } else {
+            sortState.col = col
+            sortState.dir = -1 // desc first (yes → no)
+          }
+
+          var sorted = features.slice().sort(function (a, b) {
+            var diff = (scoreVal(b[col]) - scoreVal(a[col])) * sortState.dir
+            return diff !== 0 ? diff : a.name.localeCompare(b.name)
+          })
+
+          // Update header classes
+          var ths = document.querySelectorAll('#featureMatrix thead th')
+          ths.forEach(function (th, i) {
+            th.classList.remove('sorted-asc', 'sorted-desc')
+            if (i === colIdx) {
+              th.classList.add(
+                sortState.dir === 1 ? 'sorted-asc' : 'sorted-desc',
+              )
+            }
+          })
+
+          render(sorted)
+        }
+
+        // Attach header click listeners
+        var ths = document.querySelectorAll('#featureMatrix thead th')
+        ths.forEach(function (th, i) {
+          if (i === 0) return // feature name col — not sortable
+          th.addEventListener('click', function () {
+            sortBy(i)
+          })
+        })
+
+        // Initial render (unsorted)
+        render(features)
+      })()
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Comparison Board · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>

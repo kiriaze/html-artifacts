@@ -1,723 +1,1193 @@
-<!-- html-artifacts: architecture-diagram example | docs: https://github.com/YOUR_USERNAME/html-artifacts -->
+<!-- html-artifacts: architecture-diagram example | docs: https://github.com/kiriaze/html-artifacts -->
 <!-- generated: 2026-05-15T00:00:00Z | source: examples/architecture-diagram.html -->
-<!DOCTYPE html>
+<!doctype html>
+<!-- Copyright 2026 Constantine Kiriaze · SPDX-License-Identifier: Apache-2.0 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Architecture — Acme Sync</title>
-  <style>
-    :root {
-      --bg:#ffffff; --bg-subtle:#f9fafb; --bg-subtle-2:#f3f4f6;
-      --fg:#111827; --fg-muted:#6b7280; --fg-faint:#9ca3af;
-      --accent:#2563eb; --accent-bg:#eff6ff; --accent-border:#bfdbfe;
-      --success:#16a34a; --success-bg:#f0fdf4;
-      --warning:#d97706; --warning-bg:#fffbeb;
-      --danger:#dc2626; --danger-bg:#fef2f2;
-      --border:#e5e7eb; --border-strong:#d1d5db;
-      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
-      --font-mono:'SF Mono','Cascadia Code',Menlo,Monaco,'Courier New',monospace;
-      --radius-sm:4px; --radius-md:6px; --radius-lg:10px;
-      --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.05);
-    }
-    html.dark {
-      --bg:#0d1117; --bg-subtle:#161b22; --bg-subtle-2:#21262d;
-      --fg:#e6edf3; --fg-muted:#8b949e; --fg-faint:#6e7681;
-      --accent:#58a6ff; --accent-bg:#0c2d6b; --accent-border:#1f6feb;
-      --success:#3fb950; --success-bg:#0f2c1a;
-      --warning:#d29922; --warning-bg:#2d1f00;
-      --danger:#f85149; --danger-bg:#3d0000;
-      --border:#30363d; --border-strong:#484f58;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
-
-    /* ── Nav ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      height: 48px;
-    }
-    .back {
-      text-decoration: none;
-      color: var(--fg-muted);
-      font-size: 12px;
-      white-space: nowrap;
-      transition: color 0.15s;
-      flex-shrink: 0;
-    }
-    .back:hover { color: var(--fg); }
-    .nav-sep { color: var(--fg-faint); font-size: 13px; flex-shrink: 0; }
-    .nav-brand { font-size: 13px; font-weight: 500; color: var(--fg); flex-shrink: 0; }
-    .nav-links { display: flex; gap: 4px; list-style: none; }
-    .nav-links a {
-      display: block;
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      text-decoration: none;
-      color: var(--fg-muted);
-      font-size: 12px;
-      transition: background 0.15s, color 0.15s;
-    }
-    .nav-links a:hover { background: var(--bg-subtle-2); color: var(--fg); }
-
-    /* ── Layout ── */
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 32px 24px 64px;
-    }
-
-    /* ── Page header ── */
-    .page-header { margin-bottom: 32px; }
-    .page-kicker {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 8px;
-    }
-    .page-sub { font-size: 13px; color: var(--fg-muted); }
-
-    /* ── Hot-path legend ── */
-    .hotpath-legend {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--fg);
-      padding: 6px 12px;
-      border-radius: var(--radius-md);
-      background: var(--bg-subtle);
-      border: 1px dashed var(--accent);
-      margin-bottom: 24px;
-    }
-    .hotpath-swatch {
-      width: 24px;
-      height: 10px;
-      border-radius: 2px;
-      border: 2px dashed var(--accent);
-    }
-
-    /* ── Diagram area ── */
-    .diagram-section { margin-bottom: 40px; }
-    .diagram-section h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 16px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-
-    .diagram {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      grid-template-rows: auto 48px auto;
-      gap: 0;
-      align-items: center;
-      padding: 24px;
-      background: var(--bg-subtle);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      overflow-x: auto;
-    }
-
-    /* Component boxes */
-    .comp {
-      background: var(--bg);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s, background 0.15s;
-      position: relative;
-      min-width: 120px;
-    }
-    .comp:hover {
-      border-color: var(--accent);
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
-    }
-    .comp.active {
-      border-color: var(--accent);
-      background: var(--accent-bg);
-      box-shadow: 0 0 0 3px var(--accent-border);
-    }
-    .comp.hotpath {
-      border: 2px dashed var(--accent);
-      background: var(--bg);
-    }
-    .comp.hotpath.active {
-      background: var(--accent-bg);
-    }
-    .comp-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 2px;
-    }
-    .comp-file {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--fg-muted);
-    }
-    .comp-hint {
-      font-size: 11px;
-      color: var(--fg-muted);
-      margin-top: 4px;
-    }
-
-    /* Arrows */
-    .arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 4px;
-      color: var(--fg-muted);
-      font-size: 18px;
-      line-height: 1;
-    }
-    .arrow.hotpath { color: var(--accent); }
-
-    /* Second row — conflict path */
-    .conflict-row {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      gap: 0;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px dashed var(--border);
-    }
-    .conflict-label {
-      font-size: 11px;
-      color: var(--fg-muted);
-      white-space: nowrap;
-      margin-right: 8px;
-      font-style: italic;
-    }
-    .conflict-path {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-    .conflict-chip {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid #fecaca;
-      border-radius: var(--radius-sm);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-    }
-    .conflict-arrow { color: var(--fg-muted); font-size: 13px; padding: 0 4px; }
-    .cli-chip {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border: 1px solid var(--accent-border);
-      border-radius: var(--radius-sm);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-    }
-
-    /* ── Detail panel ── */
-    .detail-panel {
-      display: none;
-      margin-top: 16px;
-      padding: 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      animation: slideDown 0.15s ease;
-    }
-    .detail-panel.visible { display: block; }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .detail-panel h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 8px;
-    }
-    .detail-panel ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .detail-panel ul li {
-      display: flex;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--fg);
-    }
-    .detail-panel ul li::before {
-      content: '→';
-      color: var(--accent);
-      flex-shrink: 0;
-      font-size: 12px;
-      margin-top: 1px;
-    }
-    .close-btn {
-      float: right;
-      background: none;
-      border: none;
-      color: var(--fg-muted);
-      font-size: 16px;
-      cursor: pointer;
-      line-height: 1;
-      padding: 0;
-      margin-left: 8px;
-    }
-    .close-btn:hover { color: var(--fg); }
-
-    /* ── State section ── */
-    .state-section { margin-bottom: 40px; scroll-margin-top: 56px; }
-    .state-section h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 12px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-    .state-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-    .state-card {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-    }
-    .state-card-name {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 4px;
-    }
-    .state-card-desc { font-size: 12px; color: var(--fg); }
-
-    /* ── Constraints table ── */
-    .constraints-section { scroll-margin-top: 56px; }
-    .constraints-section h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 12px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    thead th {
-      text-align: left;
-      padding: 8px 12px;
-      background: var(--bg-subtle);
-      color: var(--fg);
-      font-weight: 600;
-      font-size: 12px;
-      border-bottom: 1px solid var(--border-strong);
-    }
-    thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
-    thead th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
-    tbody tr { border-bottom: 1px solid var(--bg-subtle); }
-    tbody tr:last-child { border-bottom: none; }
-    tbody td { padding: 10px 12px; vertical-align: top; color: var(--fg); }
-    tbody td:first-child { font-weight: 600; white-space: nowrap; color: var(--fg); }
-    tbody td code {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      background: var(--bg-subtle);
-      padding: 1px 5px;
-      border-radius: var(--radius-sm);
-      color: var(--accent);
-    }
-    tbody tr:nth-child(even) td { background: var(--bg-subtle); }
-    .severity-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: var(--radius-sm);
-      text-transform: uppercase;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
-    .badge-req   { background: var(--danger-bg); color: var(--danger); }
-    .badge-perf  { background: var(--warning-bg); color: var(--warning); }
-    .badge-limit { background: var(--accent-bg); color: var(--accent); }
-
-    .dm-toggle{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:13px;cursor:pointer;color:var(--fg-muted);line-height:1;flex-shrink:0}
-    .dm-toggle:hover{background:var(--bg-subtle);color:var(--fg)}
-  </style>
-</head>
-<body>
-
-<nav>
-  <a href="../index.html" class="back">← Acme Sync</a>
-  <span class="nav-sep">|</span>
-  <span class="nav-brand">Architecture</span>
-  <div style="flex:1"></div>
-  <ul class="nav-links">
-    <li><a href="#section-diagram">Diagram</a></li>
-    <li><a href="#section-state">State</a></li>
-    <li><a href="#section-constraints">Constraints</a></li>
-  </ul>
-  <button class="dm-toggle" id="dm-toggle" type="button" title="Toggle dark mode">◐</button>
-</nav>
-
-<main>
-  <header class="page-header">
-    <div class="page-kicker">System Architecture</div>
-    <h1>Acme Sync</h1>
-    <p class="page-sub">File synchronization engine — CLI entry point through S3-compatible remote. Click any component to expand its responsibilities.</p>
-  </header>
-
-  <!-- Diagram -->
-  <section class="diagram-section" id="section-diagram">
-    <h2>Data Flow</h2>
-
-    <div class="hotpath-legend">
-      <div class="hotpath-swatch"></div>
-      Hot path — latency-sensitive, keep allocations low
-    </div>
-
-    <div class="diagram" id="diagram">
-      <!-- Row 1: main pipeline -->
-      <div class="comp" id="comp-cli" data-key="cli">
-        <div class="comp-name">CLI</div>
-        <div class="comp-file">src/cli.ts</div>
-        <div class="comp-hint">Entry point</div>
-      </div>
-
-      <div class="arrow">→</div>
-
-      <div class="comp hotpath" id="comp-watcher" data-key="watcher">
-        <div class="comp-name">Watcher</div>
-        <div class="comp-file">src/watcher.ts</div>
-        <div class="comp-hint">FS events</div>
-      </div>
-
-      <div class="arrow hotpath">→</div>
-
-      <div class="comp hotpath" id="comp-diff" data-key="diff">
-        <div class="comp-name">Diff Engine</div>
-        <div class="comp-file">src/diff.ts</div>
-        <div class="comp-hint">3-way merge</div>
-      </div>
-
-      <!-- Row spacer -->
-      <div style="grid-column:1/-1; height:16px;"></div>
-
-      <!-- Row 2: right side continues -->
-      <div></div>
-      <div></div>
-      <div></div>
-      <div class="arrow hotpath">→</div>
-
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <div class="comp hotpath" id="comp-queue" data-key="queue">
-          <div class="comp-name">Sync Queue</div>
-          <div class="comp-file">src/queue.ts</div>
-          <div class="comp-hint">Offline/retry</div>
-        </div>
-        <div class="comp" id="comp-remote" data-key="remote">
-          <div class="comp-name">Remote Client</div>
-          <div class="comp-file">src/remote.ts</div>
-          <div class="comp-hint">S3-compatible</div>
-        </div>
-      </div>
-
-      <!-- Conflict path -->
-      <div class="conflict-row">
-        <span class="conflict-label">On conflict:</span>
-        <div class="conflict-path">
-          <span class="conflict-chip">Diff Engine</span>
-          <span class="conflict-arrow">→</span>
-          <div class="comp" id="comp-conflict" data-key="conflict" style="min-width:0;display:inline-block;">
-            <div class="comp-name">Conflict Store</div>
-            <div class="comp-file">src/conflict.ts</div>
-          </div>
-          <span class="conflict-arrow">→</span>
-          <span class="cli-chip">CLI (next command)</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Detail panel -->
-    <div class="detail-panel" id="detail-panel">
-      <button class="close-btn" id="detail-close" type="button">×</button>
-      <h3 id="detail-title"></h3>
-      <ul id="detail-list"></ul>
-    </div>
-  </section>
-
-  <!-- State -->
-  <section class="state-section" id="section-state">
-    <h2>Persistent State — <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent);">~/.acmesync/state.db</code></h2>
-    <div class="state-cards" id="state-cards"></div>
-  </section>
-
-  <!-- Constraints -->
-  <section class="constraints-section" id="section-constraints">
-    <h2>Constraints &amp; Tradeoffs</h2>
-    <table id="constraints-table">
-      <thead>
-        <tr>
-          <th>Constraint</th>
-          <th>Detail</th>
-          <th>Applies to</th>
-        </tr>
-      </thead>
-      <tbody id="constraints-body"></tbody>
-    </table>
-  </section>
-</main>
-
-<script>
-  (function(){
-    var t=localStorage.getItem('ha-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-    if(t==='dark')document.documentElement.classList.add('dark');
-    document.getElementById('dm-toggle').addEventListener('click',function(){
-      var d=document.documentElement.classList.toggle('dark');
-      localStorage.setItem('ha-theme',d?'dark':'light');
-    });
-  })();
-  // ── Component data ────────────────────────────────────────────────────────
-
-  const COMPONENTS = {
-    cli: {
-      title: 'CLI — src/cli.ts',
-      responsibilities: [
-        'Parses argv using a minimal command-router (no heavy deps)',
-        'Spawns the Watcher process for "watch" and "sync" commands',
-        'Surfaces Conflict Store entries on every command invocation',
-        'Reads config from ~/.acmesync/config.toml',
-        'Exits non-zero on unresolved conflicts when --strict is passed',
-      ],
-    },
-    watcher: {
-      title: 'Watcher — src/watcher.ts',
-      responsibilities: [
-        'Wraps Node fs.watch with a 150ms debounce to coalesce inotify bursts',
-        'Normalises paths to POSIX separators before forwarding events',
-        'Skips binary files (detected by magic-bytes) — passes them directly to Remote Client',
-        'Feeds text-file change events to the Diff Engine with (path, localContent, remoteContent)',
-        'Part of the hot path — allocations kept to a minimum; no async/await in the event loop',
-      ],
-    },
-    diff: {
-      title: 'Diff Engine — src/diff.ts',
-      responsibilities: [
-        'Implements git-style three-way merge using base (ancestor) + ours + theirs',
-        'Fetches ancestor snapshot from the SQLite snapshots table via conflict.ts',
-        'Returns merged text on clean merge; null on unresolvable conflict',
-        'Falls back to last-write-wins when no ancestor snapshot exists',
-        'Part of the hot path — pure synchronous computation, no I/O',
-      ],
-    },
-    queue: {
-      title: 'Sync Queue — src/queue.ts',
-      responsibilities: [
-        'SQLite-backed persistent queue (WAL mode) — survives process crashes',
-        'Exponential backoff retry with jitter: 1s → 2s → 4s … up to 5 min',
-        'Deduplicates entries by (path, revId) — rapid changes coalesce',
-        'Drains queue on network reconnect via polling the Remote Client',
-        'Part of the hot path — inserts are WAL-append, reads are indexed by priority',
-      ],
-    },
-    remote: {
-      title: 'Remote Client — src/remote.ts',
-      responsibilities: [
-        'S3-compatible API client using presigned URLs (no SDK dependency)',
-        'Multipart upload for files over 100MB (S3 threshold at 5GB max)',
-        'Partitions PUT requests by file extension to stay under 3,500/s per prefix',
-        'Verifies ETag after upload to catch silent corruption',
-        'Streams large downloads to avoid buffering full file in memory',
-      ],
-    },
-    conflict: {
-      title: 'Conflict Store — src/conflict.ts',
-      responsibilities: [
-        'SQLite table "conflicts" — fields: path, revA, revB, flaggedAt, resolvedAt',
-        'Exposes resolveConflict(id, resolution) which writes the winner back to Remote',
-        'findAncestor(revA, revB) queries the snapshots table (O(n) — fine at current scale)',
-        'CLI reads unresolved rows on every command to surface pending conflicts',
-        'Used by the Diff Engine on conflict detection; never on the hot path',
-      ],
-    },
-  };
-
-  const STATE_TABLES = [
-    { name: 'queue',     desc: 'Pending sync operations. Drained to Remote Client. Survives crash.' },
-    { name: 'conflicts', desc: 'Unresolved merge conflicts. Cleared when user resolves via CLI.' },
-    { name: 'snapshots', desc: 'Ancestor content snapshots. Keyed by revId + path hash.' },
-  ];
-
-  const CONSTRAINTS = [
-    {
-      name: 'SQLite WAL mode',
-      detail: 'Required — the Watcher writes to the queue while the CLI reads conflict rows concurrently. WAL allows one writer + multiple readers without locking.',
-      scope: 'Sync Queue, Conflict Store',
-      badge: 'req',
-      badgeText: 'required',
-    },
-    {
-      name: 'S3 rate limit',
-      detail: '3,500 PUT/s per key prefix. Partition uploads by file extension (e.g. /docs/, /images/) to distribute load and avoid 503 SlowDown errors.',
-      scope: 'Remote Client',
-      badge: 'perf',
-      badgeText: 'perf',
-    },
-    {
-      name: 'Debounce window',
-      detail: '150ms minimum. Linux inotify fires two events per save (truncate + write). Below 150ms, the Watcher receives both and queues duplicate diffs.',
-      scope: 'Watcher',
-      badge: 'req',
-      badgeText: 'required',
-    },
-    {
-      name: 'Max file size',
-      detail: '5GB — S3 single-object limit. Files above 100MB use multipart upload. Files at or beyond 5GB must be rejected at the CLI with a clear error.',
-      scope: 'Remote Client',
-      badge: 'limit',
-      badgeText: 'limit',
-    },
-  ];
-
-  // ── Render ────────────────────────────────────────────────────────────────
-
-  function renderStateCards() {
-    const container = document.getElementById('state-cards');
-    STATE_TABLES.forEach(function(t) {
-      const card = document.createElement('div');
-      card.className = 'state-card';
-      const name = document.createElement('div');
-      name.className = 'state-card-name';
-      name.textContent = t.name;
-      const desc = document.createElement('div');
-      desc.className = 'state-card-desc';
-      desc.textContent = t.desc;
-      card.appendChild(name);
-      card.appendChild(desc);
-      container.appendChild(card);
-    });
-  }
-
-  function renderConstraints() {
-    const tbody = document.getElementById('constraints-body');
-    CONSTRAINTS.forEach(function(c) {
-      const tr = document.createElement('tr');
-
-      const tdName = document.createElement('td');
-      const nameText = document.createTextNode(c.name);
-      const badge = document.createElement('span');
-      badge.className = 'severity-badge badge-' + c.badge;
-      badge.textContent = c.badgeText;
-      tdName.appendChild(nameText);
-      tdName.appendChild(badge);
-
-      const tdDetail = document.createElement('td');
-      tdDetail.textContent = c.detail;
-
-      const tdScope = document.createElement('td');
-      const code = document.createElement('code');
-      code.textContent = c.scope;
-      tdScope.appendChild(code);
-
-      tr.appendChild(tdName);
-      tr.appendChild(tdDetail);
-      tr.appendChild(tdScope);
-      tbody.appendChild(tr);
-    });
-  }
-
-  // ── Component click interaction ───────────────────────────────────────────
-
-  function showDetail(key) {
-    const data = COMPONENTS[key];
-    if (!data) return;
-
-    // Clear active state
-    document.querySelectorAll('.comp').forEach(function(el) {
-      el.classList.remove('active');
-    });
-    document.getElementById('comp-' + key).classList.add('active');
-
-    const panel = document.getElementById('detail-panel');
-    const title = document.getElementById('detail-title');
-    const list  = document.getElementById('detail-list');
-
-    title.textContent = data.title;
-    list.innerHTML = '';
-    data.responsibilities.forEach(function(r) {
-      const li = document.createElement('li');
-      li.textContent = r;
-      list.appendChild(li);
-    });
-
-    panel.classList.add('visible');
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  function hideDetail() {
-    document.getElementById('detail-panel').classList.remove('visible');
-    document.querySelectorAll('.comp').forEach(function(el) {
-      el.classList.remove('active');
-    });
-  }
-
-  // Wire up component clicks
-  document.querySelectorAll('.comp[data-key]').forEach(function(el) {
-    el.addEventListener('click', function() {
-      const key = el.getAttribute('data-key');
-      const panel = document.getElementById('detail-panel');
-      const titleEl = document.getElementById('detail-title');
-      if (panel.classList.contains('visible') && titleEl.textContent === COMPONENTS[key].title) {
-        hideDetail();
-      } else {
-        showDetail(key);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Architecture — Acme Sync</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --accent-border: #bfdbfe;
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          Arial, sans-serif;
+        --font-mono:
+          'SF Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 10px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
       }
-    });
-  });
+      html.dark {
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --accent-border: #1f6feb;
+        --success: #3fb950;
+        --success-bg: #0f2c1a;
+        --warning: #d29922;
+        --warning-bg: #2d1f00;
+        --danger: #f85149;
+        --danger-bg: #3d0000;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-  document.getElementById('detail-close').addEventListener('click', hideDetail);
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 48px;
+      }
+      .back {
+        text-decoration: none;
+        color: var(--fg-muted);
+        font-size: 12px;
+        white-space: nowrap;
+        transition: color 0.15s;
+        flex-shrink: 0;
+      }
+      .back:hover {
+        color: var(--fg);
+      }
+      .nav-sep {
+        color: var(--fg-faint);
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .nav-brand {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg);
+        flex-shrink: 0;
+      }
+      .nav-links {
+        display: flex;
+        gap: 4px;
+        list-style: none;
+      }
+      .nav-links a {
+        display: block;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--fg-muted);
+        font-size: 12px;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .nav-links a:hover {
+        background: var(--bg-subtle-2);
+        color: var(--fg);
+      }
 
-  // ── Init ──────────────────────────────────────────────────────────────────
-  renderStateCards();
-  renderConstraints();
-</script>
+      /* ── Layout ── */
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+      }
 
-<footer style="max-width:960px;margin:0 auto;padding:20px 24px 32px;border-top:1px solid var(--border, #e5e7eb);font-size:12px;color:var(--fg-faint, #9ca3af);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  Generated by html-artifacts · Architecture Diagram · May 2026
-</footer>
-</body>
+      /* ── Page header ── */
+      .page-header {
+        margin-bottom: 32px;
+      }
+      .page-kicker {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--fg);
+        margin-bottom: 8px;
+      }
+      .page-sub {
+        font-size: 13px;
+        color: var(--fg-muted);
+      }
+
+      /* ── Hot-path legend ── */
+      .hotpath-legend {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--fg);
+        padding: 6px 12px;
+        border-radius: var(--radius-md);
+        background: var(--bg-subtle);
+        border: 1px dashed var(--accent);
+        margin-bottom: 24px;
+      }
+      .hotpath-swatch {
+        width: 24px;
+        height: 10px;
+        border-radius: 2px;
+        border: 2px dashed var(--accent);
+      }
+
+      /* ── Diagram area ── */
+      .diagram-section {
+        margin-bottom: 40px;
+      }
+      .diagram-section h2 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 16px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .diagram {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        grid-template-rows: auto 48px auto;
+        gap: 0;
+        align-items: center;
+        padding: 24px;
+        background: var(--bg-subtle);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+      }
+
+      /* Component boxes */
+      .comp {
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s,
+          transform 0.1s,
+          background 0.15s;
+        position: relative;
+        min-width: 120px;
+      }
+      .comp:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+      }
+      .comp.active {
+        border-color: var(--accent);
+        background: var(--accent-bg);
+        box-shadow: 0 0 0 3px var(--accent-border);
+      }
+      .comp.hotpath {
+        border: 2px dashed var(--accent);
+        background: var(--bg);
+      }
+      .comp.hotpath.active {
+        background: var(--accent-bg);
+      }
+      .comp-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 2px;
+      }
+      .comp-file {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-muted);
+      }
+      .comp-hint {
+        font-size: 11px;
+        color: var(--fg-muted);
+        margin-top: 4px;
+      }
+
+      /* Arrows */
+      .arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        color: var(--fg-muted);
+        font-size: 18px;
+        line-height: 1;
+      }
+      .arrow.hotpath {
+        color: var(--accent);
+      }
+
+      /* Second row — conflict path */
+      .conflict-row {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px dashed var(--border);
+      }
+      .conflict-label {
+        font-size: 11px;
+        color: var(--fg-muted);
+        white-space: nowrap;
+        margin-right: 8px;
+        font-style: italic;
+      }
+      .conflict-path {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .conflict-chip {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border: 1px solid #fecaca;
+        border-radius: var(--radius-sm);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+      }
+      .conflict-arrow {
+        color: var(--fg-muted);
+        font-size: 13px;
+        padding: 0 4px;
+      }
+      .cli-chip {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-sm);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+      }
+
+      /* ── Detail panel ── */
+      .detail-panel {
+        display: none;
+        margin-top: 16px;
+        padding: 16px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        animation: slideDown 0.15s ease;
+      }
+      .detail-panel.visible {
+        display: block;
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .detail-panel h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 8px;
+      }
+      .detail-panel ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .detail-panel ul li {
+        display: flex;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--fg);
+      }
+      .detail-panel ul li::before {
+        content: '→';
+        color: var(--accent);
+        flex-shrink: 0;
+        font-size: 12px;
+        margin-top: 1px;
+      }
+      .close-btn {
+        float: right;
+        background: none;
+        border: none;
+        color: var(--fg-muted);
+        font-size: 16px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+        margin-left: 8px;
+      }
+      .close-btn:hover {
+        color: var(--fg);
+      }
+
+      /* ── State section ── */
+      .state-section {
+        margin-bottom: 40px;
+        scroll-margin-top: 56px;
+      }
+      .state-section h2 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 12px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      .state-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .state-card {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+      }
+      .state-card-name {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--accent);
+        margin-bottom: 4px;
+      }
+      .state-card-desc {
+        font-size: 12px;
+        color: var(--fg);
+      }
+
+      /* ── Constraints table ── */
+      .constraints-section {
+        scroll-margin-top: 56px;
+      }
+      .constraints-section h2 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 12px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      thead th {
+        text-align: left;
+        padding: 8px 12px;
+        background: var(--bg-subtle);
+        color: var(--fg);
+        font-weight: 600;
+        font-size: 12px;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      thead th:first-child {
+        border-radius: var(--radius-sm) 0 0 0;
+      }
+      thead th:last-child {
+        border-radius: 0 var(--radius-sm) 0 0;
+      }
+      tbody tr {
+        border-bottom: 1px solid var(--bg-subtle);
+      }
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+      tbody td {
+        padding: 10px 12px;
+        vertical-align: top;
+        color: var(--fg);
+      }
+      tbody td:first-child {
+        font-weight: 600;
+        white-space: nowrap;
+        color: var(--fg);
+      }
+      tbody td code {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        background: var(--bg-subtle);
+        padding: 1px 5px;
+        border-radius: var(--radius-sm);
+        color: var(--accent);
+      }
+      tbody tr:nth-child(even) td {
+        background: var(--bg-subtle);
+      }
+      .severity-badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: var(--radius-sm);
+        text-transform: uppercase;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .badge-req {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+      .badge-perf {
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+      .badge-limit {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .dm-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        color: var(--fg-muted);
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .dm-toggle:hover {
+        background: var(--bg-subtle);
+        color: var(--fg);
+      }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
+
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
+
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="back">← Acme Sync</a>
+      <span class="nav-sep">|</span>
+      <span class="nav-brand">Architecture</span>
+      <div style="flex: 1"></div>
+      <ul class="nav-links">
+        <li><a href="#section-diagram">Diagram</a></li>
+        <li><a href="#section-state">State</a></li>
+        <li><a href="#section-constraints">Constraints</a></li>
+      </ul>
+      <button
+        class="dm-toggle"
+        id="dm-toggle"
+        type="button"
+        title="Toggle dark mode"
+      >
+        ◐
+      </button>
+    </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">I need a quick visual orientation to how Acme Sync fits together. Read through the codebase and generate an HTML architecture diagram: show the main components, how data flows between them, and call out the key system boundaries — local daemon, cloud relay, and client apps.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate an architecture diagram for Acme Sync showing major components, data flow, and key system boundaries</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a system architecture diagram for Acme Sync — include all major components, data flow between them, and annotations on key boundaries like the local daemon, cloud relay, and clients</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <main>
+      <header class="page-header">
+        <div class="page-kicker">System Architecture</div>
+        <h1>Acme Sync</h1>
+        <p class="page-sub">
+          File synchronization engine — CLI entry point through S3-compatible
+          remote. Click any component to expand its responsibilities.
+        </p>
+      </header>
+
+      <!-- Diagram -->
+      <section class="diagram-section" id="section-diagram">
+        <h2>Data Flow</h2>
+
+        <div class="hotpath-legend">
+          <div class="hotpath-swatch"></div>
+          Hot path — latency-sensitive, keep allocations low
+        </div>
+
+        <div class="diagram" id="diagram">
+          <!-- Row 1: main pipeline -->
+          <div class="comp" id="comp-cli" data-key="cli">
+            <div class="comp-name">CLI</div>
+            <div class="comp-file">src/cli.ts</div>
+            <div class="comp-hint">Entry point</div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="comp hotpath" id="comp-watcher" data-key="watcher">
+            <div class="comp-name">Watcher</div>
+            <div class="comp-file">src/watcher.ts</div>
+            <div class="comp-hint">FS events</div>
+          </div>
+
+          <div class="arrow hotpath">→</div>
+
+          <div class="comp hotpath" id="comp-diff" data-key="diff">
+            <div class="comp-name">Diff Engine</div>
+            <div class="comp-file">src/diff.ts</div>
+            <div class="comp-hint">3-way merge</div>
+          </div>
+
+          <!-- Row spacer -->
+          <div style="grid-column: 1/-1; height: 16px"></div>
+
+          <!-- Row 2: right side continues -->
+          <div></div>
+          <div></div>
+          <div></div>
+          <div class="arrow hotpath">→</div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div class="comp hotpath" id="comp-queue" data-key="queue">
+              <div class="comp-name">Sync Queue</div>
+              <div class="comp-file">src/queue.ts</div>
+              <div class="comp-hint">Offline/retry</div>
+            </div>
+            <div class="comp" id="comp-remote" data-key="remote">
+              <div class="comp-name">Remote Client</div>
+              <div class="comp-file">src/remote.ts</div>
+              <div class="comp-hint">S3-compatible</div>
+            </div>
+          </div>
+
+          <!-- Conflict path -->
+          <div class="conflict-row">
+            <span class="conflict-label">On conflict:</span>
+            <div class="conflict-path">
+              <span class="conflict-chip">Diff Engine</span>
+              <span class="conflict-arrow">→</span>
+              <div
+                class="comp"
+                id="comp-conflict"
+                data-key="conflict"
+                style="min-width: 0; display: inline-block"
+              >
+                <div class="comp-name">Conflict Store</div>
+                <div class="comp-file">src/conflict.ts</div>
+              </div>
+              <span class="conflict-arrow">→</span>
+              <span class="cli-chip">CLI (next command)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail panel -->
+        <div class="detail-panel" id="detail-panel">
+          <button class="close-btn" id="detail-close" type="button">×</button>
+          <h3 id="detail-title"></h3>
+          <ul id="detail-list"></ul>
+        </div>
+      </section>
+
+      <!-- State -->
+      <section class="state-section" id="section-state">
+        <h2>
+          Persistent State —
+          <code
+            style="
+              font-family: var(--font-mono);
+              font-size: 12px;
+              color: var(--accent);
+            "
+            >~/.acmesync/state.db</code
+          >
+        </h2>
+        <div class="state-cards" id="state-cards"></div>
+      </section>
+
+      <!-- Constraints -->
+      <section class="constraints-section" id="section-constraints">
+        <h2>Constraints &amp; Tradeoffs</h2>
+        <table id="constraints-table">
+          <thead>
+            <tr>
+              <th>Constraint</th>
+              <th>Detail</th>
+              <th>Applies to</th>
+            </tr>
+          </thead>
+          <tbody id="constraints-body"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document
+          .getElementById('dm-toggle')
+          .addEventListener('click', function () {
+            var d = document.documentElement.classList.toggle('dark')
+            localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+          })
+      })()
+      // ── Component data ────────────────────────────────────────────────────────
+
+      const COMPONENTS = {
+        cli: {
+          title: 'CLI — src/cli.ts',
+          responsibilities: [
+            'Parses argv using a minimal command-router (no heavy deps)',
+            'Spawns the Watcher process for "watch" and "sync" commands',
+            'Surfaces Conflict Store entries on every command invocation',
+            'Reads config from ~/.acmesync/config.toml',
+            'Exits non-zero on unresolved conflicts when --strict is passed',
+          ],
+        },
+        watcher: {
+          title: 'Watcher — src/watcher.ts',
+          responsibilities: [
+            'Wraps Node fs.watch with a 150ms debounce to coalesce inotify bursts',
+            'Normalises paths to POSIX separators before forwarding events',
+            'Skips binary files (detected by magic-bytes) — passes them directly to Remote Client',
+            'Feeds text-file change events to the Diff Engine with (path, localContent, remoteContent)',
+            'Part of the hot path — allocations kept to a minimum; no async/await in the event loop',
+          ],
+        },
+        diff: {
+          title: 'Diff Engine — src/diff.ts',
+          responsibilities: [
+            'Implements git-style three-way merge using base (ancestor) + ours + theirs',
+            'Fetches ancestor snapshot from the SQLite snapshots table via conflict.ts',
+            'Returns merged text on clean merge; null on unresolvable conflict',
+            'Falls back to last-write-wins when no ancestor snapshot exists',
+            'Part of the hot path — pure synchronous computation, no I/O',
+          ],
+        },
+        queue: {
+          title: 'Sync Queue — src/queue.ts',
+          responsibilities: [
+            'SQLite-backed persistent queue (WAL mode) — survives process crashes',
+            'Exponential backoff retry with jitter: 1s → 2s → 4s … up to 5 min',
+            'Deduplicates entries by (path, revId) — rapid changes coalesce',
+            'Drains queue on network reconnect via polling the Remote Client',
+            'Part of the hot path — inserts are WAL-append, reads are indexed by priority',
+          ],
+        },
+        remote: {
+          title: 'Remote Client — src/remote.ts',
+          responsibilities: [
+            'S3-compatible API client using presigned URLs (no SDK dependency)',
+            'Multipart upload for files over 100MB (S3 threshold at 5GB max)',
+            'Partitions PUT requests by file extension to stay under 3,500/s per prefix',
+            'Verifies ETag after upload to catch silent corruption',
+            'Streams large downloads to avoid buffering full file in memory',
+          ],
+        },
+        conflict: {
+          title: 'Conflict Store — src/conflict.ts',
+          responsibilities: [
+            'SQLite table "conflicts" — fields: path, revA, revB, flaggedAt, resolvedAt',
+            'Exposes resolveConflict(id, resolution) which writes the winner back to Remote',
+            'findAncestor(revA, revB) queries the snapshots table (O(n) — fine at current scale)',
+            'CLI reads unresolved rows on every command to surface pending conflicts',
+            'Used by the Diff Engine on conflict detection; never on the hot path',
+          ],
+        },
+      }
+
+      const STATE_TABLES = [
+        {
+          name: 'queue',
+          desc: 'Pending sync operations. Drained to Remote Client. Survives crash.',
+        },
+        {
+          name: 'conflicts',
+          desc: 'Unresolved merge conflicts. Cleared when user resolves via CLI.',
+        },
+        {
+          name: 'snapshots',
+          desc: 'Ancestor content snapshots. Keyed by revId + path hash.',
+        },
+      ]
+
+      const CONSTRAINTS = [
+        {
+          name: 'SQLite WAL mode',
+          detail:
+            'Required — the Watcher writes to the queue while the CLI reads conflict rows concurrently. WAL allows one writer + multiple readers without locking.',
+          scope: 'Sync Queue, Conflict Store',
+          badge: 'req',
+          badgeText: 'required',
+        },
+        {
+          name: 'S3 rate limit',
+          detail:
+            '3,500 PUT/s per key prefix. Partition uploads by file extension (e.g. /docs/, /images/) to distribute load and avoid 503 SlowDown errors.',
+          scope: 'Remote Client',
+          badge: 'perf',
+          badgeText: 'perf',
+        },
+        {
+          name: 'Debounce window',
+          detail:
+            '150ms minimum. Linux inotify fires two events per save (truncate + write). Below 150ms, the Watcher receives both and queues duplicate diffs.',
+          scope: 'Watcher',
+          badge: 'req',
+          badgeText: 'required',
+        },
+        {
+          name: 'Max file size',
+          detail:
+            '5GB — S3 single-object limit. Files above 100MB use multipart upload. Files at or beyond 5GB must be rejected at the CLI with a clear error.',
+          scope: 'Remote Client',
+          badge: 'limit',
+          badgeText: 'limit',
+        },
+      ]
+
+      // ── Render ────────────────────────────────────────────────────────────────
+
+      function renderStateCards() {
+        const container = document.getElementById('state-cards')
+        STATE_TABLES.forEach(function (t) {
+          const card = document.createElement('div')
+          card.className = 'state-card'
+          const name = document.createElement('div')
+          name.className = 'state-card-name'
+          name.textContent = t.name
+          const desc = document.createElement('div')
+          desc.className = 'state-card-desc'
+          desc.textContent = t.desc
+          card.appendChild(name)
+          card.appendChild(desc)
+          container.appendChild(card)
+        })
+      }
+
+      function renderConstraints() {
+        const tbody = document.getElementById('constraints-body')
+        CONSTRAINTS.forEach(function (c) {
+          const tr = document.createElement('tr')
+
+          const tdName = document.createElement('td')
+          const nameText = document.createTextNode(c.name)
+          const badge = document.createElement('span')
+          badge.className = 'severity-badge badge-' + c.badge
+          badge.textContent = c.badgeText
+          tdName.appendChild(nameText)
+          tdName.appendChild(badge)
+
+          const tdDetail = document.createElement('td')
+          tdDetail.textContent = c.detail
+
+          const tdScope = document.createElement('td')
+          const code = document.createElement('code')
+          code.textContent = c.scope
+          tdScope.appendChild(code)
+
+          tr.appendChild(tdName)
+          tr.appendChild(tdDetail)
+          tr.appendChild(tdScope)
+          tbody.appendChild(tr)
+        })
+      }
+
+      // ── Component click interaction ───────────────────────────────────────────
+
+      function showDetail(key) {
+        const data = COMPONENTS[key]
+        if (!data) return
+
+        // Clear active state
+        document.querySelectorAll('.comp').forEach(function (el) {
+          el.classList.remove('active')
+        })
+        document.getElementById('comp-' + key).classList.add('active')
+
+        const panel = document.getElementById('detail-panel')
+        const title = document.getElementById('detail-title')
+        const list = document.getElementById('detail-list')
+
+        title.textContent = data.title
+        list.innerHTML = ''
+        data.responsibilities.forEach(function (r) {
+          const li = document.createElement('li')
+          li.textContent = r
+          list.appendChild(li)
+        })
+
+        panel.classList.add('visible')
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }
+
+      function hideDetail() {
+        document.getElementById('detail-panel').classList.remove('visible')
+        document.querySelectorAll('.comp').forEach(function (el) {
+          el.classList.remove('active')
+        })
+      }
+
+      // Wire up component clicks
+      document.querySelectorAll('.comp[data-key]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          const key = el.getAttribute('data-key')
+          const panel = document.getElementById('detail-panel')
+          const titleEl = document.getElementById('detail-title')
+          if (
+            panel.classList.contains('visible') &&
+            titleEl.textContent === COMPONENTS[key].title
+          ) {
+            hideDetail()
+          } else {
+            showDetail(key)
+          }
+        })
+      })
+
+      document
+        .getElementById('detail-close')
+        .addEventListener('click', hideDetail)
+
+      // ── Init ──────────────────────────────────────────────────────────────────
+      renderStateCards()
+      renderConstraints()
+    </script>
+
+    <footer
+      style="
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 24px 32px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        font-size: 12px;
+        color: var(--fg-faint, #9ca3af);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      "
+    >
+      Generated by html-artifacts · Architecture Diagram · May 2026
+    </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
 </html>
