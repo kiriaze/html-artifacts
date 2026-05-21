@@ -439,6 +439,171 @@
         border-radius: 99px;
         transition: width 0.3s ease;
       }
+    
+      /* ── Recreate modal ── */
+      .gen-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .gen-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      }
+      .gen-trigger svg { flex-shrink: 0; }
+
+      .gen-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 300;
+        backdrop-filter: blur(2px);
+      }
+      .gen-backdrop.open { display: block; }
+
+      .gen-modal {
+        display: none;
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        z-index: 400;
+        width: 480px;
+        max-width: calc(100vw - 48px);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transform-origin: bottom right;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .gen-modal.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .gen-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .gen-modal-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gen-modal-title svg { color: var(--accent); flex-shrink: 0; }
+      .gen-modal-sub {
+        font-size: 12px;
+        color: var(--fg-muted);
+        font-weight: 400;
+        margin-top: 1px;
+      }
+      .gen-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background 0.12s;
+      }
+      .gen-close:hover { color: var(--fg); background: var(--bg-subtle-2); }
+
+      .gen-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
+
+      .gen-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gen-row-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .gen-row-label .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-nl { background: var(--accent); }
+      .dot-slash { background: #7c3aed; }
+      .dot-prose { background: #16a34a; }
+
+      .gen-block {
+        position: relative;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .gen-block pre {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.65;
+        color: var(--fg);
+        padding: 12px 80px 12px 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .gen-block pre::-webkit-scrollbar { width: 4px; }
+      .gen-block pre::-webkit-scrollbar-track { background: transparent; }
+      .gen-block pre::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+      .gen-copy {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--fg-muted);
+        cursor: pointer;
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+        white-space: nowrap;
+      }
+      .gen-copy:hover { color: var(--fg); border-color: var(--fg-muted); }
+      .gen-copy.copied { color: var(--success); border-color: #86efac; background: var(--success-bg); }
     </style>
   </head>
   <body>
@@ -456,6 +621,60 @@
         ◐
       </button>
     </nav>
+    <!-- Recreate trigger -->
+    <button class="gen-trigger" id="gen-trigger" aria-haspopup="dialog">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 1L7.8 4.7H11.7L8.5 7L9.8 10.7L6.5 8.4L3.2 10.7L4.5 7L1.3 4.7H5.2L6.5 1Z" fill="currentColor"/>
+      </svg>
+      Recreate this
+    </button>
+
+    <!-- Backdrop -->
+    <div class="gen-backdrop" id="gen-backdrop"></div>
+
+    <!-- Modal -->
+    <div class="gen-modal" id="gen-modal" role="dialog" aria-modal="true" aria-label="Recreate this page">
+      <div class="gen-modal-head">
+        <div>
+          <div class="gen-modal-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1.5L8.5 5.5H12.5L9.2 7.9L10.5 12L7 9.5L3.5 12L4.8 7.9L1.5 5.5H5.5L7 1.5Z" fill="currentColor"/>
+            </svg>
+            Recreate this
+          </div>
+          <div class="gen-modal-sub">Three ways to generate a page like this with Claude</div>
+        </div>
+        <button class="gen-close" id="gen-close" aria-label="Close">✕</button>
+      </div>
+      <div class="gen-body">
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-nl"></span>Natural language</div>
+          <div class="gen-block">
+            <pre id="p-nl">We're building shared folder invitations for Acme Sync and need the spec written before implementation kicks off. Generate an HTML feature spec: cover the user flows, invite/accept/reject states, permission model, edge cases, and open questions we need to resolve.</pre>
+            <button class="gen-copy" data-target="p-nl">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-slash"></span>Slash command</div>
+          <div class="gen-block">
+            <pre id="p-slash">/html-artifacts Generate a feature spec for shared folder invitations in Acme Sync — user flows, permission model, invite states, edge cases, and open questions</pre>
+            <button class="gen-copy" data-target="p-slash">Copy</button>
+          </div>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-row-label"><span class="dot dot-prose"></span>Skill invocation</div>
+          <div class="gen-block">
+            <pre id="p-prose">Use the html-artifacts skill to generate a feature spec for Acme Sync's shared folder invitations — include user flows, invite/accept/reject states, permission model, edge cases, and open questions for the team to resolve</pre>
+            <button class="gen-copy" data-target="p-prose">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
 
     <main>
       <!-- Header -->
@@ -761,5 +980,61 @@
     >
       Generated by html-artifacts · Feature Spec · May 2026
     </footer>
+  
+    <script>
+      (function () {
+        const trigger = document.getElementById('gen-trigger')
+        const backdrop = document.getElementById('gen-backdrop')
+        const modal = document.getElementById('gen-modal')
+        const closeBtn = document.getElementById('gen-close')
+
+        function openModal() {
+          backdrop.classList.add('open')
+          modal.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              modal.classList.add('open')
+            })
+          })
+          modal.focus()
+        }
+
+        function closeModal() {
+          modal.classList.remove('open')
+          backdrop.classList.remove('open')
+          modal.addEventListener(
+            'transitionend',
+            function handler() {
+              modal.style.display = 'none'
+              modal.removeEventListener('transitionend', handler)
+            },
+            { once: true }
+          )
+          trigger.focus()
+        }
+
+        trigger.addEventListener('click', openModal)
+        backdrop.addEventListener('click', closeModal)
+        closeBtn.addEventListener('click', closeModal)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal()
+        })
+
+        document.querySelectorAll('.gen-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const pre = document.getElementById(btn.dataset.target)
+            if (!pre) return
+            navigator.clipboard.writeText(pre.textContent.trim()).then(function () {
+              btn.textContent = 'Copied!'
+              btn.classList.add('copied')
+              setTimeout(function () {
+                btn.textContent = 'Copy'
+                btn.classList.remove('copied')
+              }, 2000)
+            })
+          })
+        })
+      })()
+    </script>
   </body>
 </html>
