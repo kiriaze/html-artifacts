@@ -220,7 +220,6 @@
       })();
       // Fetch-and-inject partial loader
       (function() {
-        var BASE = window.location.origin;
         var heroSlot = document.getElementById('hero-slot');
         var cardsSlot = document.getElementById('cards-slot');
         var heroStatus = document.getElementById('hero-fetch-status');
@@ -257,7 +256,7 @@
           document.querySelectorAll('.hero-fetch-btn').forEach(function(btn) {
             btn.classList.toggle('active', btn.dataset.variant === variant);
           });
-          loadPartial(heroSlot, heroStatus, BASE + '/_parts/hero-' + variant + '.html');
+          loadPartial(heroSlot, heroStatus, '_parts/hero-' + variant + '.html');
         }
 
         function loadCards(layout) {
@@ -265,7 +264,7 @@
           document.querySelectorAll('.cards-fetch-btn').forEach(function(btn) {
             btn.classList.toggle('active', btn.dataset.layout === layout);
           });
-          loadPartial(cardsSlot, cardsStatus, BASE + '/_parts/cards-' + layout + '.html');
+          loadPartial(cardsSlot, cardsStatus, '_parts/cards-' + layout + '.html');
         }
 
         // Wire buttons
