@@ -75,12 +75,27 @@
         border-radius: 4px;
       }
 
+      .dm-sm {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        padding: 3px 7px;
+        cursor: pointer;
+        /* font-size: 11px; */
+        color: var(--fg-faint);
+        background: none;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+
       /* ── V-A Header ── */
       .hdr-a {
-        padding: 0 40px;
         display: flex;
         align-items: stretch;
+        justify-content: center;
         height: 52px;
+        overflow: hidden;
+        padding: 0 40px;
         border-bottom: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(8px);
@@ -130,17 +145,31 @@
       .hdr-a .lineage strong {
         color: var(--fg-muted);
       }
-      .hdr-a .dm-sm {
-        background: none;
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        padding: 3px 7px;
-        font-size: 11px;
-        cursor: pointer;
-        color: var(--fg-faint);
-        margin-left: 16px;
-        align-self: center;
-        flex-shrink: 0;
+      .hdr-inner {
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        transform: translate3d(0, 0%, 0);
+        transition: transform 0.25s cubic-bezier(0.96, 0.25, 0.26, 0.79);
+      }
+
+      .hdr-inner:hover {
+        transform: translate3d(0, -100%, 0);
+      }
+
+      .hdr-inner .wm {
+        top: 0;
+        position: absolute;
+        border: 0;
+        height: 100%;
+        padding: 0;
+      }
+
+      .hdr-inner .gh-url {
+        top: 100%;
+        position: relative;
+        padding: 0;
+        text-decoration: none;
       }
 
       /* ── Pill Nav ── */
@@ -189,9 +218,10 @@
 
       /* ── Hero V-A ── */
       .hero-a {
-        padding: 80px 64px 72px;
-        max-width: 1100px;
         margin: 0 auto;
+        max-width: 1100px;
+        text-align: center;
+        padding: 80px 64px 72px;
       }
       .eyebrow {
         display: inline-flex;
@@ -216,8 +246,8 @@
         letter-spacing: -0.03em;
         line-height: 1.05;
         color: var(--fg);
-        margin-bottom: 24px;
         max-width: 680px;
+        margin: 0 auto 24px;
       }
       .hero-a h1 .accent {
         color: var(--accent);
@@ -228,11 +258,12 @@
         color: var(--fg-muted);
         line-height: 1.6;
         max-width: 540px;
-        margin-bottom: 32px;
+        margin: 0 auto 32px;
       }
       .hero-a .stats {
         display: flex;
         align-items: center;
+        justify-content: center;
         margin-bottom: 40px;
       }
       .hero-a .stat {
@@ -254,6 +285,7 @@
         display: flex;
         gap: 12px;
         align-items: center;
+        justify-content: center;
       }
       .btn-primary {
         background: var(--accent);
@@ -307,6 +339,7 @@
       .hero-a .hint {
         font-size: 13px;
         color: var(--fg-muted);
+        margin: auto;
         max-width: 650px;
       }
       .hero-a .hint code {
@@ -850,10 +883,6 @@
         border-top: 1px solid var(--border);
         padding-top: 2rem;
       }
-      .cat-group:first-child > .group-heading {
-        border-top: none;
-        padding-top: 0;
-      }
       .cat-group:not(:last-child) {
         margin-bottom: 2rem;
       }
@@ -1183,24 +1212,34 @@
         margin-right: auto;
         display: flex;
         justify-content: space-between;
-        font-size: 13px;
+
+        font-size: 12px;
         color: var(--fg-faint);
+      }
+      .footer-bottom a {
+        color: var(--fg-faint);
+        text-decoration: none;
+      }
+      .footer-bottom a:hover {
+        color: var(--fg-muted);
+        text-decoration: underline;
       }
     </style>
   </head>
   <body>
-    <!-- Header (scrolls away) -->
+    <button class="dm-sm" id="dm-toggle" title="Toggle dark mode">◐</button>
+
     <header class="hdr-a">
-      <span class="wm">html-artifacts</span>
-      <span class="gh-url"
-        ><span class="host">github.com/</span
-        ><span class="path">kiriaze/html-artifacts</span></span
-      >
-      <span class="spacer"></span>
-      <span class="lineage"
-        >An extension of <strong>ThariqS/html-effectiveness</strong></span
-      >
-      <button class="dm-sm" id="dm-toggle" title="Toggle dark mode">◐</button>
+      <div class="hdr-inner">
+        <span class="wm">html-artifacts</span>
+        <a
+          href="https://github.com/kiriaze/html-artifacts"
+          class="gh-url"
+          target="_blank"
+          ><span class="host">github.com/</span
+          ><span class="path">kiriaze/html-artifacts</span></a
+        >
+      </div>
     </header>
 
     <!-- Sticky Pill Nav -->
@@ -4284,15 +4323,11 @@ Commit message or chat reply?                        <span class="arrow">→</sp
       <div class="footer-bottom">
         <span
           >Apache 2.0 — see
-          <a href="LICENSE" style="color: inherit; text-decoration: underline"
-            >LICENSE</a
-          >
+          <a href="LICENSE">LICENSE</a>
           for details</span
         >
         <span
-          ><a
-            href="https://github.com/kiriaze/html-artifacts"
-            style="color: inherit; text-decoration: underline"
+          ><a href="https://github.com/kiriaze/html-artifacts"
             >kiriaze/html-artifacts</a
           ></span
         >
