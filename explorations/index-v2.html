@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Variant Demo — Option 1: URL Params</title>
+    <title>Variant Demo — Option 2: Floating Panel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
@@ -715,52 +715,137 @@
         line-height: 1.5;
       }
 
-      /* v1: URL display */
-      .mech-url-live {
-        font-size: 11px;
-        font-family: var(--font-mono);
-        color: var(--fg-faint);
-        background: var(--bg);
-        border: 1px dashed var(--border-strong);
-        padding: 4px 10px;
-        border-radius: 4px;
-        max-width: 540px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .variant-chips {
+      /* v2: floating panel */
+      .vp-trigger {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 200;
+        background: var(--fg);
+        color: var(--bg);
+        border: none;
+        border-radius: 20px;
+        padding: 9px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        cursor: pointer;
         display: flex;
-        gap: 6px;
         align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        letter-spacing: 0.01em;
+      }
+      .vp-trigger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      }
+      .vp-panel {
+        display: none;
+        position: fixed;
+        bottom: 68px;
+        left: 24px;
+        z-index: 400;
+        width: 300px;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        transform-origin: bottom left;
+        transform: scale(0.96) translateY(8px);
+        opacity: 0;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease;
+      }
+      .vp-panel.open {
+        display: block;
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      .vp-head {
+        padding: 14px 16px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .vp-title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .vp-close {
+        background: none;
+        border: none;
+        color: var(--fg-faint);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+      .vp-close:hover {
+        color: var(--fg);
+        background: var(--bg-subtle-2);
+      }
+      .vp-body {
+        padding: 12px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .vp-group-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--fg-faint);
+        margin-bottom: 6px;
+      }
+      .vp-chips {
+        display: flex;
+        gap: 4px;
         flex-wrap: wrap;
       }
-      .v-chip-label {
-        font-size: 11px;
-        color: var(--fg-faint);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-      }
-      .v-chip {
-        font-size: 11px;
-        font-family: var(--font-mono);
-        padding: 3px 10px;
+      .vp-chip {
+        font-size: 12px;
+        padding: 4px 12px;
         border-radius: 12px;
         border: 1px solid var(--border);
         cursor: pointer;
         background: var(--bg);
         color: var(--fg-muted);
         transition: all 0.12s;
+        font-family: var(--font-sans);
       }
-      .v-chip:hover {
+      .vp-chip:hover {
         border-color: var(--accent);
         color: var(--accent);
       }
-      .v-chip.active {
+      .vp-chip.active {
         background: var(--accent);
         color: #fff;
         border-color: var(--accent);
+      }
+      .vp-footer {
+        font-size: 10px;
+        color: var(--fg-faint);
+        text-align: center;
+        padding: 8px 16px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-subtle);
+      }
+      .vp-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+      }
+      .vp-backdrop.open {
+        display: block;
       }
     </style>
   </head>
@@ -796,60 +881,29 @@
       </svg>
     </button>
 
+    <!-- Floating variant panel trigger -->
+    <button class="vp-trigger" id="vp-trigger">◧ Variants</button>
+    <div class="vp-backdrop" id="vp-backdrop"></div>
+    <div class="vp-panel" id="vp-panel" role="dialog" aria-modal="true">
+      <div class="vp-head">
+        <span class="vp-title">Variants</span>
+        <button class="vp-close" id="vp-close">✕</button>
+      </div>
+      <div class="vp-body" id="vp-body"></div>
+      <div class="vp-footer">State saved to localStorage</div>
+    </div>
+
     <header class="hdr-a">
       <span class="wm">html-artifacts</span>
     </header>
 
     <!-- Mechanism banner -->
     <div class="mech-banner">
-      <span class="mech-tag">Option 1 — URL params</span>
+      <span class="mech-tag">Option 2 — Floating panel</span>
       <span class="mech-desc"
-        >Variant state lives in the URL. Every combination is a shareable link.
-        No JS framework, no build step.</span
+        >◧ button (bottom-left) opens a panel that lists every variant group.
+        State auto-persists to localStorage.</span
       >
-      <div class="mech-links">
-        <a href="?hero=v1&layout=d">v1 + classic</a>
-        <a href="?hero=v2&layout=d">v2 + classic</a>
-        <a href="?hero=v1&layout=a">v1 + svg</a>
-        <a href="?hero=v2&layout=b">v2 + list</a>
-      </div>
-    </div>
-
-    <!-- Variant chips -->
-    <div
-      style="
-        padding: 14px 40px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        gap: 28px;
-        align-items: center;
-        flex-wrap: wrap;
-        background: var(--bg);
-      "
-    >
-      <div class="variant-chips">
-        <span class="v-chip-label">Hero</span>
-        <button class="v-chip" data-param="hero" data-value="v1">
-          v1 Full
-        </button>
-        <button class="v-chip" data-param="hero" data-value="v2">
-          v2 Minimal
-        </button>
-      </div>
-      <div class="variant-chips">
-        <span class="v-chip-label">Layout</span>
-        <button class="v-chip" data-param="layout" data-value="d">
-          Classic
-        </button>
-        <button class="v-chip" data-param="layout" data-value="a">
-          SVG Cards
-        </button>
-        <button class="v-chip" data-param="layout" data-value="c">
-          Wide Rows
-        </button>
-        <button class="v-chip" data-param="layout" data-value="b">List</button>
-      </div>
-      <div class="mech-url-live" id="current-url"></div>
     </div>
 
     <section class="hero-variant" data-variant="v1">
@@ -874,7 +928,7 @@
         </div>
         <div class="ctas">
           <a href="#examples" class="btn-primary">Browse examples</a>
-          <a href="index.html" class="btn-secondary">Back to index →</a>
+          <a href="../index.html" class="btn-secondary">Back to index →</a>
         </div>
       </div>
     </section>
@@ -911,7 +965,8 @@
       <p class="section-label">Examples</p>
       <h2 class="section-title">9 patterns</h2>
       <p class="section-desc">
-        Switching layout updates the URL — copy it to share this exact view.
+        Use the ◧ Variants panel to switch any dimension. State persists across
+        refreshes.
       </p>
 
       <div class="view-toggle" id="card-toggle">
@@ -926,7 +981,7 @@
           <div class="cat-group">
             <div class="group-heading">Planning</div>
             <div class="grid-svg">
-              <a class="card-svg" href="examples/product-brief.html"
+              <a class="card-svg" href="../examples/product-brief.html"
                 ><div class="svg-cover cov-blue">📄</div>
                 <div class="body">
                   <div class="pn">product-brief</div>
@@ -936,7 +991,7 @@
                   </div>
                 </div></a
               >
-              <a class="card-svg" href="examples/feature-spec.html"
+              <a class="card-svg" href="../examples/feature-spec.html"
                 ><div class="svg-cover cov-violet">📋</div>
                 <div class="body">
                   <div class="pn">feature-spec</div>
@@ -946,7 +1001,7 @@
                   </div>
                 </div></a
               >
-              <a class="card-svg" href="examples/milestone-plan.html"
+              <a class="card-svg" href="../examples/milestone-plan.html"
                 ><div class="svg-cover cov-slate">🗓️</div>
                 <div class="body">
                   <div class="pn">milestone-plan</div>
@@ -961,7 +1016,7 @@
           <div class="cat-group">
             <div class="group-heading">Code</div>
             <div class="grid-svg">
-              <a class="card-svg" href="examples/code-review.html"
+              <a class="card-svg" href="../examples/code-review.html"
                 ><div class="svg-cover cov-green">🔍</div>
                 <div class="body">
                   <div class="pn">code-review</div>
@@ -971,7 +1026,7 @@
                   </div>
                 </div></a
               >
-              <a class="card-svg" href="examples/architecture-diagram.html"
+              <a class="card-svg" href="../examples/architecture-diagram.html"
                 ><div class="svg-cover cov-teal">🏗️</div>
                 <div class="body">
                   <div class="pn">architecture-diagram</div>
@@ -981,7 +1036,7 @@
                   </div>
                 </div></a
               >
-              <a class="card-svg" href="examples/flowchart-diagram.html"
+              <a class="card-svg" href="../examples/flowchart-diagram.html"
                 ><div class="svg-cover cov-amber">🔀</div>
                 <div class="body">
                   <div class="pn">flowchart-diagram</div>
@@ -996,7 +1051,7 @@
           <div class="cat-group">
             <div class="group-heading">Reports</div>
             <div class="grid-svg">
-              <a class="card-svg" href="examples/research-explainer.html"
+              <a class="card-svg" href="../examples/research-explainer.html"
                 ><div class="svg-cover cov-blue">📖</div>
                 <div class="body">
                   <div class="pn">research-explainer</div>
@@ -1006,7 +1061,7 @@
                   </div>
                 </div></a
               >
-              <a class="card-svg" href="examples/status-report.html"
+              <a class="card-svg" href="../examples/status-report.html"
                 ><div class="svg-cover cov-rose">📊</div>
                 <div class="body">
                   <div class="pn">status-report</div>
@@ -1016,7 +1071,7 @@
                   </div>
                 </div></a
               >
-              <a class="card-svg" href="examples/slide-deck.html"
+              <a class="card-svg" href="../examples/slide-deck.html"
                 ><div class="svg-cover cov-orange">🎯</div>
                 <div class="body">
                   <div class="pn">slide-deck</div>
@@ -1033,19 +1088,19 @@
           <div class="cat-group">
             <div class="group-heading">Planning</div>
             <div class="list-compact">
-              <a class="list-item" href="examples/product-brief.html"
+              <a class="list-item" href="../examples/product-brief.html"
                 ><span class="li-num">01</span
                 ><span class="li-name">product-brief</span
                 ><span class="li-title">Product Brief</span
                 ><span class="li-cta">Open →</span></a
               >
-              <a class="list-item" href="examples/feature-spec.html"
+              <a class="list-item" href="../examples/feature-spec.html"
                 ><span class="li-num">02</span
                 ><span class="li-name">feature-spec</span
                 ><span class="li-title">Feature Spec</span
                 ><span class="li-cta">Open →</span></a
               >
-              <a class="list-item" href="examples/milestone-plan.html"
+              <a class="list-item" href="../examples/milestone-plan.html"
                 ><span class="li-num">03</span
                 ><span class="li-name">milestone-plan</span
                 ><span class="li-title">Milestone Plan</span
@@ -1056,19 +1111,19 @@
           <div class="cat-group">
             <div class="group-heading">Code</div>
             <div class="list-compact">
-              <a class="list-item" href="examples/code-review.html"
+              <a class="list-item" href="../examples/code-review.html"
                 ><span class="li-num">01</span
                 ><span class="li-name">code-review</span
                 ><span class="li-title">Code Review</span
                 ><span class="li-cta">Open →</span></a
               >
-              <a class="list-item" href="examples/architecture-diagram.html"
+              <a class="list-item" href="../examples/architecture-diagram.html"
                 ><span class="li-num">02</span
                 ><span class="li-name">architecture-diagram</span
                 ><span class="li-title">Architecture Diagram</span
                 ><span class="li-cta">Open →</span></a
               >
-              <a class="list-item" href="examples/flowchart-diagram.html"
+              <a class="list-item" href="../examples/flowchart-diagram.html"
                 ><span class="li-num">03</span
                 ><span class="li-name">flowchart-diagram</span
                 ><span class="li-title">Flowchart</span
@@ -1079,19 +1134,19 @@
           <div class="cat-group">
             <div class="group-heading">Reports</div>
             <div class="list-compact">
-              <a class="list-item" href="examples/research-explainer.html"
+              <a class="list-item" href="../examples/research-explainer.html"
                 ><span class="li-num">01</span
                 ><span class="li-name">research-explainer</span
                 ><span class="li-title">Research Explainer</span
                 ><span class="li-cta">Open →</span></a
               >
-              <a class="list-item" href="examples/status-report.html"
+              <a class="list-item" href="../examples/status-report.html"
                 ><span class="li-num">02</span
                 ><span class="li-name">status-report</span
                 ><span class="li-title">Status Report</span
                 ><span class="li-cta">Open →</span></a
               >
-              <a class="list-item" href="examples/slide-deck.html"
+              <a class="list-item" href="../examples/slide-deck.html"
                 ><span class="li-num">03</span
                 ><span class="li-name">slide-deck</span
                 ><span class="li-title">Pitch Deck</span
@@ -1104,7 +1159,7 @@
           <div class="cat-group">
             <div class="group-heading">Planning</div>
             <div class="grid-wide">
-              <a class="card-wide" href="examples/product-brief.html"
+              <a class="card-wide" href="../examples/product-brief.html"
                 ><div class="cw-badge cw-b1">📄</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1117,7 +1172,7 @@
                 </div>
                 <span class="cw-cta">Open →</span></a
               >
-              <a class="card-wide" href="examples/feature-spec.html"
+              <a class="card-wide" href="../examples/feature-spec.html"
                 ><div class="cw-badge cw-b4">📋</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1130,7 +1185,7 @@
                 </div>
                 <span class="cw-cta">Open →</span></a
               >
-              <a class="card-wide" href="examples/milestone-plan.html"
+              <a class="card-wide" href="../examples/milestone-plan.html"
                 ><div class="cw-badge cw-b6">🗓️</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1148,7 +1203,7 @@
           <div class="cat-group">
             <div class="group-heading">Code</div>
             <div class="grid-wide">
-              <a class="card-wide" href="examples/code-review.html"
+              <a class="card-wide" href="../examples/code-review.html"
                 ><div class="cw-badge cw-b2">🔍</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1161,7 +1216,7 @@
                 </div>
                 <span class="cw-cta">Open →</span></a
               >
-              <a class="card-wide" href="examples/architecture-diagram.html"
+              <a class="card-wide" href="../examples/architecture-diagram.html"
                 ><div class="cw-badge cw-b6">🏗️</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1174,7 +1229,7 @@
                 </div>
                 <span class="cw-cta">Open →</span></a
               >
-              <a class="card-wide" href="examples/flowchart-diagram.html"
+              <a class="card-wide" href="../examples/flowchart-diagram.html"
                 ><div class="cw-badge cw-b3">🔀</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1192,7 +1247,7 @@
           <div class="cat-group">
             <div class="group-heading">Reports</div>
             <div class="grid-wide">
-              <a class="card-wide" href="examples/research-explainer.html"
+              <a class="card-wide" href="../examples/research-explainer.html"
                 ><div class="cw-badge cw-b1">📖</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1205,7 +1260,7 @@
                 </div>
                 <span class="cw-cta">Open →</span></a
               >
-              <a class="card-wide" href="examples/status-report.html"
+              <a class="card-wide" href="../examples/status-report.html"
                 ><div class="cw-badge cw-b5">📊</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1218,7 +1273,7 @@
                 </div>
                 <span class="cw-cta">Open →</span></a
               >
-              <a class="card-wide" href="examples/slide-deck.html"
+              <a class="card-wide" href="../examples/slide-deck.html"
                 ><div class="cw-badge cw-b3">🎯</div>
                 <div class="cw-info">
                   <div class="cw-top">
@@ -1238,7 +1293,7 @@
           <div class="cat-group">
             <div class="group-heading">Planning</div>
             <div class="card-grid">
-              <a class="card" href="examples/product-brief.html"
+              <a class="card" href="../examples/product-brief.html"
                 ><span class="pattern-name">product-brief</span>
                 <div class="card-title">Product Brief</div>
                 <div class="card-desc">
@@ -1246,7 +1301,7 @@
                 </div>
                 <div class="card-cta">Open example →</div></a
               >
-              <a class="card" href="examples/feature-spec.html"
+              <a class="card" href="../examples/feature-spec.html"
                 ><span class="pattern-name">feature-spec</span>
                 <div class="card-title">Feature Spec</div>
                 <div class="card-desc">
@@ -1254,7 +1309,7 @@
                 </div>
                 <div class="card-cta">Open example →</div></a
               >
-              <a class="card" href="examples/milestone-plan.html"
+              <a class="card" href="../examples/milestone-plan.html"
                 ><span class="pattern-name">milestone-plan</span>
                 <div class="card-title">Milestone Plan</div>
                 <div class="card-desc">
@@ -1267,7 +1322,7 @@
           <div class="cat-group">
             <div class="group-heading">Code</div>
             <div class="card-grid">
-              <a class="card" href="examples/code-review.html"
+              <a class="card" href="../examples/code-review.html"
                 ><span class="pattern-name">code-review</span>
                 <div class="card-title">Code Review</div>
                 <div class="card-desc">
@@ -1275,7 +1330,7 @@
                 </div>
                 <div class="card-cta">Open example →</div></a
               >
-              <a class="card" href="examples/architecture-diagram.html"
+              <a class="card" href="../examples/architecture-diagram.html"
                 ><span class="pattern-name">architecture-diagram</span>
                 <div class="card-title">Architecture Diagram</div>
                 <div class="card-desc">
@@ -1283,7 +1338,7 @@
                 </div>
                 <div class="card-cta">Open example →</div></a
               >
-              <a class="card" href="examples/flowchart-diagram.html"
+              <a class="card" href="../examples/flowchart-diagram.html"
                 ><span class="pattern-name">flowchart-diagram</span>
                 <div class="card-title">Flowchart</div>
                 <div class="card-desc">
@@ -1296,7 +1351,7 @@
           <div class="cat-group">
             <div class="group-heading">Reports</div>
             <div class="card-grid">
-              <a class="card" href="examples/research-explainer.html"
+              <a class="card" href="../examples/research-explainer.html"
                 ><span class="pattern-name">research-explainer</span>
                 <div class="card-title">Research Explainer</div>
                 <div class="card-desc">
@@ -1304,7 +1359,7 @@
                 </div>
                 <div class="card-cta">Open example →</div></a
               >
-              <a class="card" href="examples/status-report.html"
+              <a class="card" href="../examples/status-report.html"
                 ><span class="pattern-name">status-report</span>
                 <div class="card-title">Status Report</div>
                 <div class="card-desc">
@@ -1312,7 +1367,7 @@
                 </div>
                 <div class="card-cta">Open example →</div></a
               >
-              <a class="card" href="examples/slide-deck.html"
+              <a class="card" href="../examples/slide-deck.html"
                 ><span class="pattern-name">slide-deck</span>
                 <div class="card-title">Pitch Deck</div>
                 <div class="card-desc">
@@ -1341,56 +1396,135 @@
             localStorage.setItem('ha-theme', d ? 'dark' : 'light')
           })
       })()
-      // URL param variant switcher
+      // Floating variant panel
       ;(function () {
-        var params = new URLSearchParams(location.search)
-        var hero = params.get('hero') || 'v1'
-        var layout = params.get('layout') || 'd'
+        var GROUPS = [
+          {
+            key: 'hero',
+            label: 'Hero',
+            options: [
+              { value: 'v1', label: 'v1 Full' },
+              { value: 'v2', label: 'v2 Minimal' },
+            ],
+          },
+          {
+            key: 'layout',
+            label: 'Layout',
+            options: [
+              { value: 'd', label: 'Classic' },
+              { value: 'a', label: 'SVG Cards' },
+              { value: 'c', label: 'Wide Rows' },
+              { value: 'b', label: 'List' },
+            ],
+          },
+        ]
 
-        // Apply hero variant
-        document.querySelectorAll('.hero-variant').forEach(function (el) {
-          el.hidden = el.dataset.variant !== hero
+        // Load saved or defaults
+        var saved = {}
+        try {
+          saved = JSON.parse(localStorage.getItem('ha-variants') || '{}')
+        } catch (e) {}
+        var state = { hero: saved.hero || 'v1', layout: saved.layout || 'd' }
+
+        function applyState() {
+          // Hero
+          document.querySelectorAll('.hero-variant').forEach(function (el) {
+            el.hidden = el.dataset.variant !== state.hero
+          })
+          // Layout
+          var inner = document.getElementById('examples-inner')
+          if (inner) inner.dataset.view = state.layout
+          // Sync card-toggle buttons
+          document
+            .querySelectorAll('#card-toggle button')
+            .forEach(function (btn) {
+              btn.classList.toggle('active', btn.dataset.view === state.layout)
+            })
+          // Mark chips active
+          document.querySelectorAll('.vp-chip').forEach(function (chip) {
+            var groupKey = chip.dataset.group
+            chip.classList.toggle(
+              'active',
+              chip.dataset.value === state[groupKey],
+            )
+          })
+          // Persist
+          localStorage.setItem('ha-variants', JSON.stringify(state))
+        }
+
+        // Build panel body
+        var bodyEl = document.getElementById('vp-body')
+        GROUPS.forEach(function (group) {
+          var groupDiv = document.createElement('div')
+          var label = document.createElement('div')
+          label.className = 'vp-group-label'
+          label.textContent = group.label
+          groupDiv.appendChild(label)
+          var chips = document.createElement('div')
+          chips.className = 'vp-chips'
+          group.options.forEach(function (opt) {
+            var chip = document.createElement('button')
+            chip.className = 'vp-chip'
+            chip.dataset.group = group.key
+            chip.dataset.value = opt.value
+            chip.textContent = opt.label
+            chip.addEventListener('click', function () {
+              state[group.key] = opt.value
+              applyState()
+            })
+            chips.appendChild(chip)
+          })
+          groupDiv.appendChild(chips)
+          bodyEl.appendChild(groupDiv)
         })
 
-        // Apply layout variant
-        var inner = document.getElementById('examples-inner')
-        if (inner) inner.dataset.view = layout
+        applyState()
 
-        // Mark active chips
-        document
-          .querySelectorAll('.v-chip[data-param]')
-          .forEach(function (chip) {
-            var active = chip.dataset.param === 'hero' ? hero : layout
-            chip.classList.toggle('active', chip.dataset.value === active)
-          })
+        // Panel open/close
+        var trigger = document.getElementById('vp-trigger')
+        var panel = document.getElementById('vp-panel')
+        var closeBtn = document.getElementById('vp-close')
+        var backdrop = document.getElementById('vp-backdrop')
 
-        // Show current URL
-        var urlEl = document.getElementById('current-url')
-        if (urlEl) urlEl.textContent = location.href
-
-        // Chip click → update param + navigate
-        document
-          .querySelectorAll('.v-chip[data-param]')
-          .forEach(function (chip) {
-            chip.addEventListener('click', function () {
-              var p = new URLSearchParams(location.search)
-              p.set(chip.dataset.param, chip.dataset.value)
-              location.href = '?' + p.toString() + '#examples'
-            })
-          })
-
-        // Sync view-toggle buttons with URL param
-        var cardToggle = document.getElementById('card-toggle')
-        if (cardToggle) {
-          cardToggle.querySelectorAll('button').forEach(function (btn) {
-            btn.classList.toggle('active', btn.dataset.view === layout)
-            btn.addEventListener('click', function () {
-              var p = new URLSearchParams(location.search)
-              p.set('layout', btn.dataset.view)
-              location.href = '?' + p.toString() + '#examples'
+        function openPanel() {
+          backdrop.classList.add('open')
+          panel.style.display = 'block'
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              panel.classList.add('open')
             })
           })
         }
+        function closePanel() {
+          panel.classList.remove('open')
+          backdrop.classList.remove('open')
+          panel.addEventListener(
+            'transitionend',
+            function h() {
+              panel.style.display = 'none'
+              panel.removeEventListener('transitionend', h)
+            },
+            { once: true },
+          )
+        }
+
+        trigger.addEventListener('click', openPanel)
+        closeBtn.addEventListener('click', closePanel)
+        backdrop.addEventListener('click', closePanel)
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && panel.classList.contains('open'))
+            closePanel()
+        })
+
+        // Also wire up the card-toggle buttons to update panel state
+        document
+          .querySelectorAll('#card-toggle button')
+          .forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              state.layout = btn.dataset.view
+              applyState()
+            })
+          })
       })()
     </script>
   </body>

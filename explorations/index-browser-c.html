@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Examples — html-artifacts</title>
+    <style>
+      :root {
+        --accent: #2563eb;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --bg: #fff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --mono: 'SF Mono', Menlo, monospace;
+        --bar: 44px;
+      }
+      html.dark {
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --accent: #58a6ff;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Top bar ── */
+      .bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--bar);
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 2px;
+        z-index: 100;
+      }
+      .wm {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--fg);
+        margin-right: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .bar-div {
+        width: 1px;
+        height: 16px;
+        background: var(--border);
+        margin: 0 6px;
+        flex-shrink: 0;
+      }
+
+      .cat-btn {
+        position: relative;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: var(--font);
+        color: var(--fg-muted);
+        padding: 5px 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        transition:
+          background 0.1s,
+          color 0.1s;
+      }
+      .cat-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 10px;
+        right: 10px;
+        height: 2px;
+        border-radius: 1px;
+        background: var(--cc, var(--accent));
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .cat-btn:hover {
+        color: var(--fg);
+        background: var(--bg-subtle);
+      }
+      .cat-btn:hover::after {
+        opacity: 0.4;
+      }
+      .cat-btn.act {
+        color: var(--fg);
+        background: var(--bg-subtle);
+      }
+      .cat-btn.act::after {
+        opacity: 1;
+      }
+      .cat-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .bar-end {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .ib {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--fg-faint);
+        font-size: 14px;
+        padding: 3px 5px;
+        border-radius: 4px;
+        line-height: 1;
+      }
+      .ib:hover {
+        color: var(--fg);
+        background: var(--bg-subtle-2);
+      }
+      .vl {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 2px 6px;
+      }
+      .vl a {
+        font-size: 11px;
+        color: var(--fg-faint);
+        text-decoration: none;
+        padding: 0 3px;
+      }
+      .vl a:hover {
+        color: var(--accent);
+      }
+      .vl a.cur {
+        color: var(--fg);
+        font-weight: 700;
+        pointer-events: none;
+      }
+      .vl-sep {
+        font-size: 10px;
+        color: var(--border-strong);
+      }
+
+      /* ── Dropdown ── */
+      .dd {
+        position: fixed;
+        top: var(--bar);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        box-shadow:
+          0 8px 24px rgba(0, 0, 0, 0.1),
+          0 2px 6px rgba(0, 0, 0, 0.06);
+        z-index: 200;
+        padding: 5px;
+        width: 268px;
+        animation: ddIn 0.12s ease forwards;
+      }
+      @keyframes ddIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .dd-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.1s;
+      }
+      .dd-item:hover {
+        background: var(--bg-subtle-2);
+      }
+      .dd-item.on {
+        background: var(--bg-subtle);
+      }
+      .dd-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 5px;
+      }
+      .dd-name {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--fg);
+        line-height: 1.3;
+      }
+      .dd-item.on .dd-name {
+        color: var(--cc, var(--accent));
+      }
+      .dd-desc {
+        font-size: 11px;
+        color: var(--fg-faint);
+        margin-top: 1px;
+      }
+
+      /* ── Click-away overlay ── */
+      .ov {
+        position: fixed;
+        inset: 0;
+        z-index: 150;
+        display: none;
+      }
+      .ov.on {
+        display: block;
+      }
+
+      /* ── Full-viewport iframe ── */
+      .frame-wrap {
+        position: fixed;
+        top: var(--bar);
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      /* ── Floating current chip ── */
+      .cur-chip {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 90;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 20px;
+        padding: 5px 12px 5px 9px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        font-size: 11.5px;
+        color: var(--fg-muted);
+      }
+      .cc-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .cc-name {
+        font-weight: 500;
+        color: var(--fg);
+      }
+      .cc-open {
+        font-size: 10.5px;
+        color: var(--accent);
+        text-decoration: none;
+        border-left: 1px solid var(--border);
+        padding-left: 8px;
+        margin-left: 2px;
+      }
+      .cc-open:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bar">
+      <span class="wm">html-artifacts</span>
+      <div class="bar-div"></div>
+      <div id="cat-btns" style="display: flex; gap: 2px"></div>
+      <div class="bar-end">
+        <div class="vl">
+          <a href="index-browser-a.html">A</a>
+          <span class="vl-sep">·</span>
+          <a href="index-browser-b.html">B</a>
+          <span class="vl-sep">·</span>
+          <a href="index-browser-c.html" class="cur">C</a>
+        </div>
+        <a
+          href="../index.html"
+          class="ib"
+          title="Grid view"
+          style="
+            font-size: 13px;
+            text-decoration: none;
+            font-family: var(--mono);
+          "
+          >⊞</a
+        >
+        <button class="ib" id="dmt" title="Toggle dark mode">◐</button>
+      </div>
+    </div>
+
+    <div class="ov" id="ov"></div>
+
+    <div class="frame-wrap">
+      <iframe
+        id="fr"
+        src="../examples/slide-deck.html"
+        title="Preview"
+      ></iframe>
+    </div>
+
+    <div class="cur-chip">
+      <span class="cc-dot" id="ccdot" style="background: #d97706"></span>
+      <span class="cc-name" id="ccname">Slide Deck</span>
+      <a
+        class="cc-open"
+        id="ccopen"
+        href="../examples/slide-deck.html"
+        target="_blank"
+        >Open ↗</a
+      >
+    </div>
+
+    <script>
+      var D = [
+        {
+          id: 'planning',
+          name: 'Planning',
+          c: '#2563eb',
+          items: [
+            {
+              name: 'Product Brief',
+              file: 'product-brief.html',
+              desc: 'One-page product overview',
+            },
+            {
+              name: 'Comparison Board',
+              file: 'comparison-board.html',
+              desc: 'Feature matrix',
+            },
+            {
+              name: 'Approach Explorer',
+              file: 'approach-explorer.html',
+              desc: 'Options comparison',
+            },
+            {
+              name: 'Feature Spec',
+              file: 'feature-spec.html',
+              desc: 'Detailed feature spec',
+            },
+            {
+              name: 'Milestone Plan',
+              file: 'milestone-plan.html',
+              desc: 'Product roadmap',
+            },
+          ],
+        },
+        {
+          id: 'code',
+          name: 'Code',
+          c: '#7c3aed',
+          items: [
+            {
+              name: 'Code Review',
+              file: 'code-review.html',
+              desc: 'PR walkthrough',
+            },
+            {
+              name: 'Architecture Diagram',
+              file: 'architecture-diagram.html',
+              desc: 'System overview',
+            },
+            {
+              name: 'Flowchart Diagram',
+              file: 'flowchart-diagram.html',
+              desc: 'Process flow',
+            },
+            {
+              name: 'Incident Report',
+              file: 'incident-report.html',
+              desc: 'Post-mortem',
+            },
+          ],
+        },
+        {
+          id: 'reporting',
+          name: 'Reporting',
+          c: '#16a34a',
+          items: [
+            {
+              name: 'Status Report',
+              file: 'status-report.html',
+              desc: 'Sprint recap',
+            },
+            {
+              name: 'Design Explorer',
+              file: 'design-explorer.html',
+              desc: 'Design tokens',
+            },
+            {
+              name: 'Visual Designs',
+              file: 'exploration-visual-designs.html',
+              desc: 'Design variants',
+            },
+          ],
+        },
+        {
+          id: 'proto',
+          name: 'Prototyping',
+          c: '#d97706',
+          items: [
+            {
+              name: 'Prototype: Interaction',
+              file: 'prototype-interaction.html',
+              desc: 'Clickable flow',
+            },
+            {
+              name: 'Prototype: Animation',
+              file: 'prototype-animation.html',
+              desc: 'Motion explorer',
+            },
+            {
+              name: 'Slide Deck',
+              file: 'slide-deck.html',
+              desc: 'Presentation',
+            },
+          ],
+        },
+        {
+          id: 'docs',
+          name: 'Docs',
+          c: '#db2777',
+          items: [
+            {
+              name: 'Research Explainer',
+              file: 'research-explainer.html',
+              desc: 'Feature explainer',
+            },
+            {
+              name: 'Editor Board',
+              file: 'editor-board.html',
+              desc: 'Feature triage',
+            },
+            {
+              name: 'Feature Flags',
+              file: 'editor-feature-flags.html',
+              desc: 'Flag reference',
+            },
+          ],
+        },
+      ]
+
+      var cur = 'slide-deck.html'
+      var fr = document.getElementById('fr')
+      var ccname = document.getElementById('ccname')
+      var ccdot = document.getElementById('ccdot')
+      var ccopen = document.getElementById('ccopen')
+      var ov = document.getElementById('ov')
+      var dd = null
+
+      function catForFile(file) {
+        for (var i = 0; i < D.length; i++)
+          for (var j = 0; j < D[i].items.length; j++)
+            if (D[i].items[j].file === file) return D[i]
+        return D[3] // default: proto
+      }
+
+      function load(file, name, cat) {
+        cur = file
+        fr.src = '../examples/' + file
+        ccname.textContent = name
+        ccdot.style.background = cat.c
+        ccopen.href = '../examples/' + file
+        closeDD()
+        history.replaceState(null, '', '#' + file.replace('.html', ''))
+      }
+
+      function closeDD() {
+        if (dd) {
+          dd.remove()
+          dd = null
+        }
+        ov.classList.remove('on')
+        document.querySelectorAll('.cat-btn').forEach(function (b) {
+          b.classList.remove('act')
+        })
+      }
+
+      function openDD(cat, btn) {
+        closeDD()
+        var rect = btn.getBoundingClientRect()
+        dd = document.createElement('div')
+        dd.className = 'dd'
+        var left = Math.min(rect.left, window.innerWidth - 278)
+        dd.style.left = left + 'px'
+
+        cat.items.forEach(function (item) {
+          var el = document.createElement('div')
+          el.className = 'dd-item' + (item.file === cur ? ' on' : '')
+          el.dataset.f = item.file
+          var dot = document.createElement('span')
+          dot.className = 'dd-dot'
+          dot.style.background = cat.c
+          var wrap = document.createElement('div')
+          var nm = document.createElement('div')
+          nm.className = 'dd-name'
+          nm.textContent = item.name
+          if (item.file === cur) nm.style.color = cat.c
+          var desc = document.createElement('div')
+          desc.className = 'dd-desc'
+          desc.textContent = item.desc
+          wrap.appendChild(nm)
+          wrap.appendChild(desc)
+          el.appendChild(dot)
+          el.appendChild(wrap)
+          el.addEventListener('click', function () {
+            load(item.file, item.name, cat)
+          })
+          dd.appendChild(el)
+        })
+
+        document.body.appendChild(dd)
+        ov.classList.add('on')
+        btn.classList.add('act')
+      }
+
+      // Build cat buttons
+      var catBtns = document.getElementById('cat-btns')
+      D.forEach(function (cat) {
+        var btn = document.createElement('button')
+        btn.className = 'cat-btn'
+        btn.style.setProperty('--cc', cat.c)
+        var dot = document.createElement('span')
+        dot.className = 'cat-dot'
+        dot.style.background = cat.c
+        var tx = document.createElement('span')
+        tx.textContent = cat.name
+        btn.appendChild(dot)
+        btn.appendChild(tx)
+        btn.addEventListener('click', function () {
+          if (dd && btn.classList.contains('act')) {
+            closeDD()
+            return
+          }
+          openDD(cat, btn)
+        })
+        catBtns.appendChild(btn)
+      })
+
+      ov.addEventListener('click', closeDD)
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDD()
+      })
+
+      var hash = window.location.hash.slice(1)
+      if (hash) {
+        var hf = hash + '.html'
+        D.forEach(function (cat) {
+          cat.items.forEach(function (i) {
+            if (i.file === hf) {
+              cur = hf
+              ccname.textContent = i.name
+              ccdot.style.background = cat.c
+              ccopen.href = '../examples/' + hf
+              fr.src = '../examples/' + hf
+            }
+          })
+        })
+      }
+
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document.getElementById('dmt').addEventListener('click', function () {
+          var d = document.documentElement.classList.toggle('dark')
+          localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+        })
+      })()
+    </script>
+  </body>
+</html>

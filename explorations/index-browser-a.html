@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Examples — html-artifacts</title>
+    <style>
+      :root {
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --fg: #111827;
+        --fg-muted: #6b7280;
+        --fg-faint: #9ca3af;
+        --bg: #fff;
+        --bg-subtle: #f9fafb;
+        --bg-subtle-2: #f3f4f6;
+        --border: #e5e7eb;
+        --border-strong: #d1d5db;
+        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --mono: 'SF Mono', Menlo, monospace;
+      }
+      html.dark {
+        --fg: #e6edf3;
+        --fg-muted: #8b949e;
+        --fg-faint: #6e7681;
+        --bg: #0d1117;
+        --bg-subtle: #161b22;
+        --bg-subtle-2: #21262d;
+        --accent: #58a6ff;
+        --accent-bg: #0c2d6b;
+        --border: #30363d;
+        --border-strong: #484f58;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Sidebar ── */
+      .sb {
+        width: 260px;
+        min-width: 180px;
+        max-width: 440px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-subtle);
+        border-right: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .sb-top {
+        padding: 12px 14px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+      }
+      .wm {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--fg);
+        letter-spacing: -0.01em;
+      }
+      .ib {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--fg-faint);
+        font-size: 14px;
+        line-height: 1;
+        padding: 3px 5px;
+        border-radius: 4px;
+      }
+      .ib:hover {
+        color: var(--fg);
+        background: var(--bg-subtle-2);
+      }
+
+      .sb-search {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .sb-search svg {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        color: var(--fg-faint);
+        pointer-events: none;
+      }
+      .sb-search input {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: 5px;
+        padding: 5px 28px 5px 27px;
+        font-size: 12px;
+        font-family: var(--font);
+        color: var(--fg);
+        outline: none;
+      }
+      .sb-search input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+      }
+      .sb-search input::placeholder {
+        color: var(--fg-faint);
+      }
+      .sb-search kbd {
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 9px;
+        color: var(--fg-faint);
+        background: var(--bg-subtle-2);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 1px 4px;
+        font-family: var(--mono);
+      }
+
+      .sb-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px 0 4px;
+      }
+      .sb-nav::-webkit-scrollbar {
+        width: 3px;
+      }
+      .sb-nav::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 3px;
+      }
+
+      .cat-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px 4px;
+        user-select: none;
+      }
+      .cat-lbl {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--fg-faint);
+      }
+      .cat-bullet {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .cat-n {
+        font-size: 9px;
+        color: var(--fg-faint);
+        background: var(--bg-subtle-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 5px;
+        line-height: 1.9;
+      }
+
+      .ex-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 12px 5px 22px;
+        cursor: pointer;
+        font-size: 12.5px;
+        color: var(--fg-muted);
+        transition:
+          background 0.1s,
+          color 0.1s;
+      }
+      .ex-row:hover {
+        background: var(--bg-subtle-2);
+        color: var(--fg);
+      }
+      .ex-row.on {
+        background: var(--accent);
+        color: #fff;
+      }
+      .ex-row.on .ex-bullet {
+        opacity: 0.5;
+      }
+      .ex-bullet {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .ex-txt {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .no-res {
+        padding: 20px 12px;
+        font-size: 12px;
+        color: var(--fg-faint);
+        text-align: center;
+      }
+
+      .sb-foot {
+        border-top: 1px solid var(--border);
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+      .bl {
+        font-size: 11px;
+        color: var(--fg-faint);
+        text-decoration: none;
+      }
+      .bl:hover {
+        color: var(--accent);
+      }
+      .vl {
+        font-size: 11px;
+        color: var(--fg-faint);
+      }
+      .vl a {
+        color: var(--fg-faint);
+        text-decoration: none;
+        padding: 0 3px;
+      }
+      .vl a:hover {
+        color: var(--accent);
+      }
+      .vl a.cur {
+        color: var(--fg);
+        font-weight: 700;
+        pointer-events: none;
+      }
+
+      /* ── Resize handle ── */
+      .rh {
+        width: 4px;
+        height: 100%;
+        cursor: col-resize;
+        background: transparent;
+        flex-shrink: 0;
+        transition: background 0.15s;
+      }
+      .rh:hover,
+      .rh.on {
+        background: var(--accent);
+      }
+
+      /* ── Preview ── */
+      .pv {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .pv-bar {
+        height: 38px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 14px;
+        background: var(--bg);
+        flex-shrink: 0;
+      }
+      .pv-crumb {
+        font-size: 11.5px;
+        color: var(--fg-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .pv-sep {
+        color: var(--border-strong);
+      }
+      .pv-name {
+        font-size: 11.5px;
+        font-weight: 500;
+        color: var(--fg);
+      }
+      .pv-ext {
+        margin-left: auto;
+        font-size: 11px;
+        color: var(--accent);
+        text-decoration: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 8px;
+        white-space: nowrap;
+      }
+      .pv-ext:hover {
+        background: var(--bg-subtle);
+        text-decoration: none;
+      }
+      iframe {
+        flex: 1;
+        border: none;
+        width: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sb" id="sb">
+      <div class="sb-top">
+        <span class="wm">html-artifacts</span>
+        <button class="ib" id="dmt" title="Toggle dark mode">◐</button>
+      </div>
+      <div class="sb-search">
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        >
+          <circle cx="5.5" cy="5.5" r="4" />
+          <line x1="9" y1="9" x2="13" y2="13" />
+        </svg>
+        <input
+          type="search"
+          id="q"
+          placeholder="Search examples…"
+          autocomplete="off"
+        />
+        <kbd>/</kbd>
+      </div>
+      <nav class="sb-nav" id="nav"></nav>
+      <div class="sb-foot">
+        <a href="../index.html" class="bl">← Grid view</a>
+        <span class="vl">
+          <a href="index-browser-a.html" class="cur">A</a>
+          <a href="index-browser-b.html">B</a>
+          <a href="index-browser-c.html">C</a>
+        </span>
+      </div>
+    </aside>
+
+    <div class="rh" id="rh"></div>
+
+    <div class="pv">
+      <div class="pv-bar">
+        <div class="pv-crumb">
+          <span>examples</span><span class="pv-sep">/</span
+          ><span class="pv-name" id="pn">approach-explorer</span>
+        </div>
+        <a
+          class="pv-ext"
+          id="po"
+          href="../examples/approach-explorer.html"
+          target="_blank"
+          >Open ↗</a
+        >
+      </div>
+      <iframe
+        id="fr"
+        src="../examples/approach-explorer.html"
+        title="Preview"
+      ></iframe>
+    </div>
+
+    <script>
+      var D = [
+        {
+          id: 'planning',
+          name: 'Planning',
+          c: '#2563eb',
+          items: [
+            { name: 'Product Brief', file: 'product-brief.html' },
+            { name: 'Comparison Board', file: 'comparison-board.html' },
+            { name: 'Approach Explorer', file: 'approach-explorer.html' },
+            { name: 'Feature Spec', file: 'feature-spec.html' },
+            { name: 'Milestone Plan', file: 'milestone-plan.html' },
+          ],
+        },
+        {
+          id: 'code',
+          name: 'Code',
+          c: '#7c3aed',
+          items: [
+            { name: 'Code Review', file: 'code-review.html' },
+            { name: 'Architecture Diagram', file: 'architecture-diagram.html' },
+            { name: 'Flowchart Diagram', file: 'flowchart-diagram.html' },
+            { name: 'Incident Report', file: 'incident-report.html' },
+          ],
+        },
+        {
+          id: 'reporting',
+          name: 'Reporting',
+          c: '#16a34a',
+          items: [
+            { name: 'Status Report', file: 'status-report.html' },
+            { name: 'Design Explorer', file: 'design-explorer.html' },
+            { name: 'Visual Designs', file: 'exploration-visual-designs.html' },
+          ],
+        },
+        {
+          id: 'proto',
+          name: 'Prototyping',
+          c: '#d97706',
+          items: [
+            {
+              name: 'Prototype: Interaction',
+              file: 'prototype-interaction.html',
+            },
+            { name: 'Prototype: Animation', file: 'prototype-animation.html' },
+            { name: 'Slide Deck', file: 'slide-deck.html' },
+          ],
+        },
+        {
+          id: 'docs',
+          name: 'Docs',
+          c: '#db2777',
+          items: [
+            { name: 'Research Explainer', file: 'research-explainer.html' },
+            { name: 'Editor Board', file: 'editor-board.html' },
+            { name: 'Feature Flags', file: 'editor-feature-flags.html' },
+          ],
+        },
+      ]
+
+      var cur = 'approach-explorer.html'
+      var fr = document.getElementById('fr')
+      var pn = document.getElementById('pn')
+      var po = document.getElementById('po')
+      var nav = document.getElementById('nav')
+      var q = document.getElementById('q')
+
+      function load(file, name) {
+        cur = file
+        fr.src = '../examples/' + file
+        pn.textContent = file.replace('.html', '')
+        po.href = '../examples/' + file
+        document.querySelectorAll('.ex-row').forEach(function (el) {
+          el.classList.toggle('on', el.dataset.f === file)
+        })
+        history.replaceState(null, '', '#' + file.replace('.html', ''))
+      }
+
+      function row(item, color) {
+        var el = document.createElement('div')
+        el.className = 'ex-row' + (item.file === cur ? ' on' : '')
+        el.dataset.f = item.file
+        var b = document.createElement('span')
+        b.className = 'ex-bullet'
+        b.style.background = color
+        var t = document.createElement('span')
+        t.className = 'ex-txt'
+        t.textContent = item.name
+        el.appendChild(b)
+        el.appendChild(t)
+        el.addEventListener('click', function () {
+          load(item.file, item.name)
+        })
+        return el
+      }
+
+      function render(query) {
+        nav.innerHTML = ''
+        var q2 = (query || '').toLowerCase().trim()
+        if (q2) {
+          var n = 0
+          D.forEach(function (cat) {
+            cat.items.forEach(function (item) {
+              if (item.name.toLowerCase().indexOf(q2) > -1) {
+                nav.appendChild(row(item, cat.c))
+                n++
+              }
+            })
+          })
+          if (!n) {
+            var m = document.createElement('div')
+            m.className = 'no-res'
+            m.textContent = 'No matches'
+            nav.appendChild(m)
+          }
+          return
+        }
+        D.forEach(function (cat) {
+          var hdr = document.createElement('div')
+          hdr.className = 'cat-hdr'
+          var lbl = document.createElement('div')
+          lbl.className = 'cat-lbl'
+          var b = document.createElement('span')
+          b.className = 'cat-bullet'
+          b.style.background = cat.c
+          var t = document.createElement('span')
+          t.textContent = cat.name
+          lbl.appendChild(b)
+          lbl.appendChild(t)
+          var n = document.createElement('span')
+          n.className = 'cat-n'
+          n.textContent = cat.items.length
+          hdr.appendChild(lbl)
+          hdr.appendChild(n)
+          nav.appendChild(hdr)
+          cat.items.forEach(function (item) {
+            nav.appendChild(row(item, cat.c))
+          })
+        })
+      }
+
+      render('')
+      q.addEventListener('input', function () {
+        render(q.value)
+      })
+      document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && document.activeElement !== q) {
+          e.preventDefault()
+          q.focus()
+          q.select()
+        }
+        if (e.key === 'Escape') {
+          q.value = ''
+          render('')
+          q.blur()
+        }
+      })
+
+      var hash = window.location.hash.slice(1)
+      if (hash) {
+        var hf = hash + '.html'
+        D.forEach(function (c) {
+          c.items.forEach(function (i) {
+            if (i.file === hf) load(i.file, i.name)
+          })
+        })
+      }
+
+      // Resize
+      var sb = document.getElementById('sb')
+      var rh = document.getElementById('rh')
+      var dragging = false
+      rh.addEventListener('mousedown', function () {
+        dragging = true
+        rh.classList.add('on')
+        document.body.style.cursor = 'col-resize'
+        document.body.style.userSelect = 'none'
+      })
+      document.addEventListener('mousemove', function (e) {
+        if (dragging)
+          sb.style.width = Math.max(180, Math.min(440, e.clientX)) + 'px'
+      })
+      document.addEventListener('mouseup', function () {
+        if (dragging) {
+          dragging = false
+          rh.classList.remove('on')
+          document.body.style.cursor = ''
+          document.body.style.userSelect = ''
+        }
+      })
+
+      // Dark mode
+      ;(function () {
+        var t =
+          localStorage.getItem('ha-theme') ||
+          (window.matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light')
+        if (t === 'dark') document.documentElement.classList.add('dark')
+        document.getElementById('dmt').addEventListener('click', function () {
+          var d = document.documentElement.classList.toggle('dark')
+          localStorage.setItem('ha-theme', d ? 'dark' : 'light')
+        })
+      })()
+    </script>
+  </body>
+</html>
