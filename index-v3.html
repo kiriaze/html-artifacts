@@ -829,7 +829,7 @@
     <div class="mech-banner">
       <span class="mech-tag">Option 3 — Fetch partials</span>
       <span class="mech-desc"
-        >Each variant is an isolated HTML fragment in <code>_parts/</code>. The
+        >Each variant is an isolated HTML fragment in <code>parts/</code>. The
         host page fetches and injects on demand. Authoring is isolated — drop a
         new file to add a variant.</span
       >
@@ -944,7 +944,7 @@
           document.querySelectorAll('.hero-fetch-btn').forEach(function (btn) {
             btn.classList.toggle('active', btn.dataset.variant === variant)
           })
-          loadPartial(heroSlot, heroStatus, '_parts/hero-' + variant + '.html')
+          loadPartial(heroSlot, heroStatus, 'parts/hero-' + variant + '.html')
         }
 
         function loadCards(layout) {
@@ -952,11 +952,7 @@
           document.querySelectorAll('.cards-fetch-btn').forEach(function (btn) {
             btn.classList.toggle('active', btn.dataset.layout === layout)
           })
-          loadPartial(
-            cardsSlot,
-            cardsStatus,
-            '_parts/cards-' + layout + '.html',
-          )
+          loadPartial(cardsSlot, cardsStatus, 'parts/cards-' + layout + '.html')
         }
 
         // Wire buttons
